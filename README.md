@@ -1,3 +1,3 @@
 # identifi-angular
 
-Angular UI that uses the Identifi API.
+Angular app that connects to the Identifi API.
