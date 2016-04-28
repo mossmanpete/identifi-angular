@@ -1,0 +1,230 @@
+<div>
+  <acme-navbar></acme-navbar>
+</div>
+<div class="container">
+  <div ng-controller="IdentifiersController">
+    <section class="cover-container">
+      <div class="cover" parallax-background parallax-ratio="-0.2" ng-style="coverPhoto"></div>
+      <div class="container hidden-xs hidden-sm">
+        <div class="heading-row row">
+          <div class="col-md-8 col-md-offset-3">
+            <h4>
+              <span ng-bind="idValue" id="id-value"></span>
+              <small class="text-muted">
+                <span ng-hide="idType === 'url'" ng-bind="idType" id="id-type"></span>
+                <a ng-href="{{idValue}}" ng-show="idType === 'url'" ng-bind="idType" id="id-type"></a>
+              </small>
+            </h4>
+            <div ng-if="isUniqueType && hasQuickContacts" class="pull-right quick-contact">
+              <a ng-repeat="id in connections" ng-if="id.quickContact" class="btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span>&nbsp;</a>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-9 col-md-offset-3">
+            <ul class="list-inline tab-list">
+              <li ng-if="isUniqueType">
+                <a href="" ng-class="{ active: tabs[0].active }" ng-click="tabs[0].active = true"><span class="glyphicon glyphicon-download"></span> <span class="hidden-xs">Received </span>({{0+overview.receivedPositive+overview.receivedNeutral+overview.receivedNegative}})</a>
+              </li>
+              <li ng-if="isUniqueType">
+                <a href="" ng-class="{ active: tabs[1].active }" ng-click="tabs[1].active = true"><span class="glyphicon glyphicon-upload"></span> <span class="hidden-xs">Sent </span>({{0+overview.authoredPositive+overview.authoredNeutral+overview.authoredNegative}})</a>
+              </li>
+              <li>
+                <a href="" ng-class="{ active: tabs[2].active }" ng-click="tabs[2].active = true"><span class="fa fa-book"></span> <span class="hidden-xs">Identity </span>(<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved">0</span>)</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section ng-init="findOne()">
+      <div class="row">
+        <div class="col-md-3 id-left-column">
+        <div ng-if="isUniqueType" class="panel panel-default">
+        <div class="panel-body">
+          <p class="hidden-md hidden-lg" ng-hide="!overview.name">
+            <span ng-bind="idValue" id="id-value"></span>
+            <small class="text-muted">
+              <span ng-hide="idType === 'url'" ng-bind="idType" id="id-type"></span>
+              <a ng-href="{{idValue}}" ng-show="idType === 'url'" ng-bind="idType" id="id-type"></a>
+            </small>
+          </p>
+          <div class="stats-box">
+            <div class="row">
+              <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
+                <p>
+                  <a ng-href="" data-toggle="tooltip" data-placement="right"><img ng-src="{{profilePhotoUrl}}" width="230" height="230" class="img-thumbnail mar-right5"></a>
+                </p>
+              </div>
+              <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
+                <h4><span ng-if="info.name||info.nickname" ng-bind="info.name||info.nickname||idValue"></span><span ng-hide="!info.nickname || !info.name || info.nickname === info.name"> (<span class="text-muted" ng-bind="info.nickname"></span>)</span></h4>
+                <p class="received-stats">
+                  <div><strong>Received</strong></div>
+                  <div>
+                    <strong>
+                      <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="overview.receivedPositive">-</span></span>
+                      <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="overview.receivedNeutral">-</span></span>
+                      <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="overview.receivedNegative">-</span></span>
+                    </strong>
+                  </div>
+                </p>
+                <p>
+                  <div>Sent</div>
+                  <div>
+                    <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="overview.authoredPositive">-</span></span>
+                    <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="overview.authoredNeutral">-</span></span>
+                    <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="overview.authoredNegative">-</span></span>
+                  </div>
+                </p>
+                <div class="hidden-xs">
+                  <p class="hidden-xs">
+                    <div>First seen</div>
+                    <div><span ng-if="overview.firstSeen" ng-bind="overview.firstSeen*1000|date:'mediumDate'"></span><span ng-if="!overview.firstSeen">-</span></div>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="isUniqueType && hasQuickContacts" class="visible-xs visible-sm panel quick-contact">
+        <a ng-repeat="id in connections" ng-if="id.quickContact" class="btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span>&nbsp;</a>
+      </div>
+      <div ng-if="isUniqueType && trustpaths.length > 0 && !(idType === filters.viewpointType && idValue === filters.viewpointValue)" class="panel panel-default">
+        <div class="panel-body">
+          <ul ng-repeat="level in trustpaths" class="trustpath-list list-unstyled">
+            <li ng-repeat-start="id in level" ng-if="!$parent.$last && ($index < 3 || collapseLevel[$parent.$index])">
+              <a class="id-link" ng-href="/id/{{id[0]|escape}}/{{id[1]|escape}}" title=""><img alt="" src="https://www.gravatar.com/avatar/{{id.gravatar}}?d=retro&amp;s=30" class="mar-bot5 img-rounded mar-right10"><span ng-bind="id.name.name || id[1]"></span></a>
+            </li>
+            <li class="mar-bot5" ng-if="level.length > 3 && $index === 2">
+              <a href="" ng-click="collapseLevel[$parent.$index] = !collapseLevel[$parent.$index]">{{level.length - 3}} more</a>
+            </li>
+            <li ng-if="$last && !$parent.$last" class="has-success" ng-repeat-end>
+              <span class="positive mar-left5 mar-bot10 glyphicon glyphicon-thumbs-up"></span>
+            </li>
+            <li ng-if="$last">
+              <a class="id-link" ng-href="/id/{{idType|escape}}/{{idValue|escape}}" title=""><img alt="" src="https://www.gravatar.com/avatar/{{gravatar}}?d=retro&amp;s=30" class="mar-bot5 img-rounded mar-right10"><span ng-bind="info.name || info.nickname || idValue"></span></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+        <div ng-include="'app/messages/filters.partial.html'"></div>
+
+        </div>
+        <div class="col-md-8 id-right-column">
+          <!-- Nav tabs -->
+          <uib-tabset>
+            <uib-tab active="tabs[0].active" ng-if="isUniqueType">
+              <uib-tab-heading><span class="glyphicon glyphicon-download"></span> <span class="hidden-xs">Received </span>({{0+overview.receivedPositive+overview.receivedNeutral+overview.receivedNegative}})</uib-tab-heading>
+
+              <div ng-show="authentication.user" class="panel panel-default panel-success">
+                <div class="panel-heading visible-xs">
+                    <h3 class="panel-title"><a data-toggle="collapse" data-target="#write-feedback"><span class="glyphicon glyphicon-chevron-down"></span> Write feedback</a></h3>
+                </div>
+                <div class="panel-body collapse in" id="write-feedback">
+                  <form ng-controller="MessagesController" ng-submit="create($event, { type: 'rating', rating: newMessage.rating, comment: newMessage.comment })">
+                    <div class="form-group">
+                      <textarea name="comment" class="form-control" id="comment" ng-model="newMessage.comment" placeholder="Write feedback"></textarea>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm-10 col-xs-12 rating-slider" id="write-msg-slider">
+                        <slider ng-model="newMessage.rating" tooltip="hide" min="-3" max="3" step="1"></slider>
+                        <span class="hidden-xs write-msg-icons mar-left5">
+                          <span ng-repeat="i in iconCount(newMessage.rating) track by $index" class="write-msg-icon glyphicon glyphicon-thumbs-up mar-left5" ng-class="[iconStyle(newMessage.rating), iconClass(newMessage.rating)]"></span>
+                        </span>
+                      </div>
+                      <div class="col-sm-2 col-xs-12" style="text-align:right">
+                        <span class="visible-xs pull-left write-msg-icons">
+                          <span ng-repeat="i in iconCount(newMessage.rating) track by $index" class="write-msg-icon glyphicon glyphicon-thumbs-up mar-left5" ng-class="[iconStyle(newMessage.rating), iconClass(newMessage.rating)]"></span>
+                        </span>
+                        <button type="submit" class="pull-right ladda-button btn btn-primary" data-style="zoom-out"><span class="ladda-label"><span class="fa fa-edit"></span> Publish</span><span class="ladda-spinner"></span></button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div ng-if="received.$resolved && received.length == 0" class="alert alert-info text-center animated fadeIn">No messages to show</div>
+              <div infinite-scroll="getReceivedMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!received.$resolved || received.finished || !tabs[0].active">
+                <div ng-repeat="msg in received" ng-include="'modules/messages/views/message.partial.html'"></div>
+              </div>
+              <div ng-if="!received.$resolved" style="position:relative;padding:20px" us-spinner></div>
+            </uib-tab>
+            <uib-tab active="tabs[1].active" ng-if="isUniqueType">
+              <uib-tab-heading><span class="glyphicon glyphicon-upload"></span> <span class="hidden-xs">Sent </span>({{0+overview.authoredPositive+overview.authoredNeutral+overview.authoredNegative}})</uib-tab-heading>
+              <div ng-if="sent.$resolved && sent.length == 0" class="alert alert-info text-center animated fadeIn">No messages to show</div>
+              <div infinite-scroll="getSentMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!sent.$resolved || sent.finished || !tabs[1].active">
+                <div ng-repeat="msg in sent" ng-include="'modules/messages/views/message.partial.html'"></div>
+              </div>
+              <div ng-if="!sent.$resolved" style="position:relative;padding:20px" us-spinner></div>
+            </uib-tab>
+            <uib-tab active="tabs[2].active" ng-if="true">
+                <uib-tab-heading><span class="fa fa-book"></span> <span class="hidden-xs">Identity </span>(<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved"></span>)</uib-tab-heading>
+                <div id="connections">
+                  <input id="authenticity_token" name="authenticity_token" type="hidden" value="z1JM7ffnFK7gOv6S3yzG9UFyakukYHikAU94/3TcT2o=">    <uib-table class="table truncated-table table-hover">
+                    <tbody>
+                      <tr ng-repeat-start="id in connections" ng-if="!id.isCurrent" style="{{id.rowStyle}}" ng-class="id.rowClass" ng-click="connectionClicked($event, id)" class="id-row">
+                        <td>
+                          <a ng-if="id.iconStyle&&id.link" class="pull-left btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span></a>
+                          <span ng-if="id.iconStyle&&!id.link" class="pull-left btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span></a>
+                          <span class="visible-xs pull-right">
+                            <button autocomplete="off" ng-controller="MessagesController" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'confirm_connection', recipientType: idType, recipientValue: idValue, recipientType2: id.type, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
+                            <button autocomplete="off" ng-controller="MessagesController" name="refute" class="ladda-button btn btn-default btn-refute" ng-click="create($event, { type: 'refute_connection', recipientType: idType, recipientValue: idValue, recipientType2: id.type, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
+                          </span>
+                        </td>
+                        <td colspan="3">
+                          <a ng-href="/id/{{id.type|escape}}/{{id.value|escape}}" data-id-type="{{id.type}}" data-id-value="{{id.value}}" ng-bind="id.value" class="id-link"></a><br>
+                          <small ng-bind="id.type"></small>
+                        </td>
+                        <!--<td>
+                          <input class="form-control linkedComment" type="text" placeholder="comment" disabled>
+                        </td>-->
+                        <td class="hidden-xs">
+                          <button autocomplete="off" ng-controller="MessagesController" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'confirm_connection', recipientType: idType, recipientValue: idValue, recipientType2: id.type, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
+                          <button autocomplete="off" ng-controller="MessagesController" name="refute" class="ladda-button btn btn-default btn-refute" ng-click="create($event, { type: 'refute_connection', recipientType: idType, recipientValue: idValue, recipientType2: id.type, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
+                        </td>
+                      </tr>
+                      <tr ng-repeat-end uib-collapse="!id.collapse" ng-if="!id.isCurrent" class="active connectingmsgs">
+                        <td class="connectingmsgs ladda-button" data-style="zoom-in" data-spinner-color="#000" colspan="5">
+                          <div ng-repeat="msg in id.connectingmsgs" class="animated fadeIn confirmation-panel">
+                            <span class="has-success">
+                              <span ng-if="msg.data.signedData.type === 'confirm_connection'">
+                                <span class="positive glyphicon glyphicon-ok hidden-xs mar-left5 pull-right"></span>
+                                <span class="positive glyphicon glyphicon-ok visible-xs mar-right10"></span>
+                              </span>
+                              <span ng-if="msg.data.signedData.type === 'refute_connection'">
+                                <span class="negative glyphicon glyphicon-remove hidden-xs mar-left5 pull-right"></span>
+                                <span class="negative glyphicon glyphicon-remove visible-xs mar-right10"></span>
+                              </span>
+                              <strong>
+                                <a ng-href="/id/{{msg.linkToAuthor[0]|escape}}/{{msg.linkToAuthor[1]|escape}}" class="id-link">
+                                  <img alt="" src="https://www.gravatar.com/avatar/{{msg.gravatar}}?d=retro&amp;s=30" class="img-rounded mar-right5">
+                                  <span ng-bind="msg.authorName||msg.data.signedData.author[0][1]"></span>
+                                </a>
+                              </strong>
+                               - <a ng-href="/messages/{{msg.hash}}" ng-bind="msg.data.signedData.timestamp*1000|date:'mediumDate'" class="text-muted small" style="display:inline-block;"></a>
+
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="active add-row" ng-controller="MessagesController">
+                        <td colspan="3"><input id="addValue" ng-model="newConnection.value" class="form-control" name="linkedValue" type="text" placeholder="value" ng-disabled="!authentication.user"></td>
+                        <td><input id="addType" ng-model="newConnection.type" class="form-control" name="linkedType" type="text" placeholder="type" ng-disabled="!authentication.user"></td>
+                        <!--<td><input id="addComment" class="form-control" name="linkedComment" type="text" placeholder="comment" disabled></td> -->
+                        <td><button autocomplete="off" id="addButton" ng-click="create($event, { type: 'confirm_connection', recipientType: idType, recipientValue: idValue, recipientType2: newConnection.type, recipientValue2: newConnection.value }, { confirmations: 0, refutations: 0, type: newConnection.type, value: newConnection.value })" class="ladda-button btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user"><span class="ladda-label"><span class="glyphicon glyphicon-plus"></span> Add</span><span class="ladda-spinner"></span></button></td>
+                      </tr>
+                  </tbody>
+                </uib-table>
+              </div>
+              <div ng-if="!connections.$resolved" style="position:relative;padding:20px" us-spinner></div>
+            </uib-tab>
+          </uib-tabset>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

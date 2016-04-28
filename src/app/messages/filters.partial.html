@@ -1,0 +1,30 @@
+<div class="panel panel-default">
+  <div class="panel-heading visible-xs visible-sm" ng-click="collapseFilters = !collapseFilters">
+    <h4 class="panel-title"><a><span class="fa fa-filter"></span> Filters</a></h4></div>
+  <div class="panel-body filters" uib-collapse="collapseFilters">
+    <ul class="nav nav-pills nav-stacked msg-type-filter">
+      <li ng-class="{active: (filters.msgType === '') }" ng-click="setFilters({ msgType: '' })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
+      <li ng-class="{active: (filters.msgType === 'rating') }" ng-click="setFilters({msgType: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
+      <ul class="nav nav-pills nav-stacked" style="padding-left: 1em;">
+        <li ng-class="{active: (filters.msgType === 'rating/positive') }" ng-click="setFilters({msgType: 'rating/positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> Positive</span></a></li>
+        <li ng-class="{active: (filters.msgType === 'rating/neutral') }" ng-click="setFilters({msgType: 'rating/neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> Neutral</span></a></li>
+        <li ng-class="{active: (filters.msgType === 'rating/negative') }" ng-click="setFilters({msgType: 'rating/negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> Negative</span></a></li>
+      </ul>
+      <li ng-class="{active: (filters.msgType === 'confirm_connection') }" ng-click="setFilters({msgType:'confirm_connection'})"><a><span class="glyphicon glyphicon-ok"></span> Connection</a></li>
+      <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
+    </ul>
+    <div class="alert alert-info">
+      <p>Viewing as
+        <a href="#/id/{{viewpoint.viewpointType|escape}}/{{viewpoint.viewpointValue|escape}}" data-id-type="keyID" data-id-value="1DqrzTcimQp3Ye88oHgxdU7DBTsM2TRYFj" class="id-link" ng-bind="viewpoint.viewpointName"></a>
+      </p>
+      <p>Max distance from viewpoint:</p>
+      <div class="btn-group trust-distance-selector">
+        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: -1})" ng-class="{active: filters.maxDistance === -1}">✕</button>
+        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: 1})" ng-class="{active: filters.maxDistance === 1}">1</button>
+        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: 2})" ng-class="{active: filters.maxDistance === 2}">2</button>
+        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: 3})" ng-class="{active: filters.maxDistance === 3}">3</button>
+        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: 0})" ng-class="{active: filters.maxDistance === 0}">∞</button>
+      </div>
+    </div>
+  </div>
+</div>

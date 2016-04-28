@@ -1,3 +1,19 @@
 angular.module 'identifiAngular',
   ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages',
-  'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr']
+  'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr',
+  'angular-toArrayFilter']
+
+angular.module('identifiAngular').filter 'escape', [ ->
+  (input) ->
+    encodeURIComponent encodeURIComponent(input)
+ ]
+angular.module('identifiAngular').filter 'encodeURIComponent', [ ->
+  (input) ->
+    encodeURIComponent input
+ ]
+
+angular.module('identifiAngular').filter 'highlight', ($sce) ->
+  (text, phrase) ->
+    if phrase
+      text = text.replace(new RegExp('(' + phrase + ')', 'gi'), '<b>$1</b>')
+    $sce.trustAsHtml text

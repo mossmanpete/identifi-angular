@@ -1,0 +1,52 @@
+<div>
+  <acme-navbar></acme-navbar>
+</div>
+<div class="container">
+  <section ng-init="search()" ng-controller="IdentifiersController">
+    <div class="mar-top60-xs"></div>
+    <div ng-if="!queryTerm && !authentication.user" class="jumbotron">
+      <div class="align-center"><h1>Global address book</h1></div>
+
+      <div class="row">
+        <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-link fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-link"></i> Keep your contacts and trusted online identity up-to-date.</p></div></div>
+        <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-thumbs-up fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-thumbs-up"></i> Find out who said what about a person or an organization.</p></div></div>
+        <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-check fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-check"></i> Show content from trusted and real identities only.</p></div></div>
+      </div>
+    </div>
+
+    <table id="search-results" class="table table-hover">
+      <tbody>
+        <tr ng-repeat="result in identifiers | toArray:false | filter:queryTerm" id="result{{$index}}" ng-click="resultClicked(result)" class="search-result-row" ng-class="{active: result.active}">
+          <td class="gravatar-col"><img alt="" class="img-circle" height="45" width="45" src="https://www.gravatar.com/avatar/{{result.gravatar}}?d=retro&amp;s=90"></td>
+          <td><a ng-bind-html="result.name|highlight:queryTerm" ng-href="#/id/{{result.linkTo.type|encodeURIComponent}}/{{result.linkTo.value|encodeURIComponent}}"></a>
+            <small ng-if="!result.name" class="list-group-item-text">
+              <span ng-bind-html="result[0][0]|highlight:queryTerm"></span>
+            </small><br>
+            <small>
+              <span ng-if="result.nickname" ng-bind-html="result.nickname|highlight:queryTerm" class="mar-right10"></span>
+              <span ng-if="result.email" class="mar-right10">
+                <span class="glyphicon glyphicon-envelope"></span> <span ng-bind-html="result.email|highlight:queryTerm"></span>
+              </span>
+              <span ng-if="result.facebook" class="mar-right10">
+                <span class="fa fa-facebook"></span> <span ng-bind-html="result.facebook|highlight:queryTerm"></span>
+              </span>
+              <span ng-if="result.twitter" class="mar-right10">
+                <span class="fa fa-twitter"></span> <span ng-bind-html="result.twitter|highlight:queryTerm"></span>
+              </span>
+              <span ng-if="result.googlePlus" class="mar-right10">
+                <span class="fa fa-google-plus"></span> <span ng-bind-html="result.googlePlus|highlight:queryTerm"></span>
+              </span>
+              <span ng-if="result.bitcoin" class="mar-right10">
+                <span class="fa fa-bitcoin"></span> <span ng-bind-html="result.bitcoin|highlight:queryTerm"></span>
+              </span>
+            </small>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="alert alert-info text-center" ng-hide="!identifiers.$resolved || identifiers.length">
+      No results
+    </div>
+  </section>
+
+</div>

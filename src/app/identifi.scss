@@ -1152,6 +1152,11 @@ h1 {
   transition: all 500ms;
   -webkit-transition: all 500ms;
   word-wrap: break-word;
+
+	.gravatar {
+		outline: 1px solid rgba(0,0,0,0.1);
+		outline-offset: -1px;
+	}
 }
 
 .rating-slider .slider {
