@@ -1,0 +1,53 @@
+<section ng-controller="MessagesController" ng-init="findOne()">
+  <div class="col-md-8 col-md-offset-2">
+    <h4 ng-bind="message.data.signedData.timestamp*1000|date:'medium'"></h4>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              <img alt="" src="https://www.gravatar.com/avatar/{{message.authorGravatar}}?d=retro&amp;s=30" class="img-rounded mar-bot5 mar-right5">
+              <span ng-bind="message.authorName"></span>
+              <span class="glyphicon glyphicon-play"></span>
+            </h3>
+          </div>
+          <div class="panel-body">
+            <ul class="list list-unstyled">
+              <li ng-repeat="id in message.data.signedData.author"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ng-href="/id/{{id[0]}}/{{id[1]|escape}}" data-original-title="" title=""></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              <img alt="" src="https://www.gravatar.com/avatar/{{message.recipientGravatar}}?d=retro&amp;s=30" class="img-rounded mar-bot5 mar-right5">
+              <span ng-bind="message.recipientName"></span>
+              <span class="glyphicon glyphicon-play"></span>
+            </h3>
+          </div>
+          <div class="panel-body">
+            <ul class="list list-unstyled">
+              <li ng-repeat="id in message.data.signedData.recipient"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ng-href="/id/{{id[0]|escape}}/{{id[1]|escape}}" data-original-title="" title=""></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title" ng-bind="message.data.signedData.type"></h3>
+      </div>
+      <div class="panel-body">
+        <p ng-if="message.data.signedData.rating"><strong>Score:</strong> <span ng-bind="message.data.signedData.rating"></span>
+          <small>(<span ng-bind="message.data.signedData.minRating"></span>...<span ng-bind="message.data.signedData.maxRating"></span>)</small>
+        </p>
+        <p ng-if="message.data.signedData.comment"><strong>Comment:</strong> <span ng-bind="message.data.signedData.comment"></span></p>
+      </div>
+    </div>
+    <p>Message origin verified by: <a ng-bind="message.signerName||message.signatureDetails.signerKeyID" ng-href="/id/keyID/{{message.signatureDetails.signerKeyID}}"></a></p>
+    <p><button class="btn btn-default" ng-click="collapseRawData = !collapseRawData">Show raw data</button></p>
+    <pre collapse="!collapseRawData" ng-bind="message.strData"></pre>
+  </div>
+</section>

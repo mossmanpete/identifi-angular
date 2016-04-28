@@ -3,13 +3,13 @@ angular.module 'identifiAngular'
     'ngInject'
     $stateProvider
       .state 'identifiers',
-        url: '/'
+        url: ''
         templateUrl: 'app/identifiers/list.html'
         controller: 'IdentifiersController'
         controllerAs: 'identifiers'
       .state 'identifiers.show',
         url: '/id/:type/:value'
-        templateUrl: 'app/identifiers/identifier.html'
+        templateUrl: 'app/identifiers/show.html'
         controller: 'IdentifiersController'
         controllerAs: 'identifiers'
       .state 'messages',
@@ -18,7 +18,7 @@ angular.module 'identifiAngular'
         controller: 'MessagesController'
         controllerAs: 'messages'
       .state 'messages.show',
-        url: '/messages/:id'
+        url: '/:id'
         templateUrl: 'app/messages/show.html'
         controller: 'MessagesController'
         controllerAs: 'messages'
