@@ -171,11 +171,6 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         return
       return
 
-    $scope.resultClicked = (result) ->
-      if result and result.linkTo
-        $location.path '/id/' + encodeURIComponent(result.linkTo.type) + '/' + encodeURIComponent(result.linkTo.value)
-      return
-
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
       if args.message.data.signedData.type == 'confirm_connection'

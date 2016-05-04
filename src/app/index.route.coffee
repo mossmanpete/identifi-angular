@@ -4,6 +4,10 @@ angular.module 'identifiAngular'
     $stateProvider
       .state 'identifiers',
         url: ''
+        template: "<ui-view/>"
+        abstract: true
+      .state 'identifiers.list',
+        url: ''
         templateUrl: 'app/identifiers/list.html'
         controller: 'IdentifiersController'
         controllerAs: 'identifiers'
@@ -14,6 +18,10 @@ angular.module 'identifiAngular'
         controllerAs: 'identifiers'
       .state 'messages',
         url: '/messages'
+        template: "<ui-view/>"
+        abstract: true
+      .state 'messages.list',
+        url: ''
         templateUrl: 'app/messages/list.html'
         controller: 'MessagesController'
         controllerAs: 'messages'
