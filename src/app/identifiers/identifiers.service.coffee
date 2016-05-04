@@ -22,8 +22,12 @@ angular.module('identifiAngular').factory 'Identifiers', [
       getname:
         action: 'GET'
         params: method: 'getname'
-      connectingmsgs:
+      connecting_msgs:
         action: 'GET'
-        params: method: 'connectingmsgs'
+        params: method: 'connecting_msgs'
+        isArray: true
+      stats:
+        action: 'GET'
+        params: method: 'stats'
         isArray: true
 ]

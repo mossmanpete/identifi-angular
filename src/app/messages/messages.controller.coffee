@@ -10,8 +10,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
   'Messages'
   ($scope, $rootScope, $window, $stateParams, $location, Messages) -> #, Authentication
     $scope.authentication = {} # Authentication
-    $scope.idType = decodeURIComponent($stateParams.idType)
-    $scope.idValue = decodeURIComponent($stateParams.idValue)
+    $scope.idType = $stateParams.idType
+    $scope.idValue = $stateParams.idValue
     $scope.messages = []
     $scope.newMessage =
       type: 'rating'
@@ -174,11 +174,13 @@ angular.module('identifiAngular').controller 'MessagesController', [
     # Find existing Message
 
     $scope.findOne = ->
-      $scope.message = Messages.get({ messageId: $stateParams.messageId }, ->
+      $scope.message = Messages.query({ messageId: $stateParams.messageId, isArray: true }, ->
         $rootScope.pageTitle = ' - Message ' + $stateParams.messageId
-        $scope.message.strData = JSON.stringify($scope.message.data, undefined, 2)
-        $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
-        $scope.message.recipientGravatar = CryptoJS.MD5($scope.message.recipientEmail or $scope.message.data.recipient[0][1]).toString()
+        $scope.message[0].data = KJUR.jws.JWS.parse($scope.message[0].jws).payloadObj
+        console.log $scope.message[0]
+        $scope.message[0].strData = JSON.stringify($scope.message[0].data, undefined, 2)
+        $scope.message[0].authorGravatar = CryptoJS.MD5($scope.message[0].authorEmail or $scope.message[0].data.author[0][1]).toString()
+        $scope.message[0].recipientGravatar = CryptoJS.MD5($scope.message[0].recipientEmail or $scope.message[0].data.recipient[0][1]).toString()
         return
       )
       return

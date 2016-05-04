@@ -21,10 +21,10 @@
           <div class="col-md-9 col-md-offset-3">
             <ul class="list-inline tab-list">
               <li ng-if="isUniqueType">
-                <a href="" ng-class="{ active: tabs[0].active }" ng-click="tabs[0].active = true"><span class="glyphicon glyphicon-download"></span> <span class="hidden-xs">Received </span>({{0+overview.receivedPositive+overview.receivedNeutral+overview.receivedNegative}})</a>
+                <a href="" ng-class="{ active: tabs[0].active }" ng-click="tabs[0].active = true"><span class="glyphicon glyphicon-download"></span> <span class="hidden-xs">Received </span>({{0+stats[0].receivedPositive+stats[0].receivedNeutral+stats[0].receivedNegative}})</a>
               </li>
               <li ng-if="isUniqueType">
-                <a href="" ng-class="{ active: tabs[1].active }" ng-click="tabs[1].active = true"><span class="glyphicon glyphicon-upload"></span> <span class="hidden-xs">Sent </span>({{0+overview.authoredPositive+overview.authoredNeutral+overview.authoredNegative}})</a>
+                <a href="" ng-class="{ active: tabs[1].active }" ng-click="tabs[1].active = true"><span class="glyphicon glyphicon-upload"></span> <span class="hidden-xs">Sent </span>({{0+stats[0].sentPositive+stats[0].sentNeutral+stats[0].sentNegative}})</a>
               </li>
               <li>
                 <a href="" ng-class="{ active: tabs[2].active }" ng-click="tabs[2].active = true"><span class="fa fa-book"></span> <span class="hidden-xs">Identity </span>(<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved">0</span>)</a>
@@ -39,7 +39,7 @@
         <div class="col-md-3 id-left-column">
         <div ng-if="isUniqueType" class="panel panel-default">
         <div class="panel-body">
-          <p class="hidden-md hidden-lg" ng-hide="!overview.name">
+          <p class="hidden-md hidden-lg" ng-hide="!stats[0].name">
             <span ng-bind="idValue" id="id-value"></span>
             <small class="text-muted">
               <span ng-hide="idType === 'url'" ng-bind="idType" id="id-type"></span>
@@ -59,24 +59,24 @@
                   <div><strong>Received</strong></div>
                   <div>
                     <strong>
-                      <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="overview.receivedPositive">-</span></span>
-                      <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="overview.receivedNeutral">-</span></span>
-                      <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="overview.receivedNegative">-</span></span>
+                      <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="stats[0].receivedPositive">-</span></span>
+                      <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="stats[0].receivedNeutral">-</span></span>
+                      <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="stats[0].receivedNegative">-</span></span>
                     </strong>
                   </div>
                 </p>
                 <p>
                   <div>Sent</div>
                   <div>
-                    <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="overview.authoredPositive">-</span></span>
-                    <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="overview.authoredNeutral">-</span></span>
-                    <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="overview.authoredNegative">-</span></span>
+                    <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="stats[0].sentPositive">-</span></span>
+                    <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="stats[0].sentNeutral">-</span></span>
+                    <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="stats[0].sentNegative">-</span></span>
                   </div>
                 </p>
                 <div class="hidden-xs">
                   <p class="hidden-xs">
                     <div>First seen</div>
-                    <div><span ng-if="overview.firstSeen" ng-bind="overview.firstSeen*1000|date:'mediumDate'"></span><span ng-if="!overview.firstSeen">-</span></div>
+                    <div><span ng-if="stats[0].firstSeen" ng-bind="stats[0].firstSeen|date:'mediumDate'"></span><span ng-if="!stats[0].firstSeen">-</span></div>
                   </p>
                 </div>
               </div>
@@ -114,7 +114,7 @@
           <!-- Nav tabs -->
           <uib-tabset>
             <uib-tab active="tabs[0].active" ng-if="isUniqueType">
-              <uib-tab-heading><span class="glyphicon glyphicon-download"></span> <span class="hidden-xs">Received </span>({{0+overview.receivedPositive+overview.receivedNeutral+overview.receivedNegative}})</uib-tab-heading>
+              <uib-tab-heading><span class="glyphicon glyphicon-download"></span> <span class="hidden-xs">Received </span>({{0+stats[0].receivedPositive+stats[0].receivedNeutral+stats[0].receivedNegative}})</uib-tab-heading>
 
               <div ng-show="authentication.user" class="panel panel-default panel-success">
                 <div class="panel-heading visible-xs">
@@ -128,7 +128,7 @@
 
                     <div class="row">
                       <div class="col-sm-10 col-xs-12 rating-slider" id="write-msg-slider">
-                        <slider ng-model="newMessage.rating" tooltip="hide" min="-3" max="3" step="1"></slider>
+                        <slider ng-model="newMessage.rating" uib-tooltip="hide" min="-3" max="3" step="1"></slider>
                         <span class="hidden-xs write-msg-icons mar-left5">
                           <span ng-repeat="i in iconCount(newMessage.rating) track by $index" class="write-msg-icon glyphicon glyphicon-thumbs-up mar-left5" ng-class="[iconStyle(newMessage.rating), iconClass(newMessage.rating)]"></span>
                         </span>
@@ -146,22 +146,23 @@
 
               <div ng-if="received.$resolved && received.length == 0" class="alert alert-info text-center animated fadeIn">No messages to show</div>
               <div infinite-scroll="getReceivedMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!received.$resolved || received.finished || !tabs[0].active">
-                <div ng-repeat="msg in received" ng-include="'modules/messages/views/message.partial.html'"></div>
+                <div ng-repeat="msg in received" ng-include="'app/messages/message.partial.html'"></div>
               </div>
               <div ng-if="!received.$resolved" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
             <uib-tab active="tabs[1].active" ng-if="isUniqueType">
-              <uib-tab-heading><span class="glyphicon glyphicon-upload"></span> <span class="hidden-xs">Sent </span>({{0+overview.authoredPositive+overview.authoredNeutral+overview.authoredNegative}})</uib-tab-heading>
+              <uib-tab-heading><span class="glyphicon glyphicon-upload"></span> <span class="hidden-xs">Sent </span>({{0+stats[0].sentPositive+stats[0].sentNeutral+stats[0].sentNegative}})</uib-tab-heading>
               <div ng-if="sent.$resolved && sent.length == 0" class="alert alert-info text-center animated fadeIn">No messages to show</div>
               <div infinite-scroll="getSentMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!sent.$resolved || sent.finished || !tabs[1].active">
-                <div ng-repeat="msg in sent" ng-include="'modules/messages/views/message.partial.html'"></div>
+                <div ng-repeat="msg in sent" ng-include="'app/messages/message.partial.html'"></div>
               </div>
               <div ng-if="!sent.$resolved" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
             <uib-tab active="tabs[2].active" ng-if="true">
                 <uib-tab-heading><span class="fa fa-book"></span> <span class="hidden-xs">Identity </span>(<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved"></span>)</uib-tab-heading>
                 <div id="connections">
-                  <input id="authenticity_token" name="authenticity_token" type="hidden" value="z1JM7ffnFK7gOv6S3yzG9UFyakukYHikAU94/3TcT2o=">    <uib-table class="table truncated-table table-hover">
+                  <!-- <input id="authenticity_token" name="authenticity_token" type="hidden" value="z1JM7ffnFK7gOv6S3yzG9UFyakukYHikAU94/3TcT2o="> -->
+                  <table class="table truncated-table table-hover">
                     <tbody>
                       <tr ng-repeat-start="id in connections" ng-if="!id.isCurrent" style="{{id.rowStyle}}" ng-class="id.rowClass" ng-click="connectionClicked($event, id)" class="id-row">
                         <td>
@@ -186,23 +187,23 @@
                       </tr>
                       <tr ng-repeat-end uib-collapse="!id.collapse" ng-if="!id.isCurrent" class="active connectingmsgs">
                         <td class="connectingmsgs ladda-button" data-style="zoom-in" data-spinner-color="#000" colspan="5">
-                          <div ng-repeat="msg in id.connectingmsgs" class="animated fadeIn confirmation-panel">
+                          <div ng-repeat="msg in id.connecting_msgs" class="animated fadeIn confirmation-panel">
                             <span class="has-success">
-                              <span ng-if="msg.data.signedData.type === 'confirm_connection'">
+                              <span ng-if="msg.data.type === 'confirm_connection'">
                                 <span class="positive glyphicon glyphicon-ok hidden-xs mar-left5 pull-right"></span>
                                 <span class="positive glyphicon glyphicon-ok visible-xs mar-right10"></span>
                               </span>
-                              <span ng-if="msg.data.signedData.type === 'refute_connection'">
+                              <span ng-if="msg.data.type === 'refute_connection'">
                                 <span class="negative glyphicon glyphicon-remove hidden-xs mar-left5 pull-right"></span>
                                 <span class="negative glyphicon glyphicon-remove visible-xs mar-right10"></span>
                               </span>
                               <strong>
                                 <a ng-href="/id/{{msg.linkToAuthor[0]|escape}}/{{msg.linkToAuthor[1]|escape}}" class="id-link">
                                   <img alt="" src="https://www.gravatar.com/avatar/{{msg.gravatar}}?d=retro&amp;s=30" class="img-rounded mar-right5">
-                                  <span ng-bind="msg.authorName||msg.data.signedData.author[0][1]"></span>
+                                  <span ng-bind="msg.authorName||msg.data.author[0][1]"></span>
                                 </a>
                               </strong>
-                               - <a ng-href="/messages/{{msg.hash}}" ng-bind="msg.data.signedData.timestamp*1000|date:'mediumDate'" class="text-muted small" style="display:inline-block;"></a>
+                               - <a ng-href="/messages/{{msg.hash}}" ng-bind="msg.data.timestamp|date:'mediumDate'" class="text-muted small" style="display:inline-block;"></a>
 
                             </span>
                           </div>
@@ -215,7 +216,7 @@
                         <td><button autocomplete="off" id="addButton" ng-click="create($event, { type: 'confirm_connection', recipientType: idType, recipientValue: idValue, recipientType2: newConnection.type, recipientValue2: newConnection.value }, { confirmations: 0, refutations: 0, type: newConnection.type, value: newConnection.value })" class="ladda-button btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user"><span class="ladda-label"><span class="glyphicon glyphicon-plus"></span> Add</span><span class="ladda-spinner"></span></button></td>
                       </tr>
                   </tbody>
-                </uib-table>
+                </table>
               </div>
               <div ng-if="!connections.$resolved" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>

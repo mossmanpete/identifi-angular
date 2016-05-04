@@ -30,7 +30,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         viewpointType: 'email'
         viewpointValue: $scope.authentication.user.email
     else
-      $rootScope.viewpoint = $rootScope.viewpoint # or ApplicationConfiguration.defaultViewpoint
+      $rootScope.viewpoint = $rootScope.viewpoint or ['keyID', 'NK0R68KzRFFOZq8mHsyu7GL1jtJXS7LFdATPyXkMBb0='] # TODO: default viewpoint
     $scope.newIdentifier =
       type: ''
       value: $stateParams.value
@@ -53,26 +53,27 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         if isNaN(key)
           continue
         msg = messages[key]
+        msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
         gravatarEmail = msg.authorEmail
         if msg.authorEmail == ''
-          gravatarEmail = msg.data.signedData.author[0][0] + msg.data.signedData.author[0][1]
+          gravatarEmail = msg.data.author[0][0] + msg.data.author[0][1]
         msg.gravatar = CryptoJS.MD5(gravatarEmail).toString()
-        msg.linkToAuthor = msg.data.signedData.author[0]
+        msg.linkToAuthor = msg.data.author[0]
         i = undefined
         i = 0
-        while i < msg.data.signedData.author.length
-          if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.signedData.author[i][0]) > -1
-            msg.linkToAuthor = msg.data.signedData.author[i]
+        while i < msg.data.author.length
+          if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.author[i][0]) > -1
+            msg.linkToAuthor = msg.data.author[i]
             break
           i++
-        msg.linkToRecipient = msg.data.signedData.recipient[0]
+        msg.linkToRecipient = msg.data.recipient[0]
         i = 0
-        while i < msg.data.signedData.recipient.length
-          if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.signedData.recipient[i][0]) > -1
-            msg.linkToRecipient = msg.data.signedData.recipient[i]
+        while i < msg.data.recipient.length
+          if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.recipient[i][0]) > -1
+            msg.linkToRecipient = msg.data.recipient[i]
             break
           i++
-        signedData = msg.data.signedData
+        signedData = msg.data
         alpha = undefined
         msg.panelStyle = 'panel-default'
         msg.iconStyle = ''
@@ -173,15 +174,15 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
 
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
-      if args.message.data.signedData.type == 'confirm_connection'
+      if args.message.data.type == 'confirm_connection'
         args.id.confirmations += 1
         if $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
-      else if args.message.data.signedData.type == 'refute_connection'
+      else if args.message.data.type == 'refute_connection'
         args.id.refutations += 1
         if $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
-      else if args.message.data.signedData.type == 'rating'
+      else if args.message.data.type == 'rating'
         if messagesAdded
           $scope.received.shift()
         $scope.received.unshift args.message
@@ -306,44 +307,44 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
 
         $scope.connectionClicked = (event, id) ->
           id.collapse = !id.collapse
-          id.connectingmsgs = id.connectingmsgs or Identifiers.connectingmsgs(angular.extend({
+          id.connecting_msgs = id.connecting_msgs or Identifiers.connecting_msgs(angular.extend({
             idType: $scope.idType
             idValue: $scope.idValue
-            id2Type: id.type
-            id2Value: id.value
+            target_type: id.type
+            target_value: id.value
           }, $rootScope.filters), ->
-            for key of id.connectingmsgs
+            for key of id.connecting_msgs
               if isNaN(key)
                 i++
                 continue
-              msg = id.connectingmsgs[key]
-              msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.data.signedData.author[0][1]).toString()
-              msg.linkToAuthor = msg.data.signedData.author[0]
+              msg = id.connecting_msgs[key]
+              msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
+              msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.data.author[0][1]).toString()
+              msg.linkToAuthor = msg.data.author[0]
               i = undefined
               i = 0
-              while i < msg.data.signedData.author.length
-                if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.signedData.author[i][0] > -1)
-                  msg.linkToAuthor = msg.data.signedData.author[i]
+              while i < msg.data.author.length
+                if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.author[i][0] > -1)
+                  msg.linkToAuthor = msg.data.author[i]
                   break
                 i++
             return
           )
           return
 
-        $scope.getOverview()
+        $scope.getStats()
         $scope.getReceivedMsgs 0
         $scope.getSentMsgs 0
         return
       )
       return
 
-    $scope.getOverview = ->
-      $scope.overview = Identifiers.get(angular.extend({}, $rootScope.filters, {
+    $scope.getStats = ->
+      $scope.stats = Identifiers.stats(angular.extend({}, $rootScope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
-        method: 'overview'
       }, if $rootScope.filters.maxDistance > -1 then ['a', 'b'] else 0), -> # then ApplicationConfiguration.defaultViewpoint
-        $scope.info.email = $scope.info.email or $scope.overview.email
+        $scope.info.email = $scope.info.email or $scope.stats.email
         return
       )
       return
@@ -357,7 +358,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         msgType: $rootScope.filters.msgType
         offset: $rootScope.filters.sentOffset
         limit: $rootScope.filters.limit
-      }, if $rootScope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0), ->
+      }, 0), -> # if $rootScope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
         processMessages sent
         if $rootScope.filters.sentOffset == 0
           $scope.sent = sent
@@ -387,7 +388,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         msgType: $rootScope.filters.msgType
         offset: $rootScope.filters.receivedOffset
         limit: $rootScope.filters.limit
-      }, if $rootScope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0), ->
+      }, 0), -> # if $rootScope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
         processMessages received
         if $rootScope.filters.receivedOffset == 0
           $scope.received = received
@@ -431,17 +432,19 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
     # Find existing Identifier
 
     $scope.findOne = ->
-      $scope.idType = decodeURIComponent($stateParams.idType)
-      $scope.idValue = decodeURIComponent($stateParams.idValue)
-      $scope.isUniqueType = ApplicationConfiguration.uniqueIdentifierTypes.indexOf($scope.idType) > -1
+      $scope.idType = $stateParams.type
+      $scope.idValue = $stateParams.value
+      $scope.isUniqueType = true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf($scope.idType) > -1
       if !$scope.isUniqueType
         $scope.tabs[2].active = true
       $rootScope.pageTitle = ' - ' + $scope.idValue
       $scope.getConnections()
-      allPaths = Identifiers.trustpaths(angular.extend({
-        idType: $scope.idType
-        idValue: $scope.idValue
-      }, $rootScope.viewpoint), ->
+      allPaths = Identifiers.trustpaths
+        idType: $rootScope.viewpoint[0]
+        idValue: $rootScope.viewpoint[1]
+        target_type: $scope.idType
+        target_value: $scope.idValue
+      , ->
         if allPaths.length == 0
           return
         shortestPath = Object.keys(allPaths[0]).length
@@ -480,7 +483,6 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
               break
           i++
         return
-      )
       return
 
     $scope.setFilters = (filters) ->
