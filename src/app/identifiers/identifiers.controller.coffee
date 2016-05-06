@@ -2,6 +2,7 @@
 # Identifiers controller
 angular.module('identifiAngular').controller 'IdentifiersController', [
   '$scope'
+  '$state'
   '$rootScope'
   '$window'
   '$stateParams'
@@ -9,7 +10,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
   '$http'
   # 'Authentication'
   'Identifiers'
-  ($scope, $rootScope, $window, $stateParams, $location, $http, Identifiers) -> #, Authentication
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, Identifiers) -> #, Authentication
     $scope.authentication = {} # Authentication
     $scope.tabs = [
       { active: true }
@@ -38,11 +39,6 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
 
     $scope.goToID = (type, value) ->
       $location.path '/id/' + encodeURIComponent(type) + '/' + encodeURIComponent(value)
-      return
-
-    $scope.dropdownSearchSelect = (suggestion) ->
-      $scope.goToID suggestion.linkTo[0], suggestion.linkTo[1]
-      $scope.queryTerm = ''
       return
 
     $scope.collapseLevel = {}
@@ -125,13 +121,9 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
           window.scrollTo 0, pos.bottom - (window.innerHeight or document.documentElement.clientHeight) + 15
       return
 
-    $scope.dropdownSearch = (query) ->
-      $scope.search query, 3
-      return
-
     $scope.search = (query, limit) ->
       $rootScope.pageTitle = ''
-      Identifiers.query angular.extend({ idValue: query or $scope.queryTerm or '' },
+      Identifiers.query angular.extend({ search_value: query or $scope.queryTerm or '' },
           { limit: if limit then limit else 20 }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (res) ->
         $scope.identifiers = res
         if $scope.identifiers.length > 0
@@ -141,7 +133,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         while i < $scope.identifiers.length
           id = $scope.identifiers[i]
           if !id.linkTo # and ApplicationConfiguration.uniqueIdentifierTypes.indexOf(id.type) > -1
-            id.linkTo = id
+            id.linkTo = { type: id.type, value: id.value }
           switch id.type
             when 'email'
               id.email = id.value
@@ -160,7 +152,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
               if id.value.indexOf('plus.google.com/') > -1
                 id.googlePlus = id.value.split('plus.google.com/')[1]
           if !id.linkTo
-            id.linkTo = id
+            id.linkTo = { type: id.type, value: id.value }
           if !id.gravatar
             id.gravatar = CryptoJS.MD5(id.value).toString()
           if !id.name
@@ -169,8 +161,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
             else
               id.name = id.value
           i++
-        return
-      return
+
 
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
@@ -188,27 +179,27 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         $scope.received.unshift args.message
         messagesAdded = true
         processMessages $scope.received
-      return
+
     $scope.$on 'SearchKeydown', (event, args) ->
       switch (if args.event then args.event.which else -1)
         when 38
           args.event.preventDefault()
           if $scope.identifiers.activeKey > 0
-            $scope.identifiers[$scope.identifiers.activeKey].active = false
-            $scope.identifiers[$scope.identifiers.activeKey - 1].active = true
+            $scope.filteredIdentifiers[$scope.identifiers.activeKey].active = false
+            $scope.filteredIdentifiers[$scope.identifiers.activeKey - 1].active = true
             $scope.identifiers.activeKey--
           scrollTo document.getElementById('result' + $scope.identifiers.activeKey)
         when 40
           args.event.preventDefault()
-          if $scope.identifiers.activeKey < $scope.identifiers.length - 1
-            $scope.identifiers[$scope.identifiers.activeKey].active = false
-            $scope.identifiers[$scope.identifiers.activeKey + 1].active = true
+          if $scope.identifiers.activeKey < ($scope.filteredIdentifiers.length || 0) - 1
+            $scope.filteredIdentifiers[$scope.identifiers.activeKey].active = false
+            $scope.filteredIdentifiers[$scope.identifiers.activeKey + 1].active = true
             $scope.identifiers.activeKey++
           scrollTo document.getElementById('result' + $scope.identifiers.activeKey)
         when 13
           args.event.preventDefault()
           id = $scope.identifiers[$scope.identifiers.activeKey]
-          $scope.resultClicked id
+          $state.go 'identifiers.show', { type: id.linkTo.type, value: id.linkTo.value }
         when -1
           clearTimeout $scope.timer
           $scope.queryTerm = ''
@@ -224,7 +215,9 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
           ), 300)
           $scope.timer = wait
           break
-      return
+
+    $scope.$on 'SearchChanged', (event, args) ->
+      $scope.search args.queryTerm, args.limit
 
     $scope.getConnections = ->
       $scope.connections = Identifiers.connections(angular.extend($rootScope.filters, {

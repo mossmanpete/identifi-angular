@@ -1,19 +1,19 @@
 <section ng-controller="MessagesController" ng-init="findOne()">
   <div class="col-md-8 col-md-offset-2">
-    <h4 ng-bind="message[0].data.timestamp|date:'medium'"></h4>
+    <h4 ng-bind="message.data.timestamp|date:'medium'"></h4>
     <div class="row">
       <div class="col-sm-6">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">
-              <img alt="" src="https://www.gravatar.com/avatar/{{message[0].authorGravatar}}?d=retro&amp;s=30" class="img-rounded mar-bot5 mar-right5">
-              <span ng-bind="message[0].authorName"></span>
+              <img alt="" src="https://www.gravatar.com/avatar/{{message.authorGravatar}}?d=retro&amp;s=30" class="img-rounded mar-bot5 mar-right5">
+              <span ng-bind="message.authorName"></span>
               <span class="glyphicon glyphicon-play"></span>
             </h3>
           </div>
           <div class="panel-body">
             <ul class="list list-unstyled">
-              <li ng-repeat="id in message[0].data.author"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ng-href="/id/{{id[0]}}/{{id[1]|escape}}" data-original-title="" title=""></a></li>
+              <li ng-repeat="id in message.data.author"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ng-href="/id/{{id[0]}}/{{id[1]|escape}}" data-original-title="" title=""></a></li>
             </ul>
           </div>
         </div>
@@ -22,14 +22,14 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">
-              <img alt="" src="https://www.gravatar.com/avatar/{{message[0].recipientGravatar}}?d=retro&amp;s=30" class="img-rounded mar-bot5 mar-right5">
-              <span ng-bind="message[0].recipientName"></span>
+              <img alt="" src="https://www.gravatar.com/avatar/{{message.recipientGravatar}}?d=retro&amp;s=30" class="img-rounded mar-bot5 mar-right5">
+              <span ng-bind="message.recipientName"></span>
               <span class="glyphicon glyphicon-play"></span>
             </h3>
           </div>
           <div class="panel-body">
             <ul class="list list-unstyled">
-              <li ng-repeat="id in message[0].data.recipient"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ng-href="/id/{{id[0]|escape}}/{{id[1]|escape}}" data-original-title="" title=""></a></li>
+              <li ng-repeat="id in message.data.recipient"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ng-href="/id/{{id[0]|escape}}/{{id[1]|escape}}" data-original-title="" title=""></a></li>
             </ul>
           </div>
         </div>
@@ -37,17 +37,17 @@
     </div>
     <div class="panel panel-default panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title" ng-bind="message[0].data.type"></h3>
+        <h3 class="panel-title" ng-bind="message.data.type"></h3>
       </div>
       <div class="panel-body">
-        <p ng-if="message[0].data.rating"><strong>Score:</strong> <span ng-bind="message[0].data.rating"></span>
-          <small>(<span ng-bind="message[0].data.minRating"></span>...<span ng-bind="message[0].data.maxRating"></span>)</small>
+        <p ng-if="message.data.rating"><strong>Score:</strong> <span ng-bind="message.data.rating"></span>
+          <small>(<span ng-bind="message.data.minRating"></span>...<span ng-bind="message.data.maxRating"></span>)</small>
         </p>
-        <p ng-if="message[0].data.comment"><strong>Comment:</strong> <span ng-bind="message[0].data.comment"></span></p>
+        <p ng-if="message.data.comment"><strong>Comment:</strong> <span ng-bind="message.data.comment"></span></p>
       </div>
     </div>
-    <p>Message origin verified by: <a ng-bind="message[0].signerName||message[0].signer_keyid" ui-sref="identifiers.show({type: 'keyID', value: message[0].signer_keyid })"></a></p>
+    <p>Message origin verified by: <a ng-bind="message.signerName||message.signer_keyid" ui-sref="identifiers.show({type: 'keyID', value: message.signer_keyid })"></a></p>
     <p><button class="btn btn-default" ng-click="collapseRawData = !collapseRawData">Show raw data</button></p>
-    <pre uib-collapse="!collapseRawData" ng-bind="message[0].strData"></pre>
+    <pre uib-collapse="!collapseRawData" ng-bind="message.strData"></pre>
   </div>
 </section>

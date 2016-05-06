@@ -174,7 +174,7 @@
                           </span>
                         </td>
                         <td colspan="3">
-                          <a ng-href="/id/{{id.type|escape}}/{{id.value|escape}}" data-id-type="{{id.type}}" data-id-value="{{id.value}}" ng-bind="id.value" class="id-link"></a><br>
+                          <a ui-sref="identifiers.show({ type: id.type, value: id.value })" data-id-type="{{id.type}}" data-id-value="{{id.value}}" ng-bind="id.value" class="id-link"></a><br>
                           <small ng-bind="id.type"></small>
                         </td>
                         <!--<td>
@@ -198,12 +198,12 @@
                                 <span class="negative glyphicon glyphicon-remove visible-xs mar-right10"></span>
                               </span>
                               <strong>
-                                <a ng-href="/id/{{msg.linkToAuthor[0]|escape}}/{{msg.linkToAuthor[1]|escape}}" class="id-link">
+                                <a ui-sref="identifiers.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" class="id-link">
                                   <img alt="" src="https://www.gravatar.com/avatar/{{msg.gravatar}}?d=retro&amp;s=30" class="img-rounded mar-right5">
                                   <span ng-bind="msg.authorName||msg.data.author[0][1]"></span>
                                 </a>
                               </strong>
-                               - <a ng-href="/messages/{{msg.hash}}" ng-bind="msg.data.timestamp|date:'mediumDate'" class="text-muted small" style="display:inline-block;"></a>
+                               - <a ui-sref="messages.show({ id: msg.hash })" ng-bind="msg.data.timestamp|date:'mediumDate'" class="text-muted small" style="display:inline-block;"></a>
 
                             </span>
                           </div>

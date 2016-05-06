@@ -1,7 +1,7 @@
 angular.module 'identifiAngular',
   ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages',
   'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr',
-  'angular-toArrayFilter']
+  'angular-toArrayFilter', 'autocomplete']
 
 angular.module('identifiAngular').filter 'escape', [ ->
   (input) ->
@@ -14,6 +14,7 @@ angular.module('identifiAngular').filter 'encodeURIComponent', [ ->
 
 angular.module('identifiAngular').filter 'highlight', ($sce) ->
   (text, phrase) ->
-    if phrase
+    if typeof text == 'string' and phrase
       text = text.replace(new RegExp('(' + phrase + ')', 'gi'), '<b>$1</b>')
-    $sce.trustAsHtml text
+      return $sce.trustAsHtml text.toString()
+    return text
