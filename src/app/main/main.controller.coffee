@@ -107,6 +107,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.$root.$broadcast 'SearchKeydown', event: e
 
     $scope.dropdownSearchSelect = (suggestion) ->
-      $state.go 'identifiers.show', { type: suggestion.type, value: suggestion.value }
+      console.log(suggestion)
+      $state.go('identifiers.show', { type: suggestion.type, value: suggestion.value })
       $scope.queryTerm = ''
 ]

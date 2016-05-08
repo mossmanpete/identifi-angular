@@ -13,7 +13,7 @@
           </div>
           <div class="panel-body">
             <ul class="list list-unstyled">
-              <li ng-repeat="id in message.data.author"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ng-href="/id/{{id[0]}}/{{id[1]|escape}}" data-original-title="" title=""></a></li>
+              <li ng-repeat="id in message.data.author"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ui-sref="identifiers.show({ type: id[0], value: id[1] })" data-original-title="" title=""></a></li>
             </ul>
           </div>
         </div>
@@ -29,7 +29,7 @@
           </div>
           <div class="panel-body">
             <ul class="list list-unstyled">
-              <li ng-repeat="id in message.data.recipient"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ng-href="/id/{{id[0]|escape}}/{{id[1]|escape}}" data-original-title="" title=""></a></li>
+              <li ng-repeat="id in message.data.recipient"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ui-sref="identifiers.show({ type: id[0], value: id[1] })" data-original-title="" title=""></a></li>
             </ul>
           </div>
         </div>
