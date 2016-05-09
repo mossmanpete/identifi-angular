@@ -1,5 +1,5 @@
 <div class="container">
-  <div ng-controller="IdentifiersController">
+  <div ng-controller="IdentitiesController">
     <section class="cover-container">
       <div class="cover" parallax-background parallax-ratio="-0.2" ng-style="coverPhoto"></div>
       <div class="container hidden-xs hidden-sm">
@@ -92,7 +92,7 @@
         <div class="panel-body">
           <ul ng-repeat="level in trustpaths" class="trustpath-list list-unstyled">
             <li ng-repeat-start="id in level" ng-if="!$parent.$last && ($index < 3 || collapseLevel[$parent.$index])">
-              <a class="id-link" ng-href="/id/{{id[0]|escape}}/{{id[1]|escape}}" title=""><img alt="" src="https://www.gravatar.com/avatar/{{id.gravatar}}?d=retro&amp;s=30" class="mar-bot5 img-rounded mar-right10"><span ng-bind="id.name.name || id[1]"></span></a>
+              <a class="id-link" ng-href="/identities/{{id[0]|escape}}/{{id[1]|escape}}" title=""><img alt="" src="https://www.gravatar.com/avatar/{{id.gravatar}}?d=retro&amp;s=30" class="mar-bot5 img-rounded mar-right10"><span ng-bind="id.name.name || id[1]"></span></a>
             </li>
             <li class="mar-bot5" ng-if="level.length > 3 && $index === 2">
               <a href="" ng-click="collapseLevel[$parent.$index] = !collapseLevel[$parent.$index]">{{level.length - 3}} more</a>
@@ -101,7 +101,7 @@
               <span class="positive mar-left5 mar-bot10 glyphicon glyphicon-thumbs-up"></span>
             </li>
             <li ng-if="$last">
-              <a class="id-link" ng-href="/id/{{idType|escape}}/{{idValue|escape}}" title=""><img alt="" src="https://www.gravatar.com/avatar/{{gravatar}}?d=retro&amp;s=30" class="mar-bot5 img-rounded mar-right10"><span ng-bind="info.name || info.nickname || idValue"></span></a>
+              <a class="id-link" ng-href="/identities/{{idType|escape}}/{{idValue|escape}}" title=""><img alt="" src="https://www.gravatar.com/avatar/{{gravatar}}?d=retro&amp;s=30" class="mar-bot5 img-rounded mar-right10"><span ng-bind="info.name || info.nickname || idValue"></span></a>
             </li>
           </ul>
         </div>
@@ -169,36 +169,36 @@
                           <a ng-if="id.iconStyle&&id.link" class="pull-left btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span></a>
                           <span ng-if="id.iconStyle&&!id.link" class="pull-left btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span></a>
                           <span class="visible-xs pull-right">
-                            <button autocomplete="off" ng-controller="MessagesController" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'confirm_connection', recipientType: idType, recipientValue: idValue, recipientType2: id.type, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
-                            <button autocomplete="off" ng-controller="MessagesController" name="refute" class="ladda-button btn btn-default btn-refute" ng-click="create($event, { type: 'refute_connection', recipientType: idType, recipientValue: idValue, recipientType2: id.type, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
+                            <button autocomplete="off" ng-controller="MessagesController" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'verify_identity', recipientType: idType, recipientValue: idValue, recipientType2: id.name, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
+                            <button autocomplete="off" ng-controller="MessagesController" name="refute" class="ladda-button btn btn-default btn-refute" ng-click="create($event, { type: 'refute_identity', recipientType: idType, recipientValue: idValue, recipientType2: id.name, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
                           </span>
                         </td>
                         <td colspan="3">
-                          <a ui-sref="identifiers.show({ type: id.type, value: id.value })" data-id-type="{{id.type}}" data-id-value="{{id.value}}" ng-bind="id.value" class="id-link"></a><br>
-                          <small ng-bind="id.type"></small>
+                          <a ui-sref="identities.show({ type: id.name, value: id.value })" data-id-type="{{id.name}}" data-id-value="{{id.value}}" ng-bind="id.value" class="id-link"></a><br>
+                          <small ng-bind="id.name"></small>
                         </td>
                         <!--<td>
                           <input class="form-control linkedComment" type="text" placeholder="comment" disabled>
                         </td>-->
                         <td class="hidden-xs">
-                          <button autocomplete="off" ng-controller="MessagesController" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'confirm_connection', recipientType: idType, recipientValue: idValue, recipientType2: id.type, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
-                          <button autocomplete="off" ng-controller="MessagesController" name="refute" class="ladda-button btn btn-default btn-refute" ng-click="create($event, { type: 'refute_connection', recipientType: idType, recipientValue: idValue, recipientType2: id.type, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
+                          <button autocomplete="off" ng-controller="MessagesController" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'verify_identity', recipientType: idType, recipientValue: idValue, recipientType2: id.name, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
+                          <button autocomplete="off" ng-controller="MessagesController" name="refute" class="ladda-button btn btn-default btn-refute" ng-click="create($event, { type: 'refute_identity', recipientType: idType, recipientValue: idValue, recipientType2: id.name, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
                         </td>
                       </tr>
                       <tr ng-repeat-end uib-collapse="!id.collapse" ng-if="!id.isCurrent" class="active connectingmsgs">
                         <td class="connectingmsgs ladda-button" data-style="zoom-in" data-spinner-color="#000" colspan="5">
                           <div ng-repeat="msg in id.connecting_msgs" class="animated fadeIn confirmation-panel">
                             <span class="has-success">
-                              <span ng-if="msg.data.type === 'confirm_connection'">
+                              <span ng-if="msg.data.type === 'verify_identity'">
                                 <span class="positive glyphicon glyphicon-ok hidden-xs mar-left5 pull-right"></span>
                                 <span class="positive glyphicon glyphicon-ok visible-xs mar-right10"></span>
                               </span>
-                              <span ng-if="msg.data.type === 'refute_connection'">
+                              <span ng-if="msg.data.type === 'refute_identity'">
                                 <span class="negative glyphicon glyphicon-remove hidden-xs mar-left5 pull-right"></span>
                                 <span class="negative glyphicon glyphicon-remove visible-xs mar-right10"></span>
                               </span>
                               <strong>
-                                <a ui-sref="identifiers.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" class="id-link">
+                                <a ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" class="id-link">
                                   <img alt="" src="https://www.gravatar.com/avatar/{{msg.gravatar}}?d=retro&amp;s=30" class="img-rounded mar-right5">
                                   <span ng-bind="msg.authorName||msg.data.author[0][1]"></span>
                                 </a>
@@ -213,7 +213,7 @@
                         <td colspan="3"><input id="addValue" ng-model="newConnection.value" class="form-control" name="linkedValue" type="text" placeholder="value" ng-disabled="!authentication.user"></td>
                         <td><input id="addType" ng-model="newConnection.type" class="form-control" name="linkedType" type="text" placeholder="type" ng-disabled="!authentication.user"></td>
                         <!--<td><input id="addComment" class="form-control" name="linkedComment" type="text" placeholder="comment" disabled></td> -->
-                        <td><button autocomplete="off" id="addButton" ng-click="create($event, { type: 'confirm_connection', recipientType: idType, recipientValue: idValue, recipientType2: newConnection.type, recipientValue2: newConnection.value }, { confirmations: 0, refutations: 0, type: newConnection.type, value: newConnection.value })" class="ladda-button btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user"><span class="ladda-label"><span class="glyphicon glyphicon-plus"></span> Add</span><span class="ladda-spinner"></span></button></td>
+                        <td><button autocomplete="off" id="addButton" ng-click="create($event, { type: 'verify_identity', recipientType: idType, recipientValue: idValue, recipientType2: newConnection.type, recipientValue2: newConnection.value }, { confirmations: 0, refutations: 0, type: newConnection.type, value: newConnection.value })" class="ladda-button btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user"><span class="ladda-label"><span class="glyphicon glyphicon-plus"></span> Add</span><span class="ladda-spinner"></span></button></td>
                       </tr>
                   </tbody>
                 </table>

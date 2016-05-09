@@ -3,10 +3,10 @@
     <p class="">
       <span class="mar-left5 pull-right" ng-class="msg.iconStyle" ng-repeat="n in msg.iconCount track by $index"></span>
       <strong>
-        <a ui-sref="identifiers.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" class="id-link"><img height="30" width="30" alt="" src="https://www.gravatar.com/avatar/{{msg.gravatar}}?d=retro&amp;s=30" class="gravatar mar-right10"><span ng-bind="msg.authorName||msg.linkToAuthor[1]"></span></a>
+        <a ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" class="id-link"><img height="30" width="30" alt="" src="https://www.gravatar.com/avatar/{{msg.gravatar}}?d=retro&amp;s=30" class="gravatar mar-right10"><span ng-bind="msg.authorName||msg.linkToAuthor[1]"></span></a>
       </strong>
       <small><i class="glyphicon glyphicon-play"></i></small>
-      <a ui-sref="identifiers.show({ type: msg.linkToRecipient[0], value: msg.linkToRecipient[1] })" ng-bind="msg.recipientName||msg.linkToRecipient[1]" class="id-link"></a>
+      <a ui-sref="identities.show({ type: msg.linkToRecipient[0], value: msg.linkToRecipient[1] })" ng-bind="msg.recipientName||msg.linkToRecipient[1]" class="id-link"></a>
        - <a ui-sref="messages.show({ id: msg.hash })" ng-bind="msg.data.timestamp|date:'medium'" class="text-muted small" style="display:inline-block;"></a>
     </p>
 

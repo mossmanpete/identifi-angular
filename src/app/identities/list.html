@@ -1,5 +1,5 @@
 <div class="container">
-  <section ng-init="search()" ng-controller="IdentifiersController">
+  <section ng-init="search()" ng-controller="IdentitiesController">
     <div class="mar-top60-xs"></div>
     <div ng-if="!queryTerm && !authentication.user" class="jumbotron">
       <div class="align-center"><h1>Global address book</h1></div>
@@ -13,10 +13,10 @@
 
     <table id="search-results" class="table table-hover">
       <tbody>
-        <tr ng-repeat="result in filteredIdentifiers = (identifiers | toArray:false | filter:queryTerm)" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identifiers.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
+        <tr ng-repeat="result in filteredAttributes = (identities | toArray:false | filter:queryTerm)" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
           <td class="gravatar-col"><img alt="" class="img-circle" height="45" width="45" src="https://www.gravatar.com/avatar/{{result.gravatar}}?d=retro&amp;s=90"></td>
-          <td><a ng-bind-html="result.name|highlight:queryTerm" ui-sref="identifiers.show({ type: result.linkTo.type, value: result.linkTo.value })"></a>
-            <small ng-if="!result.name" class="list-group-item-text">
+          <td><a ng-bind-html="result.value|highlight:queryTerm" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })"></a>
+            <small ng-if="!result.value" class="list-group-item-text">
               <span ng-bind-html="result[0][0]|highlight:queryTerm"></span>
             </small><br>
             <small>
@@ -41,7 +41,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="alert alert-info text-center" ng-hide="!identifiers.$resolved || identifiers.length">
+    <div class="alert alert-info text-center" ng-hide="!identities.$resolved || identities.length">
       No results
     </div>
   </section>

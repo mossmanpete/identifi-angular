@@ -5,12 +5,12 @@ angular.module('identifiAngular').controller 'MainController', [
   '$location'
   '$http'
   '$state'
-  'Identifiers',
+  'Identities',
 
   #'Authentication'
   #'Menus'
   #'Persona'
-  ($scope, $rootScope, $location, $http, $state, Identifiers) -> # Authentication, Menus, Persona
+  ($scope, $rootScope, $location, $http, $state, Identities) -> # Authentication, Menus, Persona
     ###
     Persona.watch
       loggedInUser: Authentication.user.email
@@ -22,8 +22,8 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.query = term: ''
     ###
 
-    $scope.addIdentifier = ->
-      $location.path '#/id/create/' + $scope.query.term
+    $scope.addAttribute = ->
+      $location.path '#/identities/create/' + $scope.query.term
 
     $scope.login = ->
       Persona.request()
@@ -61,18 +61,18 @@ angular.module('identifiAngular').controller 'MainController', [
     # TODO: move to a common base controller
     $scope.search = (query, limit) ->
       $rootScope.pageTitle = ''
-      Identifiers.query angular.extend({ search_value: query or $scope.queryTerm or '' },
+      Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
           { limit: if limit then limit else 20 }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (res) ->
-        $scope.identifiers = res
-        if $scope.identifiers.length > 0
-          $scope.identifiers.activeKey = 0
-          $scope.identifiers[0].active = true
+        $scope.identities = res
+        if $scope.identities.length > 0
+          $scope.identities.activeKey = 0
+          $scope.identities[0].active = true
         i = 0
-        while i < $scope.identifiers.length
-          id = $scope.identifiers[i]
-          if !id.linkTo # and ApplicationConfiguration.uniqueIdentifierTypes.indexOf(id.type) > -1
-            id.linkTo = { type: id.type, value: id.value }
-          switch id.type
+        while i < $scope.identities.length
+          id = $scope.identities[i]
+          if !id.linkTo # and ApplicationConfiguration.uniqueAttributeTypes.indexOf(id.name) > -1
+            id.linkTo = { type: id.name, value: id.value }
+          switch id.name
             when 'email'
               id.email = id.value
               id.gravatar = CryptoJS.MD5(id.value).toString()
@@ -90,7 +90,7 @@ angular.module('identifiAngular').controller 'MainController', [
               if id.value.indexOf('plus.google.com/') > -1
                 id.googlePlus = id.value.split('plus.google.com/')[1]
           if !id.linkTo
-            id.linkTo = { type: id.type, value: id.value }
+            id.linkTo = { type: id.name, value: id.value }
           if !id.gravatar
             id.gravatar = CryptoJS.MD5(id.value).toString()
           if !id.name
@@ -108,6 +108,6 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.dropdownSearchSelect = (suggestion) ->
       console.log(suggestion)
-      $state.go('identifiers.show', { type: suggestion.type, value: suggestion.value })
+      $state.go('identities.show', { type: suggestion.type, value: suggestion.value })
       $scope.queryTerm = ''
 ]

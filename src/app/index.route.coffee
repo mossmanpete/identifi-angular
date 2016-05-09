@@ -2,20 +2,20 @@ angular.module 'identifiAngular'
   .config ($stateProvider, $urlRouterProvider) ->
     'ngInject'
     $stateProvider
-      .state 'identifiers',
+      .state 'identities',
         url: ''
         template: "<ui-view/>"
         abstract: true
-      .state 'identifiers.list',
+      .state 'identities.list',
         url: ''
-        templateUrl: 'app/identifiers/list.html'
-        controller: 'IdentifiersController'
-        controllerAs: 'identifiers'
-      .state 'identifiers.show',
-        url: '/id/:type/:value'
-        templateUrl: 'app/identifiers/show.html'
-        controller: 'IdentifiersController'
-        controllerAs: 'identifiers'
+        templateUrl: 'app/identities/list.html'
+        controller: 'IdentitiesController'
+        controllerAs: 'identities'
+      .state 'identities.show',
+        url: '/identities/:type/:value'
+        templateUrl: 'app/identities/show.html'
+        controller: 'IdentitiesController'
+        controllerAs: 'identities'
       .state 'messages',
         url: '/messages'
         template: "<ui-view/>"

@@ -66,14 +66,14 @@ angular.module('identifiAngular').controller 'MessagesController', [
         i = undefined
         i = 0
         while i < msg.data.author.length
-          if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.author[i][0]) > -1
+          if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.author[i][0]) > -1
             msg.linkToAuthor = msg.data.author[i]
             break
           i++
         msg.linkToRecipient = msg.data.recipient[0]
         i = 0
         while i < msg.data.recipient.length
-          if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.recipient[i][0]) > -1
+          if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0]) > -1
             msg.linkToRecipient = msg.data.recipient[i]
             break
           i++
@@ -85,13 +85,13 @@ angular.module('identifiAngular').controller 'MessagesController', [
         msg.bgColor = ''
         msg.iconCount = new Array(1)
         switch signedData.type
-          when 'confirm_connection'
+          when 'verify_identity'
             msg.iconStyle = 'glyphicon glyphicon-ok'
             msg.hasSuccess = 'has-success'
           when 'connection'
             msg.iconStyle = 'glyphicon glyphicon-ok'
             msg.hasSuccess = 'has-success'
-          when 'refute_connection'
+          when 'refute_identity'
             msg.iconStyle = 'glyphicon glyphicon-remove'
             msg.hasSuccess = 'has-error'
           when 'rating'

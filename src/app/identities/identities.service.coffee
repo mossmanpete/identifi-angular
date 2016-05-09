@@ -1,11 +1,11 @@
-# Identifiers service used to communicate Identifiers REST endpoints
-angular.module('identifiAngular').factory 'Identifiers', [
+# Identities service used to communicate Identities REST endpoints
+angular.module('identifiAngular').factory 'Identities', [
   '$resource'
   ($resource) ->
-    $resource 'api/id/:idType/:idValue/:method', {},
+    $resource 'api/identities/:idType/:idValue/:method', {},
       connections:
         action: 'GET'
-        params: method: 'connections'
+        params: method: 'verifications'
         isArray: true
       sent:
         action: 'GET'

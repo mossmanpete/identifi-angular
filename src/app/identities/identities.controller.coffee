@@ -1,6 +1,6 @@
 'use strict'
-# Identifiers controller
-angular.module('identifiAngular').controller 'IdentifiersController', [
+# Identities controller
+angular.module('identifiAngular').controller 'IdentitiesController', [
   '$scope'
   '$state'
   '$rootScope'
@@ -9,8 +9,8 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
   '$location'
   '$http'
   # 'Authentication'
-  'Identifiers'
-  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, Identifiers) -> #, Authentication
+  'Identities'
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, Identities) -> #, Authentication
     $scope.authentication = {} # Authentication
     $scope.tabs = [
       { active: true }
@@ -32,13 +32,13 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         viewpointValue: $scope.authentication.user.email
     else
       $rootScope.viewpoint = $rootScope.viewpoint or ['keyID', 'NK0R68KzRFFOZq8mHsyu7GL1jtJXS7LFdATPyXkMBb0='] # TODO: default viewpoint
-    $scope.newIdentifier =
+    $scope.newAttribute =
       type: ''
       value: $stateParams.value
     $scope.queryTerm = ''
 
     $scope.goToID = (type, value) ->
-      $location.path '/id/' + encodeURIComponent(type) + '/' + encodeURIComponent(value)
+      $location.path '/identities/' + encodeURIComponent(type) + '/' + encodeURIComponent(value)
       return
 
     $scope.collapseLevel = {}
@@ -58,14 +58,14 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         i = undefined
         i = 0
         while i < msg.data.author.length
-          if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.author[i][0]) > -1
+          if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.author[i][0]) > -1
             msg.linkToAuthor = msg.data.author[i]
             break
           i++
         msg.linkToRecipient = msg.data.recipient[0]
         i = 0
         while i < msg.data.recipient.length
-          if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.recipient[i][0]) > -1
+          if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0]) > -1
             msg.linkToRecipient = msg.data.recipient[i]
             break
           i++
@@ -77,13 +77,13 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
         msg.bgColor = ''
         msg.iconCount = new Array(1)
         switch signedData.type
-          when 'confirm_connection'
+          when 'verify_identity'
             msg.iconStyle = 'glyphicon glyphicon-ok'
             msg.hasSuccess = 'has-success'
           when 'connection'
             msg.iconStyle = 'glyphicon glyphicon-ok'
             msg.hasSuccess = 'has-success'
-          when 'refute_connection'
+          when 'refute_identity'
             msg.iconStyle = 'glyphicon glyphicon-remove'
             msg.hasSuccess = 'has-error'
           when 'rating'
@@ -123,18 +123,18 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
 
     $scope.search = (query, limit) ->
       $rootScope.pageTitle = ''
-      Identifiers.query angular.extend({ search_value: query or $scope.queryTerm or '' },
+      Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
           { limit: if limit then limit else 20 }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (res) ->
-        $scope.identifiers = res
-        if $scope.identifiers.length > 0
-          $scope.identifiers.activeKey = 0
-          $scope.identifiers[0].active = true
+        $scope.identities = res
+        if $scope.identities.length > 0
+          $scope.identities.activeKey = 0
+          $scope.identities[0].active = true
         i = 0
-        while i < $scope.identifiers.length
-          id = $scope.identifiers[i]
-          if !id.linkTo # and ApplicationConfiguration.uniqueIdentifierTypes.indexOf(id.type) > -1
-            id.linkTo = { type: id.type, value: id.value }
-          switch id.type
+        while i < $scope.identities.length
+          id = $scope.identities[i]
+          if !id.linkTo # and ApplicationConfiguration.uniqueAttributeTypes.indexOf(id.name) > -1
+            id.linkTo = { type: id.name, value: id.value }
+          switch id.name
             when 'email'
               id.email = id.value
               id.gravatar = CryptoJS.MD5(id.value).toString()
@@ -152,7 +152,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
               if id.value.indexOf('plus.google.com/') > -1
                 id.googlePlus = id.value.split('plus.google.com/')[1]
           if !id.linkTo
-            id.linkTo = { type: id.type, value: id.value }
+            id.linkTo = { type: id.name, value: id.value }
           if !id.gravatar
             id.gravatar = CryptoJS.MD5(id.value).toString()
           if !id.name
@@ -165,11 +165,11 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
 
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
-      if args.message.data.type == 'confirm_connection'
+      if args.message.data.type == 'verify_identity'
         args.id.confirmations += 1
         if $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
-      else if args.message.data.type == 'refute_connection'
+      else if args.message.data.type == 'refute_identity'
         args.id.refutations += 1
         if $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
@@ -184,22 +184,22 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
       switch (if args.event then args.event.which else -1)
         when 38
           args.event.preventDefault()
-          if $scope.identifiers.activeKey > 0
-            $scope.filteredIdentifiers[$scope.identifiers.activeKey].active = false
-            $scope.filteredIdentifiers[$scope.identifiers.activeKey - 1].active = true
-            $scope.identifiers.activeKey--
-          scrollTo document.getElementById('result' + $scope.identifiers.activeKey)
+          if $scope.identities.activeKey > 0
+            $scope.filteredIdentities[$scope.identities.activeKey].active = false
+            $scope.filteredIdentities[$scope.identities.activeKey - 1].active = true
+            $scope.identities.activeKey--
+          scrollTo document.getElementById('result' + $scope.identities.activeKey)
         when 40
           args.event.preventDefault()
-          if $scope.identifiers.activeKey < ($scope.filteredIdentifiers.length || 0) - 1
-            $scope.filteredIdentifiers[$scope.identifiers.activeKey].active = false
-            $scope.filteredIdentifiers[$scope.identifiers.activeKey + 1].active = true
-            $scope.identifiers.activeKey++
-          scrollTo document.getElementById('result' + $scope.identifiers.activeKey)
+          if $scope.identities.activeKey < ($scope.filteredIdentities.length || 0) - 1
+            $scope.filteredIdentities[$scope.identities.activeKey].active = false
+            $scope.filteredIdentities[$scope.identities.activeKey + 1].active = true
+            $scope.identities.activeKey++
+          scrollTo document.getElementById('result' + $scope.identities.activeKey)
         when 13
           args.event.preventDefault()
-          id = $scope.identifiers[$scope.identifiers.activeKey]
-          $state.go 'identifiers.show', { type: id.linkTo.type, value: id.linkTo.value }
+          id = $scope.identities[$scope.identities.activeKey]
+          $state.go 'identities.show', { type: id.linkTo.type, value: id.linkTo.value }
         when -1
           clearTimeout $scope.timer
           $scope.queryTerm = ''
@@ -220,7 +220,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
       $scope.search args.queryTerm, args.limit
 
     $scope.getConnections = ->
-      $scope.connections = Identifiers.connections(angular.extend($rootScope.filters, {
+      $scope.connections = Identities.connections(angular.extend($rootScope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
       }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), ->
@@ -300,10 +300,10 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
 
         $scope.connectionClicked = (event, id) ->
           id.collapse = !id.collapse
-          id.connecting_msgs = id.connecting_msgs or Identifiers.connecting_msgs(angular.extend({
+          id.connecting_msgs = id.connecting_msgs or Identities.connecting_msgs(angular.extend({
             idType: $scope.idType
             idValue: $scope.idValue
-            target_type: id.type
+            target_name: id.name
             target_value: id.value
           }, $rootScope.filters), ->
             for key of id.connecting_msgs
@@ -317,7 +317,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
               i = undefined
               i = 0
               while i < msg.data.author.length
-                if true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf(msg.data.author[i][0] > -1)
+                if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.author[i][0] > -1)
                   msg.linkToAuthor = msg.data.author[i]
                   break
                 i++
@@ -333,7 +333,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
       return
 
     $scope.getStats = ->
-      $scope.stats = Identifiers.stats(angular.extend({}, $rootScope.filters, {
+      $scope.stats = Identities.stats(angular.extend({}, $rootScope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
       }, if $rootScope.filters.maxDistance > -1 then ['a', 'b'] else 0), -> # then ApplicationConfiguration.defaultViewpoint
@@ -345,7 +345,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
     $scope.getSentMsgs = (offset) ->
       if !isNaN(offset)
         $rootScope.filters.sentOffset = offset
-      sent = Identifiers.sent(angular.extend($rootScope.filters, {
+      sent = Identities.sent(angular.extend($rootScope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
         msgType: $rootScope.filters.msgType
@@ -375,7 +375,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
     $scope.getReceivedMsgs = (offset) ->
       if !isNaN(offset)
         $rootScope.filters.receivedOffset = offset
-      received = Identifiers.received(angular.extend($rootScope.filters, {
+      received = Identities.received(angular.extend($rootScope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
         msgType: $rootScope.filters.msgType
@@ -422,20 +422,20 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
       $scope.profilePhotoUrl = $scope.profilePhotoUrl or 'http://www.gravatar.com/avatar/' + $scope.gravatar + '?d=retro&s=210'
       return
 
-    # Find existing Identifier
+    # Find existing Attribute
 
     $scope.findOne = ->
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
-      $scope.isUniqueType = true # ApplicationConfiguration.uniqueIdentifierTypes.indexOf($scope.idType) > -1
+      $scope.isUniqueType = true # ApplicationConfiguration.uniqueAttributeTypes.indexOf($scope.idType) > -1
       if !$scope.isUniqueType
         $scope.tabs[2].active = true
       $rootScope.pageTitle = ' - ' + $scope.idValue
       $scope.getConnections()
-      allPaths = Identifiers.trustpaths
+      allPaths = Identities.trustpaths
         idType: $rootScope.viewpoint[0]
         idValue: $rootScope.viewpoint[1]
-        target_type: $scope.idType
+        target_name: $scope.idType
         target_value: $scope.idValue
       , ->
         if allPaths.length == 0
@@ -469,7 +469,7 @@ angular.module('identifiAngular').controller 'IdentifiersController', [
           n = 0
           for key of $scope.trustpaths[i]
             id = $scope.trustpaths[i][key]
-            id.name = Identifiers.getname(
+            id.name = Identities.getname(
               idType: id[0]
               idValue: id[1])
             if ++n == 3
