@@ -19,8 +19,8 @@ angular.module('identifiAngular').controller 'MainController', [
           location.reload()
           # FIXME
                         onlogout: ->
-    $scope.query = term: ''
     ###
+    $scope.query = term: ''
 
     $scope.addAttribute = ->
       $location.path '#/identities/create/' + $scope.query.term
@@ -30,6 +30,10 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.logout = ->
       Persona.logout()
+
+    $scope.logoClicked = ->
+      $scope.query.term = ''
+      $scope.searchKeydown()
 
     ###
     $scope.authentication = Authentication

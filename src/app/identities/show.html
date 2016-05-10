@@ -37,8 +37,8 @@
     <section ng-init="findOne()">
       <div class="row">
         <div class="col-md-3 id-left-column">
-        <div ng-if="isUniqueType" class="panel panel-default">
-        <div class="panel-body">
+        <div ng-if="isUniqueType">
+        <div>
           <p class="hidden-md hidden-lg" ng-hide="!stats[0].name">
             <span ng-bind="idValue" id="id-value"></span>
             <small class="text-muted">
@@ -55,6 +55,7 @@
               </div>
               <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
                 <h4><span ng-if="info.name||info.nickname" ng-bind="info.name||info.nickname||idValue"></span><span ng-hide="!info.nickname || !info.name || info.nickname === info.name"> (<span class="text-muted" ng-bind="info.nickname"></span>)</span></h4>
+                <!--
                 <p class="received-stats">
                   <div><strong>Received</strong></div>
                   <div>
@@ -72,7 +73,7 @@
                     <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="stats[0].sentNeutral">-</span></span>
                     <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="stats[0].sentNegative">-</span></span>
                   </div>
-                </p>
+                </p> -->
                 <div class="hidden-xs">
                   <p class="hidden-xs">
                     <div>First seen</div>
@@ -85,26 +86,24 @@
         </div>
       </div>
 
-      <div ng-if="isUniqueType && hasQuickContacts" class="visible-xs visible-sm panel quick-contact">
+      <div ng-if="isUniqueType && hasQuickContacts" class="visible-xs visible-sm quick-contact">
         <a ng-repeat="id in connections" ng-if="id.quickContact" class="btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span>&nbsp;</a>
       </div>
-      <div ng-if="isUniqueType && trustpaths.length > 0 && !(idType === filters.viewpointType && idValue === filters.viewpointValue)" class="panel panel-default">
-        <div class="panel-body">
-          <ul ng-repeat="level in trustpaths" class="trustpath-list list-unstyled">
-            <li ng-repeat-start="id in level" ng-if="!$parent.$last && ($index < 3 || collapseLevel[$parent.$index])">
-              <a class="id-link" ui-sref="identities.show({ type: id[0], value: id[1] })" title=""><img alt="" src="https://www.gravatar.com/avatar/{{id.gravatar}}?d=retro&amp;s=30" class="mar-bot5 gravatar mar-right10"><span ng-bind="id.name.name || id[1]"></span></a>
-            </li>
-            <li class="mar-bot5" ng-if="level.length > 3 && $index === 2">
-              <a href="" ng-click="collapseLevel[$parent.$index] = !collapseLevel[$parent.$index]">{{level.length - 3}} more</a>
-            </li>
-            <li ng-if="$last && !$parent.$last" class="has-success" ng-repeat-end>
-              <span class="positive mar-left5 mar-bot10 glyphicon glyphicon-thumbs-up"></span>
-            </li>
-            <li ng-if="$last">
-              <a class="id-link" ui-sref="identities.show({ type: idType, value: idValue })" title=""><img alt="" src="https://www.gravatar.com/avatar/{{gravatar}}?d=retro&amp;s=30" class="mar-bot5 gravatar mar-right10"><span ng-bind="info.name || info.nickname || idValue"></span></a>
-            </li>
-          </ul>
-        </div>
+      <div ng-if="isUniqueType && trustpaths.length > 0 && !(idType === filters.viewpointType && idValue === filters.viewpointValue)" class="stats-box">
+        <ul ng-repeat="level in trustpaths" class="trustpath-list list-unstyled">
+          <li ng-repeat-start="id in level" ng-if="!$parent.$last && ($index < 3 || collapseLevel[$parent.$index])">
+            <a class="id-link" ui-sref="identities.show({ type: id[0], value: id[1] })" title=""><img alt="" src="https://www.gravatar.com/avatar/{{id.gravatar}}?d=retro&amp;s=30" class="mar-bot5 gravatar mar-right10"><span ng-bind="id.name.name || id[1]"></span></a>
+          </li>
+          <li class="mar-bot5" ng-if="level.length > 3 && $index === 2">
+            <a href="" ng-click="collapseLevel[$parent.$index] = !collapseLevel[$parent.$index]">{{level.length - 3}} more</a>
+          </li>
+          <li ng-if="$last && !$parent.$last" class="has-success" ng-repeat-end>
+            <span class="positive mar-left5 mar-bot10 glyphicon glyphicon-thumbs-up"></span>
+          </li>
+          <li ng-if="$last">
+            <a class="id-link" ui-sref="identities.show({ type: idType, value: idValue })" title=""><img alt="" src="https://www.gravatar.com/avatar/{{gravatar}}?d=retro&amp;s=30" class="mar-bot5 gravatar mar-right10"><span ng-bind="info.name || info.nickname || idValue"></span></a>
+          </li>
+        </ul>
       </div>
 
         </div>
@@ -113,6 +112,20 @@
           <uib-tabset>
             <uib-tab active="tabs[0].active" ng-if="isUniqueType">
               <uib-tab-heading><span class="glyphicon glyphicon-download"></span> <span class="hidden-xs">Received </span>({{0+stats[0].receivedPositive+stats[0].receivedNeutral+stats[0].receivedNegative}})</uib-tab-heading>
+
+              <div class="panel panel-default">
+                <div class="filters">
+                  <ul class="nav nav-pills msg-type-filter">
+                    <li ng-class="{active: (filters.msgType === '') }" ng-click="setFilters({ msgType: '' })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
+                    <li ng-class="{active: (filters.msgType === 'rating'), hidden: true }" ng-click="setFilters({msgType: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
+                    <li ng-class="{active: (filters.msgType === 'rating/positive') }" ng-click="setFilters({msgType: 'rating/positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].receivedPositive}})</span></a></li>
+                    <li ng-class="{active: (filters.msgType === 'rating/neutral') }" ng-click="setFilters({msgType: 'rating/neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].receivedNeutral}})</span></a></li>
+                    <li ng-class="{active: (filters.msgType === 'rating/negative') }" ng-click="setFilters({msgType: 'rating/negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].receivedNegative}})</span></a></li>
+                    <li ng-class="{active: (filters.msgType === 'verify_identity') }" ng-click="setFilters({msgType:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> Verification</a></li>
+                    <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
+                  </ul>
+                </div>
+              </div>
 
               <div ng-show="authentication.user" class="panel panel-default panel-success">
                 <div class="panel-heading visible-xs">
@@ -150,6 +163,19 @@
             </uib-tab>
             <uib-tab active="tabs[1].active" ng-if="isUniqueType">
               <uib-tab-heading><span class="glyphicon glyphicon-upload"></span> <span class="hidden-xs">Sent </span>({{0+stats[0].sentPositive+stats[0].sentNeutral+stats[0].sentNegative}})</uib-tab-heading>
+              <div class="panel panel-default">
+                <div class="filters">
+                  <ul class="nav nav-pills msg-type-filter">
+                    <li ng-class="{active: (filters.msgType === '') }" ng-click="setFilters({ msgType: '' })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
+                    <li ng-class="{active: (filters.msgType === 'rating'), hidden: true }" ng-click="setFilters({msgType: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
+                    <li ng-class="{active: (filters.msgType === 'rating/positive') }" ng-click="setFilters({msgType: 'rating/positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].sentPositive}})</span></a></li>
+                    <li ng-class="{active: (filters.msgType === 'rating/neutral') }" ng-click="setFilters({msgType: 'rating/neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].sentNeutral}})</span></a></li>
+                    <li ng-class="{active: (filters.msgType === 'rating/negative') }" ng-click="setFilters({msgType: 'rating/negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].sentNegative}})</span></a></li>
+                    <li ng-class="{active: (filters.msgType === 'verify_identity') }" ng-click="setFilters({msgType:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> Verification</a></li>
+                    <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
+                  </ul>
+                </div>
+              </div>
               <div ng-if="sent.$resolved && sent.length == 0" class="alert alert-info text-center animated fadeIn">No messages to show</div>
               <div infinite-scroll="getSentMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!sent.$resolved || sent.finished || !tabs[1].active">
                 <div ng-repeat="msg in sent" ng-include="'app/messages/message.partial.html'"></div>
