@@ -91,7 +91,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
           when 'connection'
             msg.iconStyle = 'glyphicon glyphicon-ok'
             msg.hasSuccess = 'has-success'
-          when 'refute_identity'
+          when 'unverify_identity'
             msg.iconStyle = 'glyphicon glyphicon-remove'
             msg.hasSuccess = 'has-error'
           when 'rating'

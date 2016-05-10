@@ -83,7 +83,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           when 'connection'
             msg.iconStyle = 'glyphicon glyphicon-ok'
             msg.hasSuccess = 'has-success'
-          when 'refute_identity'
+          when 'unverify_identity'
             msg.iconStyle = 'glyphicon glyphicon-remove'
             msg.hasSuccess = 'has-error'
           when 'rating'
@@ -124,43 +124,41 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.search = (query, limit) ->
       $rootScope.pageTitle = ''
       Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
-          { limit: if limit then limit else 20 }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (res) ->
-        $scope.identities = res
-        if $scope.identities.length > 0
-          $scope.identities.activeKey = 0
-          $scope.identities[0].active = true
-        i = 0
-        while i < $scope.identities.length
-          id = $scope.identities[i]
-          if !id.linkTo # and ApplicationConfiguration.uniqueAttributeTypes.indexOf(id.name) > -1
-            id.linkTo = { type: id.name, value: id.value }
-          switch id.name
-            when 'email'
-              id.email = id.value
-              id.gravatar = CryptoJS.MD5(id.value).toString()
-            when 'name'
-              id.name = id.value
-            when 'nickname'
-              id.nickname = id.value
-            when 'bitcoin', 'bitcoin_address'
-              id.bitcoin = id.value
-            when 'url'
-              if id.value.indexOf('twitter.com/') > -1
-                id.twitter = id.value.split('twitter.com/')[1]
-              if id.value.indexOf('facebook.com/') > -1
-                id.facebook = id.value.split('facebook.com/')[1]
-              if id.value.indexOf('plus.google.com/') > -1
-                id.googlePlus = id.value.split('plus.google.com/')[1]
-          if !id.linkTo
-            id.linkTo = { type: id.name, value: id.value }
-          if !id.gravatar
-            id.gravatar = CryptoJS.MD5(id.value).toString()
-          if !id.name
-            if id.nickname
-              id.name = id.nickname
-            else
-              id.name = id.value
-          i++
+          { limit: if limit then limit else 20 }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (identities) ->
+        $scope.identities = []
+        if identities.length > 0
+          identities.activeKey = 0
+          identities.active = true
+        angular.forEach identities, (row) ->
+          identity = {}
+          angular.forEach row, (attr) ->
+            if !attr.linkTo # and ApplicationConfiguration.uniqueAttributeTypes.indexOf(id.name) > -1
+              attr.linkTo = { type: attr.attr, value: attr.val }
+            switch attr.attr
+              when 'email'
+                identity.email = attr.val
+                identity.gravatar = CryptoJS.MD5(attr.val).toString()
+              when 'name'
+                identity.name = attr.val
+              when 'nickname'
+                identity.nickname = attr.val
+              when 'bitcoin', 'bitcoin_address'
+                identity.bitcoin = attr.val
+              when 'url'
+                if attr.val.indexOf('twitter.com/') > -1
+                  identity.twitter = attr.val.split('twitter.com/')[1]
+                if attr.val.indexOf('facebook.com/') > -1
+                  identity.facebook = attr.val.split('facebook.com/')[1]
+                if attr.val.indexOf('plus.google.com/') > -1
+                  identity.googlePlus = attr.val.split('plus.google.com/')[1]
+            if !identity.linkTo
+              identity.linkTo = { type: attr.attr, value: attr.val }
+            if !identity.gravatar
+              identity.gravatar = CryptoJS.MD5(attr.val).toString()
+            if !identity.name
+              identity.name = attr.val
+          $scope.identities.push(identity)
+        console.log $scope.identities
 
 
     messagesAdded = false
@@ -169,7 +167,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         args.id.confirmations += 1
         if $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
-      else if args.message.data.type == 'refute_identity'
+      else if args.message.data.type == 'unverify_identity'
         args.id.refutations += 1
         if $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
