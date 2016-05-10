@@ -31,7 +31,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         viewpointType: 'email'
         viewpointValue: $scope.authentication.user.email
     else
-      $rootScope.viewpoint = $rootScope.viewpoint or ['keyID', 'NK0R68KzRFFOZq8mHsyu7GL1jtJXS7LFdATPyXkMBb0='] # TODO: default viewpoint
+      $rootScope.viewpoint = $rootScope.viewpoint or ['keyID', '/pbxjXjwEsojbSfdM3wGWfE24F4fX3GasmoHXY3yYPM='] # TODO: default viewpoint
     $scope.newAttribute =
       type: ''
       value: $stateParams.value
