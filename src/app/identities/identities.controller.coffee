@@ -436,13 +436,29 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         target_name: $scope.idType
         target_value: $scope.idValue
       , ->
+        # Fill $scope.trustpaths = [] with arrays consisting of trustpath nodes by distance
         if allPaths.length == 0
           return
-        shortestPath = Object.keys(allPaths[0]).length
+        shortestPath = Object.keys(allPaths).length
+        angular.forEach allPaths, (path, i) ->
+          if path.path_string
+            arr = path.path_string.split(':')
+            j = 0
+            id = null
+            while j < arr.length
+              if j % 2 == 1
+                id = [arr[j - 1], arr[j]]
+                $scope.trustpaths.push [id]
+              j++
+
+        # console.log($scope.trustpaths)
+
+        ###
         angular.forEach allPaths[0], (value, i) ->
           set = {}
           row = []
           j = 0
+
           while j < allPaths.length
             if Object.keys(allPaths[j]).length > shortestPath
               break
@@ -453,7 +469,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           for key of set
             row.push set[key]
           $scope.trustpaths.push row
-          return
+          return ###
+
         # Names for trustpath nodes
         $scope.trustpaths[0][0].name = name: $rootScope.viewpoint.viewpointName
         $scope.trustpaths[$scope.trustpaths.length - 1][0].name = name: $scope.info.name
