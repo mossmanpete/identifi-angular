@@ -10,7 +10,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   '$http'
   # 'Authentication'
   'Identities'
-  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, Identities) -> #, Authentication
+  'config'
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, Identities, config) -> #, Authentication
     $scope.authentication = {} # Authentication
     $scope.tabs = [
       { active: true }
@@ -21,7 +22,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.sent = []
     $scope.received = []
     $scope.trustedBy = []
-    $rootScope.filters = $rootScope.filters or {} # ApplicationConfiguration.defaultFilters
+    $rootScope.filters = $rootScope.filters or config.defaultFilters
     angular.extend $rootScope.filters,
       receivedOffset: 0
       sentOffset: 0
@@ -44,11 +45,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.collapseLevel = {}
     $scope.collapseFilters = $window.innerWidth < 992
 
-    processMessages = (messages) ->
+    processMessages = (messages, msgOptions) ->
       for key of messages
         if isNaN(key)
           continue
         msg = messages[key]
+        msg[k] = v for k, v of msgOptions
         msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
         gravatarEmail = msg.authorEmail
         if msg.authorEmail == ''
@@ -71,20 +73,19 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           i++
         signedData = msg.data
         alpha = undefined
-        msg.panelStyle = 'panel-default'
         msg.iconStyle = ''
         msg.hasSuccess = ''
         msg.bgColor = ''
         msg.iconCount = new Array(1)
         switch signedData.type
           when 'verify_identity'
-            msg.iconStyle = 'glyphicon glyphicon-ok'
+            msg.iconStyle = 'glyphicon glyphicon-ok positive'
             msg.hasSuccess = 'has-success'
           when 'connection'
-            msg.iconStyle = 'glyphicon glyphicon-ok'
+            msg.iconStyle = 'glyphicon glyphicon-ok positive'
             msg.hasSuccess = 'has-success'
           when 'unverify_identity'
-            msg.iconStyle = 'glyphicon glyphicon-remove'
+            msg.iconStyle = 'glyphicon glyphicon-remove negative'
             msg.hasSuccess = 'has-error'
           when 'rating'
             rating = signedData.rating
@@ -92,23 +93,17 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             maxRatingDiff = signedData.maxRating - neutralRating
             minRatingDiff = signedData.minRating - neutralRating
             if rating > neutralRating
-              msg.panelStyle = 'panel-success'
-              msg.iconStyle = 'glyphicon glyphicon-thumbs-up'
+              msg.iconStyle = 'glyphicon glyphicon-thumbs-up positive'
               msg.iconCount = if maxRatingDiff < 2 then msg.iconCount else new Array(Math.ceil(3 * rating / maxRatingDiff))
               alpha = (rating - neutralRating - 0.5) / maxRatingDiff / 1.25 + 0.2
-              msg.bgColor = 'background-image:linear-gradient(rgba(223,240,216,' + alpha +
-                ') 0%, rgba(208,233,198,' + alpha + ') 100%);background-color: rgba(223,240,216,' + alpha + ');'
+              msg.bgColor = 'background-color: rgba(223,240,216,' + alpha + ');'
             else if rating < neutralRating
-              msg.panelStyle = 'panel-danger'
-              msg.iconStyle = 'glyphicon glyphicon-thumbs-down'
+              msg.iconStyle = 'glyphicon glyphicon-thumbs-down negative'
               msg.iconCount = if minRatingDiff > -2 then msg.iconCount else new Array(Math.ceil(3 * rating / minRatingDiff))
               alpha = (rating - neutralRating + 0.5) / minRatingDiff / 1.25 + 0.2
-              msg.bgColor = 'background-image:linear-gradient(rgba(242,222,222,' + alpha +
-                ') 0%, rgba(235,204,204,' + alpha + ') 100%);background-color: rgba(242,222,222,' + alpha + ');'
+              msg.bgColor = 'background-color:rgba(242,222,222,' + alpha + ');'
             else
-              msg.panelStyle = 'panel-warning'
-              msg.iconStyle = 'glyphicon glyphicon-question-sign'
-      return
+              msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
 
     scrollTo = (el) ->
       if !el
@@ -268,32 +263,32 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
                 conn.iconStyle = 'fa fa-facebook'
                 conn.btnStyle = 'btn-facebook'
                 conn.link = conn.value
-                conn.value = conn.value.split('facebook.com/')[1]
+                conn.linkName = conn.value.split('facebook.com/')[1]
                 conn.quickContact = true
               else if conn.value.indexOf('twitter.com/') > -1
                 conn.iconStyle = 'fa fa-twitter'
                 conn.btnStyle = 'btn-twitter'
                 conn.link = conn.value
-                conn.value = conn.value.split('twitter.com/')[1]
+                conn.linkName = conn.value.split('twitter.com/')[1]
                 conn.quickContact = true
                 $scope.getPhotosFromTwitter conn.value
               else if conn.value.indexOf('plus.google.com/') > -1
                 conn.iconStyle = 'fa fa-google-plus'
                 conn.btnStyle = 'btn-google-plus'
                 conn.link = conn.value
-                conn.value = conn.value.split('plus.google.com/')[1]
+                conn.linkName = conn.value.split('plus.google.com/')[1]
                 conn.quickContact = true
               else if conn.value.indexOf('linkedin.com/') > -1
                 conn.iconStyle = 'fa fa-linkedin'
                 conn.btnStyle = 'btn-linkedin'
                 conn.link = conn.value
-                conn.value = conn.value.split('linkedin.com/')[1]
+                conn.linkName = conn.value.split('linkedin.com/')[1]
                 conn.quickContact = true
               else if conn.value.indexOf('github.com/') > -1
                 conn.iconStyle = 'fa fa-github'
                 conn.btnStyle = 'btn-github'
                 conn.link = conn.value
-                conn.value = conn.value.split('github.com/')[1]
+                conn.linkName = conn.value.split('github.com/')[1]
                 conn.quickContact = true
               else
                 conn.iconStyle = 'glyphicon glyphicon-link'
@@ -302,7 +297,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             percentage = conn.confirmations * 100 / (conn.confirmations + conn.refutations)
             if percentage >= 80
               alpha = conn.confirmations / mostConfirmations * 0.7 + 0.3
-              conn.rowStyle = 'background-color: rgba(223,240,216,' + alpha + ')'
+              # conn.rowStyle = 'background-color: rgba(223,240,216,' + alpha + ')'
             else if percentage >= 60
               conn.rowClass = 'warning'
             else
@@ -364,13 +359,13 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         offset: $rootScope.filters.sentOffset
         limit: $rootScope.filters.limit
       }, 0), -> # if $rootScope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
-        processMessages sent
+        processMessages sent, { authorIsSelf: true }
+        console.log sent
         if $rootScope.filters.sentOffset == 0
           $scope.sent = sent
         else
           for key of sent
             if isNaN(key)
-              i++
               continue
             $scope.sent.push sent[key]
         $scope.sent.$resolved = sent.$resolved
@@ -394,13 +389,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         offset: $rootScope.filters.receivedOffset
         limit: $rootScope.filters.limit
       }, 0), -> # if $rootScope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
-        processMessages received
+        processMessages received, { recipientIsSelf: true }
         if $rootScope.filters.receivedOffset == 0
           $scope.received = received
         else
           for key of received
             if isNaN(key)
-              i++
               continue
             $scope.received.push received[key]
         $scope.received.$resolved = received.$resolved

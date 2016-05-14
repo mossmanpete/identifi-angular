@@ -8,7 +8,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
   '$location'
   # 'Authentication'
   'Messages'
-  ($scope, $rootScope, $window, $stateParams, $location, Messages) -> #, Authentication
+  'config'
+  ($scope, $rootScope, $window, $stateParams, $location, Messages, config) -> #, Authentication
     $scope.authentication = {} # Authentication
     $scope.idType = $stateParams.idType
     $scope.idValue = $stateParams.idValue
@@ -40,7 +41,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
         iconStyle = 'glyphicon-thumbs-down'
       iconStyle
 
-    $rootScope.filters = $rootScope.filters or {} # ApplicationConfiguration.defaultFilters
+    $rootScope.filters = $rootScope.filters or config.defaultFilters
     angular.extend $rootScope.filters, offset: 0
     if $scope.authentication.user
       $rootScope.viewpoint =
@@ -48,16 +49,16 @@ angular.module('identifiAngular').controller 'MessagesController', [
         viewpointType: 'email'
         viewpointValue: $scope.authentication.user.email
     else
-      $rootScope.viewpoint = $rootScope.viewpoint or {} # ApplicationConfiguration.defaultViewpoint
+      $rootScope.viewpoint = $rootScope.viewpoint or config.defaultViewpoint
     $scope.collapseFilters = $window.innerWidth < 992
 
-    processMessages = (messages) ->
+    processMessages = (messages, msgOptions) ->
       for key of messages
         if isNaN(key)
           continue
         msg = messages[key]
+        msg[k] = v for k, v of msgOptions
         msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
-        # console.log(msg)
         gravatarEmail = msg.authorEmail
         if msg.authorEmail == ''
           gravatarEmail = msg.data.author[0][0] + msg.data.author[0][1]
@@ -66,33 +67,32 @@ angular.module('identifiAngular').controller 'MessagesController', [
         i = undefined
         i = 0
         while i < msg.data.author.length
-          if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.author[i][0]) > -1
+          if config.uniqueAttributeTypes.indexOf(msg.data.author[i][0]) > -1
             msg.linkToAuthor = msg.data.author[i]
             break
           i++
         msg.linkToRecipient = msg.data.recipient[0]
         i = 0
         while i < msg.data.recipient.length
-          if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0]) > -1
+          if config.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0]) > -1
             msg.linkToRecipient = msg.data.recipient[i]
             break
           i++
         signedData = msg.data
         alpha = undefined
-        msg.panelStyle = 'panel-default'
         msg.iconStyle = ''
         msg.hasSuccess = ''
         msg.bgColor = ''
         msg.iconCount = new Array(1)
         switch signedData.type
           when 'verify_identity'
-            msg.iconStyle = 'glyphicon glyphicon-ok'
+            msg.iconStyle = 'glyphicon glyphicon-ok positive'
             msg.hasSuccess = 'has-success'
           when 'connection'
-            msg.iconStyle = 'glyphicon glyphicon-ok'
+            msg.iconStyle = 'glyphicon glyphicon-ok positive'
             msg.hasSuccess = 'has-success'
           when 'unverify_identity'
-            msg.iconStyle = 'glyphicon glyphicon-remove'
+            msg.iconStyle = 'glyphicon glyphicon-remove negative'
             msg.hasSuccess = 'has-error'
           when 'rating'
             rating = signedData.rating
@@ -100,23 +100,17 @@ angular.module('identifiAngular').controller 'MessagesController', [
             maxRatingDiff = signedData.maxRating - neutralRating
             minRatingDiff = signedData.minRating - neutralRating
             if rating > neutralRating
-              msg.panelStyle = 'panel-success'
-              msg.iconStyle = 'glyphicon glyphicon-thumbs-up'
+              msg.iconStyle = 'glyphicon glyphicon-thumbs-up positive'
               msg.iconCount = if maxRatingDiff < 2 then msg.iconCount else new Array(Math.ceil(3 * rating / maxRatingDiff))
               alpha = (rating - neutralRating - 0.5) / maxRatingDiff / 1.25 + 0.2
-              msg.bgColor = 'background-image:linear-gradient(rgba(223,240,216,' + alpha +
-                ') 0%, rgba(208,233,198,' + alpha + ') 100%);background-color: rgba(223,240,216,' + alpha + ');'
+              msg.bgColor = 'background-color: rgba(223,240,216,' + alpha + ');'
             else if rating < neutralRating
-              msg.panelStyle = 'panel-danger'
-              msg.iconStyle = 'glyphicon glyphicon-thumbs-down'
+              msg.iconStyle = 'glyphicon glyphicon-thumbs-down negative'
               msg.iconCount = if minRatingDiff > -2 then msg.iconCount else new Array(Math.ceil(3 * rating / minRatingDiff))
               alpha = (rating - neutralRating + 0.5) / minRatingDiff / 1.25 + 0.2
-              msg.bgColor = 'background-image:linear-gradient(rgba(242,222,222,' + alpha +
-                ') 0%, rgba(235,204,204,' + alpha + ') 100%);background-color: rgba(242,222,222,' + alpha + ');'
+              msg.bgColor = 'background-color:rgba(242,222,222,' + alpha + ');'
             else
-              msg.panelStyle = 'panel-warning'
-              msg.iconStyle = 'glyphicon glyphicon-question-sign'
-      return
+              msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
 
     # Create new Message
 
@@ -149,7 +143,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
       params = angular.extend({
         idType: $scope.idType
         idValue: $scope.idValue
-      }, $rootScope.filters, if $rootScope.filters.maxDistance > -1 then {} else {}) # ApplicationConfiguration.defaultViewpoint
+      }, $rootScope.filters, if $rootScope.filters.maxDistance > -1 then config.defaultViewpoint else {})
       messages = Messages.query(params, ->
         processMessages messages
         if $rootScope.filters.offset == 0

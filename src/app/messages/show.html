@@ -39,7 +39,7 @@
       <div class="panel-heading">
         <h3 class="panel-title" ng-bind="message.data.type"></h3>
       </div>
-      <div class="panel-body">
+      <div class="panel-body" ng-if="message.data.rating || message.data.comment">
         <p ng-if="message.data.rating"><strong>Score:</strong> <span ng-bind="message.data.rating"></span>
           <small>(<span ng-bind="message.data.minRating"></span>...<span ng-bind="message.data.maxRating"></span>)</small>
         </p>
