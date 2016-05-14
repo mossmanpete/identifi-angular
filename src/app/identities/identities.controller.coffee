@@ -20,7 +20,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.info = {}
     $scope.sent = []
     $scope.received = []
-    $scope.trustpaths = []
+    $scope.trustedBy = []
     $rootScope.filters = $rootScope.filters or {} # ApplicationConfiguration.defaultFilters
     angular.extend $rootScope.filters,
       receivedOffset: 0
@@ -197,7 +197,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         when 13
           args.event.preventDefault()
           id = $scope.identities[$scope.identities.activeKey]
-          $state.go 'identities.show', { type: id.linkTo.type, value: id.linkTo.value }
+          $state.go 'identities.show', { type: id.linkTo.name, value: id.linkTo.value }
         when -1
           clearTimeout $scope.timer
           $scope.queryTerm = ''
@@ -224,14 +224,15 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), ->
         mostConfirmations = if $scope.connections.length > 0 then $scope.connections[0].confirmations else 1
         $scope.connections.unshift
-          type: $scope.idType
+          name: $scope.idType
           value: $scope.idValue
           confirmations: 1
           refutations: 0
           isCurrent: true
         for key of $scope.connections
           conn = $scope.connections[key]
-          switch conn.type
+          console.log "1"
+          switch conn.name
             when 'email'
               conn.iconStyle = 'glyphicon glyphicon-envelope'
               conn.btnStyle = 'btn-success'
@@ -253,6 +254,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               $scope.info.nickname = $scope.info.nickname or conn.value
               conn.iconStyle = 'glyphicon glyphicon-font'
             when 'name'
+              console.log 2
               $scope.info.name = $scope.info.name or conn.value
               conn.iconStyle = 'glyphicon glyphicon-font'
             when 'tel', 'phone'
@@ -430,68 +432,26 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.tabs[2].active = true
       $rootScope.pageTitle = ' - ' + $scope.idValue
       $scope.getConnections()
-      allPaths = Identities.trustpaths
+      trustpaths = Identities.trustpaths
         idType: $rootScope.viewpoint[0]
         idValue: $rootScope.viewpoint[1]
         target_name: $scope.idType
         target_value: $scope.idValue
       , ->
-        # Fill $scope.trustpaths = [] with arrays consisting of trustpath nodes by distance
-        if allPaths.length == 0
+        if trustpaths.length == 0
           return
-        shortestPath = Object.keys(allPaths).length
-        angular.forEach allPaths, (path, i) ->
+        shortestPath = Object.keys(trustpaths).length
+        trustedByExists = {}
+        angular.forEach trustpaths, (path, i) ->
           if path.path_string
             arr = path.path_string.split(':')
-            j = 0
-            id = null
-            while j < arr.length
-              if j % 2 == 1
-                id = [arr[j - 1], arr[j]]
-                $scope.trustpaths.push [id]
-              j++
-
-        # console.log($scope.trustpaths)
-
-        ###
-        angular.forEach allPaths[0], (value, i) ->
-          set = {}
-          row = []
-          j = 0
-
-          while j < allPaths.length
-            if Object.keys(allPaths[j]).length > shortestPath
-              break
-            id = allPaths[j][i]
-            id.gravatar = CryptoJS.MD5(id[1]).toString()
-            set[id[0] + id[1]] = id
-            j++
-          for key of set
-            row.push set[key]
-          $scope.trustpaths.push row
-          return ###
-
-        # Names for trustpath nodes
-        $scope.trustpaths[0][0].name = name: $rootScope.viewpoint.viewpointName
-        $scope.trustpaths[$scope.trustpaths.length - 1][0].name = name: $scope.info.name
-
-        setIdName = (res) ->
-          id.name = res.name
-          return
-
-        i = 1
-        while i < $scope.trustpaths.length - 1
-          n = 0
-          for key of $scope.trustpaths[i]
-            id = $scope.trustpaths[i][key]
-            id.name = Identities.getname(
-              idType: id[0]
-              idValue: id[1])
-            if ++n == 3
-              break
-          i++
-        return
-      return
+            if arr.length >= 5
+              obj = { linkTo: [arr[arr.length-5], arr[arr.length-4]] }
+              if not trustedByExists[obj.linkTo.join(':')]
+                trustedByExists[obj.linkTo.join(':')] = true
+                obj[arr[arr.length-5]] = arr[arr.length-4]
+                obj.gravatar = CryptoJS.MD5(arr[arr.length-4]).toString()
+                $scope.trustedBy.push(obj)
 
     $scope.setFilters = (filters) ->
       angular.extend $rootScope.filters, filters

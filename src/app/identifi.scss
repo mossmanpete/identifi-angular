@@ -1281,7 +1281,7 @@ a {
 }
 
 .nav-tabs {
-  margin-bottom: 20px;
+  margin-bottom: 0;// 20px;
 }
 
 .highlight {
@@ -1294,21 +1294,6 @@ a {
     margin: 0;
     padding: 15px;
     display: inline-block;
-  }
-  .quick-contact {
-    margin: 0;
-    a {
-      margin: 5px 5px 0 0;
-    }
-  }
-}
-
-.quick-contact {
-  margin: 0 0 10px 0;
-  box-shadow: none;
-  background-color: inherit;
-  a {
-    margin: 0 10px 10px 0;
   }
 }
 
