@@ -267,22 +267,34 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               if conn.value.indexOf('facebook.com/') > -1
                 conn.iconStyle = 'fa fa-facebook'
                 conn.btnStyle = 'btn-facebook'
+                conn.link = conn.value
+                conn.value = conn.value.split('facebook.com/')[1]
                 conn.quickContact = true
               else if conn.value.indexOf('twitter.com/') > -1
                 conn.iconStyle = 'fa fa-twitter'
                 conn.btnStyle = 'btn-twitter'
+                conn.link = conn.value
+                conn.value = conn.value.split('twitter.com/')[1]
                 conn.quickContact = true
                 $scope.getPhotosFromTwitter conn.value
               else if conn.value.indexOf('plus.google.com/') > -1
                 conn.iconStyle = 'fa fa-google-plus'
                 conn.btnStyle = 'btn-google-plus'
+                conn.link = conn.value
+                conn.value = conn.value.split('plus.google.com/')[1]
                 conn.quickContact = true
               else if conn.value.indexOf('linkedin.com/') > -1
                 conn.iconStyle = 'fa fa-linkedin'
                 conn.btnStyle = 'btn-linkedin'
+                conn.link = conn.value
+                conn.value = conn.value.split('linkedin.com/')[1]
+                conn.quickContact = true
               else if conn.value.indexOf('github.com/') > -1
                 conn.iconStyle = 'fa fa-github'
                 conn.btnStyle = 'btn-github'
+                conn.link = conn.value
+                conn.value = conn.value.split('github.com/')[1]
+                conn.quickContact = true
               else
                 conn.iconStyle = 'glyphicon glyphicon-link'
                 conn.btnStyle = 'btn-default'
