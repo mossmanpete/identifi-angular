@@ -22,8 +22,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.sent = []
     $scope.received = []
     $scope.trustedBy = []
-    $rootScope.filters = $rootScope.filters or config.defaultFilters
-    angular.extend $rootScope.filters,
+    $scope.filters = $scope.filters or config.defaultFilters
+    angular.extend $scope.filters,
       receivedOffset: 0
       sentOffset: 0
     if $scope.authentication.user
@@ -119,7 +119,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.search = (query, limit) ->
       $rootScope.pageTitle = ''
       Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
-          { limit: if limit then limit else 20 }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (identities) ->
+          { limit: if limit then limit else 20 }, if $scope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (identities) ->
         $scope.identities = []
         if identities.length > 0
           identities.activeKey = 0
@@ -213,10 +213,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.search args.queryTerm, args.limit
 
     $scope.getConnections = ->
-      $scope.connections = Identities.connections(angular.extend($rootScope.filters, {
+      $scope.connections = Identities.connections({
         idType: $scope.idType
         idValue: $scope.idValue
-      }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), ->
+      }, ->
         mostConfirmations = if $scope.connections.length > 0 then $scope.connections[0].confirmations else 1
         $scope.connections.unshift
           name: $scope.idType
@@ -312,7 +312,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             idValue: $scope.idValue
             target_name: id.name
             target_value: id.value
-          }, $rootScope.filters), ->
+          }, $scope.filters), ->
             for key of id.connecting_msgs
               if isNaN(key)
                 i++
@@ -340,10 +340,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       return
 
     $scope.getStats = ->
-      $scope.stats = Identities.stats(angular.extend({}, $rootScope.filters, {
+      $scope.stats = Identities.stats(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
-      }, if $rootScope.filters.maxDistance > -1 then ['a', 'b'] else 0), -> # then ApplicationConfiguration.defaultViewpoint
+      }, if $scope.filters.maxDistance > -1 then ['a', 'b'] else 0), -> # then ApplicationConfiguration.defaultViewpoint
         $scope.info.email = $scope.info.email or $scope.stats.email
         return
       )
@@ -351,17 +351,17 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.getSentMsgs = (offset) ->
       if !isNaN(offset)
-        $rootScope.filters.sentOffset = offset
-      sent = Identities.sent(angular.extend($rootScope.filters, {
+        $scope.filters.sentOffset = offset
+      sent = Identities.sent(angular.extend($scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
-        msgType: $rootScope.filters.msgType
-        offset: $rootScope.filters.sentOffset
-        limit: $rootScope.filters.limit
-      }, 0), -> # if $rootScope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
+        type: $scope.filters.type
+        offset: $scope.filters.sentOffset
+        limit: $scope.filters.limit
+      }, 0), -> # if $scope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
         processMessages sent, { authorIsSelf: true }
         console.log sent
-        if $rootScope.filters.sentOffset == 0
+        if $scope.filters.sentOffset == 0
           $scope.sent = sent
         else
           for key of sent
@@ -369,8 +369,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               continue
             $scope.sent.push sent[key]
         $scope.sent.$resolved = sent.$resolved
-        $rootScope.filters.sentOffset = $rootScope.filters.sentOffset + sent.length
-        if sent.length < $rootScope.filters.limit
+        $scope.filters.sentOffset = $scope.filters.sentOffset + sent.length
+        if sent.length < $scope.filters.limit
           $scope.sent.finished = true
         return
       )
@@ -381,16 +381,16 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.getReceivedMsgs = (offset) ->
       if !isNaN(offset)
-        $rootScope.filters.receivedOffset = offset
-      received = Identities.received(angular.extend($rootScope.filters, {
+        $scope.filters.receivedOffset = offset
+      received = Identities.received(angular.extend($scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
-        msgType: $rootScope.filters.msgType
-        offset: $rootScope.filters.receivedOffset
-        limit: $rootScope.filters.limit
-      }, 0), -> # if $rootScope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
+        type: $scope.filters.type
+        offset: $scope.filters.receivedOffset
+        limit: $scope.filters.limit
+      }, 0), -> # if $scope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
         processMessages received, { recipientIsSelf: true }
-        if $rootScope.filters.receivedOffset == 0
+        if $scope.filters.receivedOffset == 0
           $scope.received = received
         else
           for key of received
@@ -398,8 +398,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               continue
             $scope.received.push received[key]
         $scope.received.$resolved = received.$resolved
-        $rootScope.filters.receivedOffset = $rootScope.filters.receivedOffset + received.length
-        if received.length < $rootScope.filters.limit
+        $scope.filters.receivedOffset = $scope.filters.receivedOffset + received.length
+        if received.length < $scope.filters.limit
           $scope.received.finished = true
         return
       )
@@ -460,13 +460,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
                 $scope.trustedBy.push(obj)
 
     $scope.setFilters = (filters) ->
-      angular.extend $rootScope.filters, filters
-      angular.extend $rootScope.filters,
+      angular.extend $scope.filters, filters
+      angular.extend $scope.filters,
         offset: 0
         receivedOffset: 0
         sentOffset: 0
-      $scope.getConnections()
-      return
+      $scope.getReceivedMsgs 0
+      $scope.getSentMsgs 0
 
-    return
 ]

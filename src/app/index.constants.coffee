@@ -3,6 +3,6 @@ angular.module('identifiAngular')
   .constant 'moment', moment
   .constant 'config',
     defaultFilters:
-      msgType: ''
+      type: null
     defaultViewpoint: {}
     uniqueAttributeTypes: ['email', 'url', 'keyID', 'tel', 'phone', 'account']

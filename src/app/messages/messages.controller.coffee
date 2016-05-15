@@ -41,8 +41,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
         iconStyle = 'glyphicon-thumbs-down'
       iconStyle
 
-    $rootScope.filters = $rootScope.filters or config.defaultFilters
-    angular.extend $rootScope.filters, offset: 0
+    $scope.filters = config.defaultFilters
+    angular.extend $scope.filters, offset: 0
     if $scope.authentication.user
       $rootScope.viewpoint =
         viewpointName: $scope.authentication.user.displayName
@@ -139,14 +139,15 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.find = (offset) ->
       $rootScope.pageTitle = ' - Latest messages'
       if !isNaN(offset)
-        $rootScope.filters.offset = offset
+        $scope.filters.offset = offset
       params = angular.extend({
         idType: $scope.idType
         idValue: $scope.idValue
-      }, $rootScope.filters, if $rootScope.filters.maxDistance > -1 then config.defaultViewpoint else {})
-      messages = Messages.query(params, ->
+      }, $scope.filters, if $scope.filters.maxDistance > -1 then config.defaultViewpoint else {})
+      console.log params
+      messages = Messages.query params, ->
         processMessages messages
-        if $rootScope.filters.offset == 0
+        if $scope.filters.offset == 0
           $scope.messages = messages
         else
           for key of messages
@@ -155,37 +156,29 @@ angular.module('identifiAngular').controller 'MessagesController', [
               continue
             $scope.messages.push messages[key]
         $scope.messages.$resolved = messages.$resolved
-        $rootScope.filters.offset = $rootScope.filters.offset + (messages.length or 0)
-        if messages.length < $rootScope.filters.limit
+        $scope.filters.offset = $scope.filters.offset + (messages.length or 0)
+        if messages.length < $scope.filters.limit
           $scope.messages.finished = true
-        return
-      )
       if offset == 0
         $scope.messages = {}
       $scope.messages.$resolved = messages.$resolved
-      return
 
     # Find existing Message
 
     $scope.findOne = ->
-      $scope.message = Messages.get({ id: $stateParams.id }, ->
+      $scope.message = Messages.get { id: $stateParams.id }, ->
         $rootScope.pageTitle = ' - Message ' + $stateParams.id
         $scope.message.data = KJUR.jws.JWS.parse($scope.message.jws).payloadObj
         $scope.message.strData = JSON.stringify($scope.message.data, undefined, 2)
         $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
         $scope.message.recipientGravatar = CryptoJS.MD5($scope.message.recipientEmail or $scope.message.data.recipient[0][1]).toString()
-        return
-      )
-      return
 
     $scope.setFilters = (filters) ->
-      angular.extend $rootScope.filters, filters
-      angular.extend $rootScope.filters,
+      angular.extend $scope.filters, filters
+      angular.extend $scope.filters,
         offset: 0
         receivedOffset: 0
         sentOffset: 0
       $scope.find 0
-      return
 
-    return
 ]

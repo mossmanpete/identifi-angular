@@ -129,19 +129,19 @@
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
-                      <li ng-class="{active: (filters.msgType === '') }" ng-click="setFilters({ msgType: '' })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
-                      <li ng-class="{active: (filters.msgType === 'rating'), hidden: true }" ng-click="setFilters({msgType: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
-                      <li ng-class="{active: (filters.msgType === 'rating/positive') }" ng-click="setFilters({msgType: 'rating/positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].receivedPositive}})</span></a></li>
-                      <li ng-class="{active: (filters.msgType === 'rating/neutral') }" ng-click="setFilters({msgType: 'rating/neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].receivedNeutral}})</span></a></li>
-                      <li ng-class="{active: (filters.msgType === 'rating/negative') }" ng-click="setFilters({msgType: 'rating/negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].receivedNegative}})</span></a></li>
-                      <li ng-class="{active: (filters.msgType === 'verify_identity') }" ng-click="setFilters({msgType:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">Verification</span></a></li>
+                      <li ng-class="{active: (filters.type === null) }" ng-click="setFilters({ type: null })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
+                      <li ng-class="{active: (filters.type === 'rating'), hidden: true }" ng-click="setFilters({type: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
+                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].receivedPositive}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].receivedNeutral}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].receivedNegative}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">Verification</span></a></li>
                       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
                     </ul>
                   </div>
                 </div>
                 <div class="panel" ng-repeat="msg in received" style="{{msg.bgColor}}" ng-include="'app/messages/message.partial.html'"></div>
               </div>
-              <div ng-if="received.$resolved && received.length == 0" class="alert alert-info text-center animated fadeIn">No messages to show</div>
+              <div ng-if="received.$resolved && received.length == 0" class="alert alert-info text-center">No messages to show</div>
               <div ng-if="!received.$resolved" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
             <uib-tab active="tabs[1].active" ng-if="isUniqueType">
@@ -150,19 +150,19 @@
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
-                      <li ng-class="{active: (filters.msgType === '') }" ng-click="setFilters({ msgType: '' })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
-                      <li ng-class="{active: (filters.msgType === 'rating'), hidden: true }" ng-click="setFilters({msgType: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
-                      <li ng-class="{active: (filters.msgType === 'rating/positive') }" ng-click="setFilters({msgType: 'rating/positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].sentPositive}})</span></a></li>
-                      <li ng-class="{active: (filters.msgType === 'rating/neutral') }" ng-click="setFilters({msgType: 'rating/neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].sentNeutral}})</span></a></li>
-                      <li ng-class="{active: (filters.msgType === 'rating/negative') }" ng-click="setFilters({msgType: 'rating/negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].sentNegative}})</span></a></li>
-                      <li ng-class="{active: (filters.msgType === 'verify_identity') }" ng-click="setFilters({msgType:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">Verification</span></a></li>
+                      <li ng-class="{active: (filters.type === null) }" ng-click="setFilters({ type: null })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
+                      <li ng-class="{active: (filters.type === 'rating'), hidden: true }" ng-click="setFilters({type: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
+                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].sentPositive}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].sentNeutral}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].sentNegative}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">Verification</span></a></li>
                       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
                     </ul>
                   </div>
                 </div>
                 <div class="panel" ng-repeat="msg in sent" style="{{msg.bgColor}}" ng-include="'app/messages/message.partial.html'"></div>
               </div>
-              <div ng-if="sent.$resolved && sent.length == 0" class="alert alert-info text-center animated fadeIn">No messages to show</div>
+              <div ng-if="sent.$resolved && sent.length == 0" class="alert alert-info text-center">No messages to show</div>
               <div ng-if="!sent.$resolved" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
             <uib-tab active="tabs[2].active" ng-if="true">

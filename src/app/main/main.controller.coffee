@@ -66,7 +66,7 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.search = (query, limit) ->
       $rootScope.pageTitle = ''
       Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
-          { limit: if limit then limit else 20 }, if $rootScope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (res) ->
+          { limit: if limit then limit else 20 }, if $scope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (res) ->
         $scope.identities = res
         if $scope.identities.length > 0
           $scope.identities.activeKey = 0

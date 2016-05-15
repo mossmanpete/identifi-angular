@@ -3,14 +3,14 @@
     <h4 class="panel-title"><a><span class="fa fa-filter"></span> Filters</a></h4></div>
   <div class="panel-body filters" uib-collapse="collapseFilters">
     <ul class="nav nav-pills nav-stacked msg-type-filter">
-      <li ng-class="{active: (filters.msgType === '') }" ng-click="setFilters({ msgType: '' })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
-      <li ng-class="{active: (filters.msgType === 'rating') }" ng-click="setFilters({msgType: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
+      <li ng-class="{active: (filters.type === null) }" ng-click="setFilters({ type: null })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
+      <li ng-class="{active: (filters.type === 'rating') }" ng-click="setFilters({type: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
       <ul class="nav nav-pills nav-stacked" style="padding-left: 1em;">
-        <li ng-class="{active: (filters.msgType === 'rating/positive') }" ng-click="setFilters({msgType: 'rating/positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> Positive</span></a></li>
-        <li ng-class="{active: (filters.msgType === 'rating/neutral') }" ng-click="setFilters({msgType: 'rating/neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> Neutral</span></a></li>
-        <li ng-class="{active: (filters.msgType === 'rating/negative') }" ng-click="setFilters({msgType: 'rating/negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> Negative</span></a></li>
+        <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> Positive</span></a></li>
+        <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> Neutral</span></a></li>
+        <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> Negative</span></a></li>
       </ul>
-      <li ng-class="{active: (filters.msgType === 'verify_identity') }" ng-click="setFilters({msgType:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> Connection</a></li>
+      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> Verification</a></li>
       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
     </ul>
     <div class="alert alert-info">
