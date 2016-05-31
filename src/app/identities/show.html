@@ -52,6 +52,10 @@
               </div>
               <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12 mar-bot10 mar-top10">
                 <h4><span ng-if="info.name||info.nickname" ng-bind="info.name||info.nickname||idValue"></span><span ng-hide="!info.nickname || !info.name || info.nickname === info.name"> (<span class="text-muted" ng-bind="info.nickname"></span>)</span></h4>
+                <p>
+                  <b ng-if="stats[0].receivedPositive">Received: <span ng-bind="stats[0].receivedPositive / (stats[0].receivedPositive+stats[0].receivedNeutral+stats[0].receivedNegative) * 100 | number:0"></span>% positive<br></b>
+                  <span ng-if="stats[0].sentPositive">Sent: <span ng-bind="stats[0].sentPositive / (stats[0].sentPositive+stats[0].sentNeutral+stats[0].sentNegative) * 100 | number:0"></span>% positive</span>
+                </p>
                 <!--
                 <p class="received-stats">
                   <div><strong>Received</strong></div>

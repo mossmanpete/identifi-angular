@@ -1150,6 +1150,7 @@ h1 {
 
 .panel {
   word-wrap: break-word;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
 
 	.gravatar {
 		outline: 1px solid rgba(0,0,0,0.1);
@@ -1322,6 +1323,10 @@ a {
 		z-index: -1;
 	}
 	*/
+}
+
+.table-hover>tbody>tr:hover {
+    background-color: #efefef;
 }
 
 .quick-contact {

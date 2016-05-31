@@ -31,6 +31,9 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.logout = ->
       Persona.logout()
 
+    $scope.removeFocus = (event) ->
+      event.currentTarget.blur()
+
     $scope.logoClicked = ->
       $scope.query.term = ''
       $scope.searchKeydown()
