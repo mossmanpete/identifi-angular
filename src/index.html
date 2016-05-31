@@ -24,10 +24,67 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <div>
-      <acme-navbar></acme-navbar>
+    <div ng-controller="MainController">
+      <nav class="navbar navbar-default navbar-fixed-top"> <!-- ng-controller="HeaderController"-->
+      	<div class="container" role="navigation">
+          <div class="navbar-header">
+            <h1><a href="/" class="navbar-brand" ng-click="logoClicked();removeFocus($event)">
+            identifi</a></h1>
+          </div>
+
+          <ul class="nav navbar-nav navbar-right">
+            <li class="" ng-class="{active: $uiRoute}"><a ui-sref="messages.list"><span class="glyphicon glyphicon-globe"></span></a></li>
+            <li class="" ng-class="{active: $uiRoute}"><a ui-sref="about"><span class="glyphicon glyphicon-info-sign"></span></a></li>
+      			<li ng-show="authentication.user" ui-route="/identities/{{authentication.user.idType}}/{{authentication.user.idValue|encodeURIComponent}}" ng-class="{active: $uiRoute}">
+      				<a ng-href="/identities/{{authentication.user.idType}}/{{authentication.user.idValue|escape}}">
+      					<span class="glyphicon glyphicon-user"></span> <span class="hidden-xs" ng-bind="authentication.user.displayName"></span>
+      				</a>
+      			</li>
+            <li ng-show="authentication.user"><a href="/auth/signout" target="_self" ng-click="logout()" class="glyphicon glyphicon-log-out"></span></a></li>
+      			<!-- login removed for now
+            <li class="hidden-xs dropdown " ng-hide="authentication.user">
+              <a href="#" class="dropdown-toggle login-button" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in"></span> Log in <b class="caret"></b></a>
+              <ul class="dropdown-menu login-menu">
+                <li>
+                  <button ng-click="login()" id="email-login" class="btn btn-block btn-social btn-success">
+                    <i class="fa fa-envelope"></i> Email
+                  </button>
+                </li>
+                <li>
+                  <button onclick="window.location='/auth/facebook';" class="btn btn-block btn-social btn-facebook">
+                    <i class="fa fa-facebook"></i> Facebook
+                  </button>
+                </li>
+                <li>
+                  <button onclick="window.location='/auth/twitter';" class="btn btn-block btn-social btn-twitter">
+                    <i class="fa fa-twitter"></i> Twitter
+                  </button>
+                </li>
+                <li>
+                  <button onclick="window.location='/auth/google';" class="btn btn-block btn-social btn-google-plus">
+                    <i class="fa fa-google-plus"></i> Google
+                  </button>
+                </li>
+              </ul>
+            </li>
+            <li ng-hide="authentication.user" ui-route="/signin" ng-class="{active: $uiRoute}">
+              <a href="/signin" class="visible-xs login-button" ><span class="glyphicon glyphicon-log-in"></span> Log in</b></a>
+            </li> -->
+          </ul>
+
+          <form class="navbar-form navbar-left nav-search" ng-submit="addAttribute()" role="search" ng-if="'identities.list' | isState">
+            <input type="text" ng-keydown="searchKeydown($event)" ng-model="queryTerm" autocomplete="off" autofocus value="" class="nav-search-field search-search form-control" placeholder="Search">
+          </form>
+
+          <div>
+          	<autocomplete ng-if="!('identities.list' | isState)" ng-model="queryTerm" on-select="dropdownSearchSelect" on-type="searchChanged" data="identities" attr-input-class="form-control nav-search-field" attr-class="navbar-form navbar-left nav-search hidden-xs" attr-placeholder="Search">
+          </div>
+
+      	</div>
+      </nav>
+
+      <div ui-view></div>
     </div>
-    <div ui-view></div>
 
     <!-- build:js(src) scripts/vendor.js -->
     <!-- bower:js -->

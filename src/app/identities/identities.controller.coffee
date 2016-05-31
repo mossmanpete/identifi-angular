@@ -12,7 +12,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   'Identities'
   'config'
   ($scope, $state, $rootScope, $window, $stateParams, $location, $http, Identities, config) -> #, Authentication
-    $scope.authentication = {} # Authentication
     $scope.tabs = [
       { active: true }
       { active: false }
@@ -36,7 +35,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.newAttribute =
       type: ''
       value: $stateParams.value
-    $scope.queryTerm = ''
 
     $scope.goToID = (type, value) ->
       $location.path '/identities/' + encodeURIComponent(type) + '/' + encodeURIComponent(value)
@@ -44,66 +42,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.collapseLevel = {}
     $scope.collapseFilters = $window.innerWidth < 992
-
-    processMessages = (messages, msgOptions) ->
-      for key of messages
-        if isNaN(key)
-          continue
-        msg = messages[key]
-        msg[k] = v for k, v of msgOptions
-        msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
-        gravatarEmail = msg.authorEmail
-        if msg.authorEmail == ''
-          gravatarEmail = msg.data.author[0][0] + msg.data.author[0][1]
-        msg.gravatar = CryptoJS.MD5(gravatarEmail).toString()
-        msg.linkToAuthor = msg.data.author[0]
-        i = undefined
-        i = 0
-        while i < msg.data.author.length
-          if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.author[i][0]) > -1
-            msg.linkToAuthor = msg.data.author[i]
-            break
-          i++
-        msg.linkToRecipient = msg.data.recipient[0]
-        i = 0
-        while i < msg.data.recipient.length
-          if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0]) > -1
-            msg.linkToRecipient = msg.data.recipient[i]
-            break
-          i++
-        signedData = msg.data
-        alpha = undefined
-        msg.iconStyle = ''
-        msg.hasSuccess = ''
-        msg.bgColor = ''
-        msg.iconCount = new Array(1)
-        switch signedData.type
-          when 'verify_identity'
-            msg.iconStyle = 'glyphicon glyphicon-ok positive'
-            msg.hasSuccess = 'has-success'
-          when 'connection'
-            msg.iconStyle = 'glyphicon glyphicon-ok positive'
-            msg.hasSuccess = 'has-success'
-          when 'unverify_identity'
-            msg.iconStyle = 'glyphicon glyphicon-remove negative'
-            msg.hasSuccess = 'has-error'
-          when 'rating'
-            rating = signedData.rating
-            neutralRating = (signedData.minRating + signedData.maxRating) / 2
-            maxRatingDiff = signedData.maxRating - neutralRating
-            minRatingDiff = signedData.minRating - neutralRating
-            if rating > neutralRating
-              msg.iconStyle = 'glyphicon glyphicon-thumbs-up positive'
-              msg.iconCount = if maxRatingDiff < 2 then msg.iconCount else new Array(Math.ceil(3 * rating / maxRatingDiff))
-              alpha = (rating - neutralRating - 0.5) / maxRatingDiff / 1.25 + 0.2
-              msg.bgColor = 'background-color: rgba(223,240,216,' + alpha + ');'
-            else if rating < neutralRating
-              msg.iconStyle = 'glyphicon glyphicon-thumbs-down negative'
-              msg.iconCount = if minRatingDiff > -2 then msg.iconCount else new Array(Math.ceil(3 * rating / minRatingDiff))
-              alpha = (rating - neutralRating + 0.5) / minRatingDiff / 1.25 + 0.2
-              msg.bgColor = 'background-color:rgba(242,222,222,' + alpha + ');'
-            else
-              msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
 
     scrollTo = (el) ->
       if !el
@@ -153,7 +91,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             if !identity.name
               identity.name = attr.val
           $scope.identities.push(identity)
-        console.log $scope.identities
 
 
     messagesAdded = false
@@ -171,43 +108,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.received.shift()
         $scope.received.unshift args.message
         messagesAdded = true
-        processMessages $scope.received
-
-    $scope.$on 'SearchKeydown', (event, args) ->
-      switch (if args.event then args.event.which else -1)
-        when 38
-          args.event.preventDefault()
-          if $scope.identities.activeKey > 0
-            $scope.filteredIdentities[$scope.identities.activeKey].active = false
-            $scope.filteredIdentities[$scope.identities.activeKey - 1].active = true
-            $scope.identities.activeKey--
-          scrollTo document.getElementById('result' + $scope.identities.activeKey)
-        when 40
-          args.event.preventDefault()
-          if $scope.identities.activeKey < ($scope.filteredIdentities.length || 0) - 1
-            $scope.filteredIdentities[$scope.identities.activeKey].active = false
-            $scope.filteredIdentities[$scope.identities.activeKey + 1].active = true
-            $scope.identities.activeKey++
-          scrollTo document.getElementById('result' + $scope.identities.activeKey)
-        when 13
-          args.event.preventDefault()
-          id = $scope.identities[$scope.identities.activeKey]
-          $state.go 'identities.show', { type: id.linkTo.name, value: id.linkTo.value }
-        when -1
-          clearTimeout $scope.timer
-          $scope.queryTerm = ''
-          $scope.search()
-        when 33, 34, 35, 36, 37, 39
-        else
-          el = angular.element(args.event.currentTarget)
-          clearTimeout $scope.timer
-          wait = setTimeout((->
-            $scope.queryTerm = el.val()
-            $scope.search()
-            return
-          ), 300)
-          $scope.timer = wait
-          break
+        $scope.processMessages $scope.received
 
     $scope.$on 'SearchChanged', (event, args) ->
       $scope.search args.queryTerm, args.limit
@@ -359,7 +260,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         offset: $scope.filters.sentOffset
         limit: $scope.filters.limit
       }, 0), -> # if $scope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
-        processMessages sent, { authorIsSelf: true }
+        $scope.processMessages sent, { authorIsSelf: true }
         console.log sent
         if $scope.filters.sentOffset == 0
           $scope.sent = sent
@@ -389,7 +290,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         offset: $scope.filters.receivedOffset
         limit: $scope.filters.limit
       }, 0), -> # if $scope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
-        processMessages received, { recipientIsSelf: true }
+        $scope.processMessages received, { recipientIsSelf: true }
         if $scope.filters.receivedOffset == 0
           $scope.received = received
         else

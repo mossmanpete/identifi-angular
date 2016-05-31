@@ -10,7 +10,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
   'Messages'
   'config'
   ($scope, $rootScope, $window, $stateParams, $location, Messages, config) -> #, Authentication
-    $scope.authentication = {} # Authentication
     $scope.idType = $stateParams.idType
     $scope.idValue = $stateParams.idValue
     $scope.messages = []
@@ -52,66 +51,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
       $rootScope.viewpoint = $rootScope.viewpoint or config.defaultViewpoint
     $scope.collapseFilters = $window.innerWidth < 992
 
-    processMessages = (messages, msgOptions) ->
-      for key of messages
-        if isNaN(key)
-          continue
-        msg = messages[key]
-        msg[k] = v for k, v of msgOptions
-        msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
-        gravatarEmail = msg.authorEmail
-        if msg.authorEmail == ''
-          gravatarEmail = msg.data.author[0][0] + msg.data.author[0][1]
-        msg.gravatar = CryptoJS.MD5(gravatarEmail).toString()
-        msg.linkToAuthor = msg.data.author[0]
-        i = undefined
-        i = 0
-        while i < msg.data.author.length
-          if config.uniqueAttributeTypes.indexOf(msg.data.author[i][0]) > -1
-            msg.linkToAuthor = msg.data.author[i]
-            break
-          i++
-        msg.linkToRecipient = msg.data.recipient[0]
-        i = 0
-        while i < msg.data.recipient.length
-          if config.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0]) > -1
-            msg.linkToRecipient = msg.data.recipient[i]
-            break
-          i++
-        signedData = msg.data
-        alpha = undefined
-        msg.iconStyle = ''
-        msg.hasSuccess = ''
-        msg.bgColor = ''
-        msg.iconCount = new Array(1)
-        switch signedData.type
-          when 'verify_identity'
-            msg.iconStyle = 'glyphicon glyphicon-ok positive'
-            msg.hasSuccess = 'has-success'
-          when 'connection'
-            msg.iconStyle = 'glyphicon glyphicon-ok positive'
-            msg.hasSuccess = 'has-success'
-          when 'unverify_identity'
-            msg.iconStyle = 'glyphicon glyphicon-remove negative'
-            msg.hasSuccess = 'has-error'
-          when 'rating'
-            rating = signedData.rating
-            neutralRating = (signedData.minRating + signedData.maxRating) / 2
-            maxRatingDiff = signedData.maxRating - neutralRating
-            minRatingDiff = signedData.minRating - neutralRating
-            if rating > neutralRating
-              msg.iconStyle = 'glyphicon glyphicon-thumbs-up positive'
-              msg.iconCount = if maxRatingDiff < 2 then msg.iconCount else new Array(Math.ceil(3 * rating / maxRatingDiff))
-              alpha = (rating - neutralRating - 0.5) / maxRatingDiff / 1.25 + 0.2
-              msg.bgColor = 'background-color: rgba(223,240,216,' + alpha + ');'
-            else if rating < neutralRating
-              msg.iconStyle = 'glyphicon glyphicon-thumbs-down negative'
-              msg.iconCount = if minRatingDiff > -2 then msg.iconCount else new Array(Math.ceil(3 * rating / minRatingDiff))
-              alpha = (rating - neutralRating + 0.5) / minRatingDiff / 1.25 + 0.2
-              msg.bgColor = 'background-color:rgba(242,222,222,' + alpha + ');'
-            else
-              msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
-
     # Create new Message
 
     $scope.create = (event, params, id) ->
@@ -146,7 +85,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
       }, $scope.filters, if $scope.filters.maxDistance > -1 then config.defaultViewpoint else {})
       console.log params
       messages = Messages.query params, ->
-        processMessages messages
+        $scope.processMessages messages
         if $scope.filters.offset == 0
           $scope.messages = messages
         else
