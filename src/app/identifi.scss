@@ -1404,3 +1404,24 @@ a {
     }
   }
 }
+
+/* enable absolute positioning */
+.inner-addon {
+    position: relative;
+}
+
+/* style icon */
+.inner-addon .glyphicon, .inner-addon .fa {
+  position: absolute;
+  padding: 9px 12px;
+  pointer-events: none;
+	opacity: 0.75;
+}
+
+/* align icon */
+.left-addon .glyphicon, .left-addon .fa  { left:  0px;}
+.right-addon .glyphicon, .right-addon .fa { right: 0px;}
+
+/* add padding  */
+.left-addon input  { padding-left:  30px; }
+.right-addon input { padding-right: 30px; }

@@ -33,9 +33,9 @@
           </div>
 
           <ul class="nav navbar-nav navbar-right">
-            <li class="" ng-class="{active: $uiRoute}"><a ui-sref="messages.list"><span class="glyphicon glyphicon-globe"></span></a></li>
-            <li class="" ng-class="{active: $uiRoute}"><a ui-sref="about"><span class="glyphicon glyphicon-info-sign"></span></a></li>
-      			<li ng-show="authentication.user" ui-route="/identities/{{authentication.user.idType}}/{{authentication.user.idValue|encodeURIComponent}}" ng-class="{active: $uiRoute}">
+            <li class="" ui-sref-active="active"><a ui-sref="messages.list"><span class="glyphicon glyphicon-globe"></span></a></li>
+            <li class="" ui-sref-active="active"><a ui-sref="about"><span class="glyphicon glyphicon-info-sign"></span></a></li>
+      			<li ng-show="authentication.user" ui-route="/identities/{{authentication.user.idType}}/{{authentication.user.idValue|encodeURIComponent}}" ui-sref-active="active">
       				<a ng-href="/identities/{{authentication.user.idType}}/{{authentication.user.idValue|escape}}">
       					<span class="glyphicon glyphicon-user"></span> <span class="hidden-xs" ng-bind="authentication.user.displayName"></span>
       				</a>
@@ -73,11 +73,22 @@
           </ul>
 
           <form class="navbar-form navbar-left nav-search" ng-submit="addAttribute()" role="search" ng-if="'identities.list' | isState">
-            <input type="text" ng-keydown="searchKeydown($event)" ng-model="queryTerm" autocomplete="off" autofocus value="" class="nav-search-field search-search form-control" placeholder="Search">
+            <div class="inner-addon right-addon">
+              <i class="fa fa-search"></i>
+              <input type="text" ng-keydown="searchKeydown($event)" ng-model="queryTerm" autocomplete="off" autofocus value="" class="nav-search-field search-search form-control" placeholder="Search">
+            </div>
           </form>
 
-          <div>
-          	<autocomplete ng-if="!('identities.list' | isState)" ng-model="queryTerm" on-select="dropdownSearchSelect" on-type="searchChanged" data="identities" attr-input-class="form-control nav-search-field" attr-class="navbar-form navbar-left nav-search hidden-xs" attr-placeholder="Search">
+          <div ng-if="!('identities.list' | isState)" class="navbar-form navbar-left nav-search hidden-xs">
+            <div class="inner-addon right-addon">
+              <i class="fa fa-search"></i>
+              <input type="text" ng-keydown="searchKeydown($event)" ng-model="queryTerm" placeholder="Search" uib-typeahead="identity for identities in getLocation($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control nav-search-field">
+            </div>
+            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+            <div ng-show="noResults">
+              <i class="glyphicon glyphicon-remove"></i> No Results Found
+            </div>
+          	<autocomplete  ng-model="queryTerm" on-select="dropdownSearchSelect" on-type="searchChanged" data="identities" attr-input-class="form-control nav-search-field" attr-class="navbar-form navbar-left nav-search hidden-xs" attr-placeholder="Search">
           </div>
 
       	</div>

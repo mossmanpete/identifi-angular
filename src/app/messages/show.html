@@ -1,8 +1,9 @@
 <section ng-controller="MessagesController" ng-init="findOne()">
   <div class="col-md-8 col-md-offset-2">
-    <h4 ng-bind="message.data.timestamp|date:'medium'"></h4>
+    <p><strong ng-bind="message.data.timestamp|date:'medium'"></strong></p>
     <div class="row">
       <div class="col-sm-6">
+        <h4>From:</h4>
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">
@@ -19,6 +20,7 @@
         </div>
       </div>
       <div class="col-sm-6">
+        <h4>To:</h4>
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">
