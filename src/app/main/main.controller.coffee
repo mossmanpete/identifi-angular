@@ -208,8 +208,7 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.timer = wait
           break
 
-    $scope.dropdownSearchSelect = (suggestion) ->
-      console.log(suggestion)
-      $state.go('identities.show', { type: suggestion.linkTo.type, value: suggestion.linkTo.value })
+    $scope.dropdownSearchSelect = (item) ->
+      $state.go('identities.show', { type: item.linkTo.type, value: item.linkTo.value })
       $scope.queryTerm = ''
 ]
