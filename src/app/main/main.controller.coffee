@@ -81,14 +81,16 @@ angular.module('identifiAngular').controller 'MainController', [
         while i < msg.data.author.length
           if config.uniqueAttributeTypes.indexOf(msg.data.author[i][0]) > -1
             msg.linkToAuthor = msg.data.author[i]
-            break
+          else if msg.data.author[i][0] in ['name', 'nickname']
+            msg.authorName = msg.data.author[i][1]
           i++
         msg.linkToRecipient = msg.data.recipient[0]
         i = 0
         while i < msg.data.recipient.length
           if config.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0]) > -1
             msg.linkToRecipient = msg.data.recipient[i]
-            break
+          else if msg.data.recipient[i][0] in ['name', 'nickname']
+            msg.recipientName = msg.data.recipient[i][1]
           i++
         signedData = msg.data
         alpha = undefined
