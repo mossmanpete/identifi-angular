@@ -40,15 +40,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
         iconStyle = 'glyphicon-thumbs-down'
       iconStyle
 
-    $scope.filters = config.defaultFilters
-    angular.extend $scope.filters, offset: 0
-    if $scope.authentication.user
-      $rootScope.viewpoint =
-        viewpointName: $scope.authentication.user.displayName
-        viewpointType: 'email'
-        viewpointValue: $scope.authentication.user.email
-    else
-      $rootScope.viewpoint = $rootScope.viewpoint or config.defaultViewpoint
     $scope.collapseFilters = $window.innerWidth < 992
 
     # Create new Message
@@ -111,13 +102,5 @@ angular.module('identifiAngular').controller 'MessagesController', [
         $scope.message.strData = JSON.stringify($scope.message.data, undefined, 2)
         $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
         $scope.message.recipientGravatar = CryptoJS.MD5($scope.message.recipientEmail or $scope.message.data.recipient[0][1]).toString()
-
-    $scope.setFilters = (filters) ->
-      angular.extend $scope.filters, filters
-      angular.extend $scope.filters,
-        offset: 0
-        receivedOffset: 0
-        sentOffset: 0
-      $scope.find 0
 
 ]

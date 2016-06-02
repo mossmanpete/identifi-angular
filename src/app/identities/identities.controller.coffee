@@ -21,17 +21,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.sent = []
     $scope.received = []
     $scope.trustedBy = []
-    $scope.filters = $scope.filters or config.defaultFilters
-    angular.extend $scope.filters,
-      receivedOffset: 0
-      sentOffset: 0
-    if $scope.authentication.user
-      $rootScope.viewpoint =
-        viewpointName: $scope.authentication.user.displayName
-        viewpointType: 'email'
-        viewpointValue: $scope.authentication.user.email
-    else
-      $rootScope.viewpoint = $rootScope.viewpoint or ['keyID', '/pbxjXjwEsojbSfdM3wGWfE24F4fX3GasmoHXY3yYPM='] # TODO: default viewpoint
     $scope.newAttribute =
       type: ''
       value: $stateParams.value
@@ -42,56 +31,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.collapseLevel = {}
     $scope.collapseFilters = $window.innerWidth < 992
-
-    scrollTo = (el) ->
-      if !el
-        return
-      pos = el.getBoundingClientRect()
-      if pos.top
-        if pos.top - 60 < window.pageYOffset
-          window.scrollTo 0, pos.top - 60
-        else if pos.bottom > window.pageYOffset + (window.innerHeight or document.documentElement.clientHeight)
-          window.scrollTo 0, pos.bottom - (window.innerHeight or document.documentElement.clientHeight) + 15
-      return
-
-    $scope.search = (query, limit) ->
-      $rootScope.pageTitle = ''
-      Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
-          { limit: if limit then limit else 20 }, if $scope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (identities) ->
-        $scope.identities = []
-        if identities.length > 0
-          identities.activeKey = 0
-          identities.active = true
-        angular.forEach identities, (row) ->
-          identity = {}
-          angular.forEach row, (attr) ->
-            if !attr.linkTo # and ApplicationConfiguration.uniqueAttributeTypes.indexOf(id.name) > -1
-              attr.linkTo = { type: attr.attr, value: attr.val }
-            switch attr.attr
-              when 'email'
-                identity.email = attr.val
-                identity.gravatar = CryptoJS.MD5(attr.val).toString()
-              when 'name'
-                identity.name = attr.val
-              when 'nickname'
-                identity.nickname = attr.val
-              when 'bitcoin', 'bitcoin_address'
-                identity.bitcoin = attr.val
-              when 'url'
-                if attr.val.indexOf('twitter.com/') > -1
-                  identity.twitter = attr.val.split('twitter.com/')[1]
-                if attr.val.indexOf('facebook.com/') > -1
-                  identity.facebook = attr.val.split('facebook.com/')[1]
-                if attr.val.indexOf('plus.google.com/') > -1
-                  identity.googlePlus = attr.val.split('plus.google.com/')[1]
-            if !identity.linkTo
-              identity.linkTo = { type: attr.attr, value: attr.val }
-            if !identity.gravatar
-              identity.gravatar = CryptoJS.MD5(attr.val).toString()
-            if !identity.name
-              identity.name = attr.val
-          $scope.identities.push(identity)
-
 
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
@@ -229,16 +168,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
                   msg.linkToAuthor = msg.data.author[i]
                   break
                 i++
-            return
           )
-          return
 
         $scope.getStats()
         $scope.getReceivedMsgs 0
         $scope.getSentMsgs 0
-        return
       )
-      return
 
     $scope.getStats = ->
       $scope.stats = Identities.stats(angular.extend({}, $scope.filters, {
@@ -246,9 +181,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         idValue: $scope.idValue
       }, if $scope.filters.maxDistance > -1 then ['a', 'b'] else 0), -> # then ApplicationConfiguration.defaultViewpoint
         $scope.info.email = $scope.info.email or $scope.stats.email
-        return
       )
-      return
 
     $scope.getSentMsgs = (offset) ->
       if !isNaN(offset)
@@ -273,12 +206,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.filters.sentOffset = $scope.filters.sentOffset + sent.length
         if sent.length < $scope.filters.limit
           $scope.sent.finished = true
-        return
       )
       if offset == 0
         $scope.sent = {}
       $scope.sent.$resolved = sent.$resolved
-      return
 
     $scope.getReceivedMsgs = (offset) ->
       if !isNaN(offset)
@@ -302,12 +233,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.filters.receivedOffset = $scope.filters.receivedOffset + received.length
         if received.length < $scope.filters.limit
           $scope.received.finished = true
-        return
       )
       if offset == 0
         $scope.received = {}
       $scope.received.$resolved = received.$resolved
-      return
 
     $scope.getPhotosFromTwitter = (profileUrl) ->
       if !$scope.isUniqueType
@@ -327,7 +256,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       if !$scope.isUniqueType
         return
       $scope.profilePhotoUrl = $scope.profilePhotoUrl or 'http://www.gravatar.com/avatar/' + $scope.gravatar + '?d=retro&s=210'
-      return
 
     # Find existing Attribute
 
@@ -359,14 +287,5 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
                 obj[arr[arr.length-5]] = arr[arr.length-4]
                 obj.gravatar = CryptoJS.MD5(arr[arr.length-4]).toString()
                 $scope.trustedBy.push(obj)
-
-    $scope.setFilters = (filters) ->
-      angular.extend $scope.filters, filters
-      angular.extend $scope.filters,
-        offset: 0
-        receivedOffset: 0
-        sentOffset: 0
-      $scope.getReceivedMsgs 0
-      $scope.getSentMsgs 0
-
+    return
 ]

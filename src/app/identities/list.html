@@ -7,13 +7,13 @@
       <div class="row">
         <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-book fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-book"></i> Keep your contacts and trusted online identity up-to-date.</p></div></div>
         <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-thumbs-up fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-thumbs-up"></i> Find out who said what about a person or an organization.</p></div></div>
-        <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-check fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-check"></i> Show content from trusted and real identities only.</p></div></div>
+        <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-check fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-check"></i> Show content from trusted and real ids.list only.</p></div></div>
       </div>
     </div>
 
     <table id="search-results" class="table table-hover">
       <tbody>
-        <tr ng-repeat="result in filteredAttributes = (identities | toArray:false | filter:queryTerm)" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
+        <tr ng-repeat="result in ids.list" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
           <td class="gravatar-col"><img alt="" class="img-circle" height="45" width="45" src="https://www.gravatar.com/avatar/{{result.gravatar}}?d=retro&amp;s=90"></td>
           <td><a ng-bind-html="result.name|highlight:queryTerm" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })"></a>
             <small ng-if="!result.name" class="list-group-item-text">
@@ -41,7 +41,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="alert alert-info text-center" ng-hide="!identities.$resolved || identities.length">
+    <div class="alert alert-info text-center" ng-if="!ids.list.length">
       No results
     </div>
   </section>

@@ -1,7 +1,6 @@
 angular.module 'identifiAngular',
   ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages',
-  'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr',
-  'angular-toArrayFilter', 'angular-parallax']
+  'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr', 'angular-parallax']
 
 angular.module('identifiAngular').filter 'escape', [ ->
   (input) ->

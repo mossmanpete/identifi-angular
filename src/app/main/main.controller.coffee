@@ -24,6 +24,7 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.authentication = {} # Authentication
     $scope.queryTerm = ''
     $scope.filters = config.defaultFilters
+    $scope.ids = { list: [] }
 
     $scope.addAttribute = ->
       $location.path '#/identities/create/' + $scope.queryTerm
@@ -37,9 +38,31 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.removeFocus = (event) ->
       event.currentTarget.blur()
 
+    $scope.setFilters = (filters) ->
+      angular.extend $scope.filters, filters
+      angular.extend $scope.filters,
+        offset: 0
+        receivedOffset: 0
+        sentOffset: 0
+      $scope.getReceivedMsgs 0
+      $scope.getSentMsgs 0
+
     $scope.logoClicked = ->
       $scope.queryTerm = ''
       $scope.searchKeydown()
+
+    $scope.filters = $scope.filters or config.defaultFilters
+    angular.extend $scope.filters,
+      receivedOffset: 0
+      sentOffset: 0
+    if $scope.authentication.user
+      $rootScope.viewpoint =
+        viewpointName: $scope.authentication.user.displayName
+        viewpointType: 'email'
+        viewpointValue: $scope.authentication.user.email
+    else
+      $rootScope.viewpoint = $rootScope.viewpoint or ['keyID', '/pbxjXjwEsojbSfdM3wGWfE24F4fX3GasmoHXY3yYPM='] # TODO: default viewpoint
+
 
     ###
     $scope.authentication = Authentication
@@ -130,11 +153,22 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.$on '$stateChangeSuccess', ->
       $scope.isCollapsed = false
 
+    scrollTo = (el) ->
+      if !el
+        return
+      pos = el.getBoundingClientRect()
+      if pos.top
+        if pos.top - 60 < window.pageYOffset
+          window.scrollTo 0, pos.top - 60
+        else if pos.bottom > window.pageYOffset + (window.innerHeight or document.documentElement.clientHeight)
+          window.scrollTo 0, pos.bottom - (window.innerHeight or document.documentElement.clientHeight) + 15
+      return
+
     $scope.search = (query, limit) ->
       $rootScope.pageTitle = ''
       Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
           { limit: if limit then limit else 20 }, if $scope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (identities) ->
-        $scope.identities = []
+        $scope.ids.list = []
         angular.forEach identities, (row) ->
           identity = {}
           angular.forEach row, (attr) ->
@@ -163,37 +197,32 @@ angular.module('identifiAngular').controller 'MainController', [
               identity.gravatar = CryptoJS.MD5(attr.val).toString()
             if !identity.name
               identity.name = attr.val
-          $scope.identities.push(identity)
+          $scope.ids.list.push(identity)
         if identities.length > 0
-          identities.activeKey = 0
-          identities.active = true
-        console.log $scope.identities
-
-    $scope.searchChanged = (query) ->
-      console.log "searchChanged"
-      $scope.search query, 3
+          $scope.ids.activeKey = 0
+          $scope.ids.list[0].active = true
 
     $scope.searchKeydown = (event) ->
       console.log "searchKeydown"
       switch (if event then event.which else -1)
         when 38
           event.preventDefault()
-          if $scope.identities.activeKey > 0
-            $scope.filteredIdentities[$scope.identities.activeKey].active = false
-            $scope.filteredIdentities[$scope.identities.activeKey - 1].active = true
-            $scope.identities.activeKey--
-          scrollTo document.getElementById('result' + $scope.identities.activeKey)
+          if $scope.ids.activeKey > 0
+            $scope.ids.list[$scope.ids.activeKey].active = false
+            $scope.ids.list[$scope.ids.activeKey - 1].active = true
+            $scope.ids.activeKey--
+          scrollTo document.getElementById('result' + $scope.ids.activeKey)
         when 40
           event.preventDefault()
-          if $scope.identities.activeKey < ($scope.filteredIdentities.length || 0) - 1
-            $scope.filteredIdentities[$scope.identities.activeKey].active = false
-            $scope.filteredIdentities[$scope.identities.activeKey + 1].active = true
-            $scope.identities.activeKey++
-          scrollTo document.getElementById('result' + $scope.identities.activeKey)
+          if $scope.ids.activeKey < ($scope.ids.list.length || 0) - 1
+            $scope.ids.list[$scope.ids.activeKey].active = false
+            $scope.ids.list[$scope.ids.activeKey + 1].active = true
+            $scope.ids.activeKey++
+          scrollTo document.getElementById('result' + $scope.ids.activeKey)
         when 13
           event.preventDefault()
-          id = $scope.identities[$scope.identities.activeKey]
-          $state.go 'identities.show', { type: id.linkTo.name, value: id.linkTo.value }
+          id = $scope.ids.list[$scope.ids.activeKey]
+          $state.go 'identities.show', { type: id.linkTo.type, value: id.linkTo.value }
         when -1
           clearTimeout $scope.timer
           $scope.queryTerm = ''

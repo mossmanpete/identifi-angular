@@ -35,8 +35,8 @@
           <ul class="nav navbar-nav navbar-right">
             <li class="" ui-sref-active="active"><a ui-sref="messages.list"><span class="glyphicon glyphicon-globe"></span></a></li>
             <li class="" ui-sref-active="active"><a ui-sref="about"><span class="glyphicon glyphicon-info-sign"></span></a></li>
-      			<li ng-show="authentication.user" ui-route="/identities/{{authentication.user.idType}}/{{authentication.user.idValue|encodeURIComponent}}" ui-sref-active="active">
-      				<a ng-href="/identities/{{authentication.user.idType}}/{{authentication.user.idValue|escape}}">
+      			<li ng-show="authentication.user" ui-route="/ids.list/{{authentication.user.idType}}/{{authentication.user.idValue|encodeURIComponent}}" ui-sref-active="active">
+      				<a ng-href="/ids.list/{{authentication.user.idType}}/{{authentication.user.idValue|escape}}">
       					<span class="glyphicon glyphicon-user"></span> <span class="hidden-xs" ng-bind="authentication.user.displayName"></span>
       				</a>
       			</li>
@@ -83,12 +83,11 @@
             <div class="inner-addon right-addon">
               <i class="fa fa-search"></i>
               <input type="text" ng-keydown="searchKeydown($event)" ng-model="queryTerm"
-              placeholder="Search" uib-typeahead="identity.name for identity in identities"
+              placeholder="Search" uib-typeahead="identity.name for identity in ids.list"
               typeahead-no-results="noResults" class="form-control nav-search-field"
-              typeahead-on-select="dropdownSearchSelect($item)"
+              typeahead-on-select="dropdownSearchSelect($item);queryTerm=''"
               typeahead-focus-on-select="false">
             </div>
-          	<autocomplete  ng-model="queryTerm" on-select="dropdownSearchSelect($item)" on-type="searchChanged" data="identities" attr-input-class="form-control nav-search-field" attr-class="navbar-form navbar-left nav-search hidden-xs" attr-placeholder="Search">
           </div>
 
       	</div>
