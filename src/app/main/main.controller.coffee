@@ -166,7 +166,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.search = (query, limit) ->
       $rootScope.pageTitle = ''
-      Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
+      q = Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
           { limit: if limit then limit else 20 }, if $scope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (identities) ->
         $scope.ids.list = []
         angular.forEach identities, (row) ->
@@ -201,6 +201,8 @@ angular.module('identifiAngular').controller 'MainController', [
         if identities.length > 0
           $scope.ids.activeKey = 0
           $scope.ids.list[0].active = true
+      return q.$promise.then ->
+        return $scope.ids.list
 
     $scope.searchKeydown = (event) ->
       console.log "searchKeydown"

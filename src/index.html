@@ -82,8 +82,9 @@
           <div ng-if="!('identities.list' | isState)" class="navbar-form navbar-left nav-search hidden-xs">
             <div class="inner-addon right-addon">
               <i class="fa fa-search"></i>
-              <input type="text" ng-keydown="searchKeydown($event)" ng-model="queryTerm"
-              placeholder="Search" uib-typeahead="identity.name for identity in ids.list"
+              <input type="text" ng-model="queryTerm"
+              placeholder="Search"
+              uib-typeahead="identity.name for identity in search($viewValue, 5)"
               typeahead-no-results="noResults" class="form-control nav-search-field"
               typeahead-on-select="dropdownSearchSelect($item);queryTerm=''"
               typeahead-focus-on-select="false">
