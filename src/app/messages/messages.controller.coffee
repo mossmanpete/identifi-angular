@@ -93,8 +93,16 @@ angular.module('identifiAngular').controller 'MessagesController', [
         $scope.messages = {}
       $scope.messages.$resolved = messages.$resolved
 
-    # Find existing Message
+    $scope.setFilters = (filters) ->
+      angular.extend $scope.filters, filters
+      angular.extend $scope.filters,
+        offset: 0
+        receivedOffset: 0
+        sentOffset: 0
+      $scope.find 0
 
+
+    # Find existing Message
     $scope.findOne = ->
       $scope.message = Messages.get { id: $stateParams.id }, ->
         $rootScope.pageTitle = ' - Message ' + $stateParams.id

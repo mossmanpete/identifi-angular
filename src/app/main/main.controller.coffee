@@ -38,15 +38,6 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.removeFocus = (event) ->
       event.currentTarget.blur()
 
-    $scope.setFilters = (filters) ->
-      angular.extend $scope.filters, filters
-      angular.extend $scope.filters,
-        offset: 0
-        receivedOffset: 0
-        sentOffset: 0
-      $scope.getReceivedMsgs 0
-      $scope.getSentMsgs 0
-
     $scope.logoClicked = ->
       $scope.queryTerm = ''
       $scope.searchKeydown()

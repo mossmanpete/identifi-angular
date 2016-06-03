@@ -257,7 +257,14 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         return
       $scope.profilePhotoUrl = $scope.profilePhotoUrl or 'http://www.gravatar.com/avatar/' + $scope.gravatar + '?d=retro&s=210'
 
-    # Find existing Attribute
+    $scope.setFilters = (filters) ->
+      angular.extend $scope.filters, filters
+      angular.extend $scope.filters,
+        offset: 0
+        receivedOffset: 0
+        sentOffset: 0
+      $scope.getReceivedMsgs 0
+      $scope.getSentMsgs 0
 
     $scope.findOne = ->
       $scope.idType = $stateParams.type
