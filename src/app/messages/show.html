@@ -46,6 +46,7 @@
           <small>(<span ng-bind="message.data.minRating"></span>...<span ng-bind="message.data.maxRating"></span>)</small>
         </p>
         <p ng-if="message.data.comment"><strong>Comment:</strong> <span ng-bind="message.data.comment"></span></p>
+        <p ng-if="message.data.context"><strong>Context:</strong> <span ng-bind="message.data.context"></span></p>
       </div>
     </div>
     <p>Message origin verified by: <a ng-bind="message.signerName||message.signer_keyid" ui-sref="identities.show({type: 'keyID', value: message.signer_keyid })"></a></p>

@@ -163,8 +163,6 @@ angular.module('identifiAngular').controller 'MainController', [
         angular.forEach identities, (row) ->
           identity = {}
           angular.forEach row, (attr) ->
-            if !attr.linkTo # and ApplicationConfiguration.uniqueAttributeTypes.indexOf(id.name) > -1
-              attr.linkTo = { type: attr.attr, value: attr.val }
             switch attr.attr
               when 'email'
                 identity.email = attr.val
@@ -173,6 +171,7 @@ angular.module('identifiAngular').controller 'MainController', [
                 identity.name = attr.val
               when 'nickname'
                 identity.nickname = attr.val
+                identity.name = attr.val if !identity.name
               when 'bitcoin', 'bitcoin_address'
                 identity.bitcoin = attr.val
               when 'url'
@@ -186,8 +185,8 @@ angular.module('identifiAngular').controller 'MainController', [
               identity.linkTo = { type: attr.attr, value: attr.val }
             if !identity.gravatar
               identity.gravatar = CryptoJS.MD5(attr.val).toString()
-            if !identity.name
-              identity.name = attr.val
+          if !identity.name
+            identity.name = row[0].val
           $scope.ids.list.push(identity)
         if identities.length > 0
           $scope.ids.activeKey = 0

@@ -5,4 +5,14 @@ angular.module('identifiAngular')
     defaultFilters:
       type: null
     defaultViewpoint: {}
-    uniqueAttributeTypes: ['email', 'url', 'keyID', 'tel', 'phone', 'account']
+    uniqueAttributeTypes: [
+      'email',
+      'url',
+      'keyID',
+      'tel',
+      'phone',
+      'account',
+      'bitcoin',
+      'gpg_keyid',
+      'gpg_fingerprint'
+    ]

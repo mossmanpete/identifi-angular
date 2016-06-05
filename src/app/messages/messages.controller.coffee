@@ -101,7 +101,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
         sentOffset: 0
       $scope.find 0
 
-
     # Find existing Message
     $scope.findOne = ->
       $scope.message = Messages.get { id: $stateParams.id }, ->

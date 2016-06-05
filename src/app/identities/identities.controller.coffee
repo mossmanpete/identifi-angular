@@ -194,7 +194,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         limit: $scope.filters.limit
       }, 0), -> # if $scope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
         $scope.processMessages sent, { authorIsSelf: true }
-        console.log sent
         if $scope.filters.sentOffset == 0
           $scope.sent = sent
         else
