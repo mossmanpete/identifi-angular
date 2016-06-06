@@ -82,7 +82,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
         else
           for key of messages
             if isNaN(key)
-              i++
               continue
             $scope.messages.push messages[key]
         $scope.messages.$resolved = messages.$resolved
