@@ -89,6 +89,11 @@
               typeahead-on-select="dropdownSearchSelect($item);queryTerm=''"
               typeahead-focus-on-select="false">
             </div>
+            <span ng-if="noResults" auto-close="disabled" is-open="true" uib-dropdown uib-dropdown-toggle>
+              <ul class="uib-dropdown-menu" >
+                <li><a href>No results</a></li>
+              </ul>
+            </span>
           </div>
 
       	</div>

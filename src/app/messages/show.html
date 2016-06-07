@@ -37,9 +37,12 @@
         </div>
       </div>
     </div>
-    <div class="panel panel-default panel-success">
-      <div class="panel-heading">
-        <h3 class="panel-title" ng-bind="message.data.type"></h3>
+    <div class="panel panel-default">
+      <div class="panel-heading" style="{{ message.bgColor }}">
+        <h3 class="panel-title">
+          {{ message.data.type }}
+          <span class="mar-left5 pull-right" ng-class="message.iconStyle" ng-repeat="n in message.iconCount track by $index"></span>
+        </h3>
       </div>
       <div class="panel-body" ng-if="message.data.rating || message.data.comment">
         <p ng-if="message.data.rating"><strong>Score:</strong> <span ng-bind="message.data.rating"></span>

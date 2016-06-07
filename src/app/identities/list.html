@@ -41,7 +41,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="alert alert-info text-center" ng-if="!ids.list.length">
+    <div class="alert alert-info text-center" ng-if="ids.query.$resolved && !ids.list.length">
       No results
     </div>
   </section>

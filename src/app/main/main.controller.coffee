@@ -85,10 +85,7 @@ angular.module('identifiAngular').controller 'MainController', [
         msg = messages[key]
         msg[k] = v for k, v of msgOptions
         msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
-        gravatarEmail = msg.authorEmail
-        if msg.authorEmail == ''
-          gravatarEmail = msg.data.author[0][0] + msg.data.author[0][1]
-        msg.gravatar = CryptoJS.MD5(gravatarEmail).toString()
+        msg.gravatar = CryptoJS.MD5(msg.data.author[0][1]).toString()
         msg.linkToAuthor = msg.data.author[0]
         i = undefined
         i = 0
@@ -191,6 +188,7 @@ angular.module('identifiAngular').controller 'MainController', [
         if identities.length > 0
           $scope.ids.activeKey = 0
           $scope.ids.list[0].active = true
+      $scope.ids.query = q
       return q.$promise.then ->
         return $scope.ids.list
 
