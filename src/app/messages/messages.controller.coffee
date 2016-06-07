@@ -20,6 +20,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.newConnection =
       type: ''
       value: ''
+    $scope.filters.offset = 0
 
     $scope.iconCount = (rating) ->
       new Array(Math.max(1, Math.abs(rating)))
@@ -73,6 +74,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
       params = angular.extend({
         idType: $scope.idType
         idValue: $scope.idValue
+        offset: $scope.filters.offset
+        limit: 50
       }, $scope.filters, if $scope.filters.maxDistance > -1 then config.defaultViewpoint else {})
       console.log params
       messages = Messages.query params, ->
