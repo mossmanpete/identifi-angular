@@ -79,7 +79,7 @@
                   <ul class="list-unstyled">
                     <li ng-repeat="id in connections" ng-if="id.quickContact"><a ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span><span ng-bind="id.linkName || id.value"></span></a></li>
                     <li>
-                      <span class="fa fa-calendar"></span>First seen: <span ng-if="stats[0].firstSeen" ng-bind="stats[0].firstSeen|date:'mediumDate'"></span><span ng-if="!stats[0].firstSeen">-</span>
+                      <span class="fa fa-calendar"></span>First seen: <span ng-if="stats[0].first_seen" ng-bind="stats[0].first_seen|date:'mediumDate'"></span><span ng-if="!stats[0].first_seen">-</span>
                     </li>
                   </ul>
                 </div>
