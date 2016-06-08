@@ -24,6 +24,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.newAttribute =
       type: ''
       value: $stateParams.value
+    angular.extend $scope.filters,
+      receivedOffset: 0
+      sentOffset: 0
+      type: null
 
     $scope.goToID = (type, value) ->
       $location.path '/identities/' + encodeURIComponent(type) + '/' + encodeURIComponent(value)

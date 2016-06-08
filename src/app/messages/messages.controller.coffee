@@ -20,7 +20,9 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.newConnection =
       type: ''
       value: ''
-    $scope.filters.offset = 0
+    angular.extend $scope.filters,
+      type: null
+      offset: 0
 
     $scope.iconCount = (rating) ->
       new Array(Math.max(1, Math.abs(rating)))

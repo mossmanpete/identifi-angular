@@ -43,9 +43,6 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.searchKeydown()
 
     $scope.filters = $scope.filters or config.defaultFilters
-    angular.extend $scope.filters,
-      receivedOffset: 0
-      sentOffset: 0
     if $scope.authentication.user
       $rootScope.viewpoint =
         viewpointName: $scope.authentication.user.displayName
