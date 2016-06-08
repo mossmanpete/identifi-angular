@@ -23,6 +23,7 @@ angular.module('identifiAngular').controller 'MainController', [
     ###
     $scope.authentication = {} # Authentication
     $scope.queryTerm = ''
+    $scope.previousSearchValue = ''
     $scope.filters = config.defaultFilters
     $scope.ids = { list: [] }
 
@@ -150,10 +151,17 @@ angular.module('identifiAngular').controller 'MainController', [
       return
 
     $scope.search = (query, limit) ->
-      $rootScope.pageTitle = ''
-      q = Identities.query angular.extend({ search_value: query or $scope.queryTerm or '' },
-          { limit: if limit then limit else 20 }, if $scope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (identities) ->
+      searchValue = query or $scope.queryTerm or ''
+      if searchValue != $scope.previousSearchValue
+        $scope.filters.offset = 0
         $scope.ids.list = []
+        $scope.ids.finished = false
+      $scope.previousSearchValue = searchValue
+      $rootScope.pageTitle = ''
+      limit = limit or 20
+      q = Identities.query angular.extend({ search_value: searchValue },
+          { limit: limit, offset: $scope.filters.offset }, if $scope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (identities) ->
+        $scope.ids.list = $scope.ids.list or []
         angular.forEach identities, (row) ->
           identity = {}
           angular.forEach row, (attr) ->
@@ -185,6 +193,9 @@ angular.module('identifiAngular').controller 'MainController', [
         if identities.length > 0
           $scope.ids.activeKey = 0
           $scope.ids.list[0].active = true
+        $scope.filters.offset = $scope.filters.offset + identities.length
+        if identities.length < limit
+          $scope.ids.finished = true
       $scope.ids.query = q
       return q.$promise.then ->
         return $scope.ids.list

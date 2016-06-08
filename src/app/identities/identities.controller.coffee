@@ -27,6 +27,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     angular.extend $scope.filters,
       receivedOffset: 0
       sentOffset: 0
+      offset: 0
       type: null
 
     $scope.goToID = (type, value) ->

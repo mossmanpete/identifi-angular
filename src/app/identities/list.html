@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <table id="search-results" class="table table-hover">
+    <table id="search-results" class="table table-hover" infinite-scroll="search(queryTerm)" infinite-scroll-distance="2" infinite-scroll-disabled="!ids.query.$resolved || ids.finished">
       <tbody>
         <tr ng-repeat="result in ids.list" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
           <td class="gravatar-col"><img alt="" class="img-circle" height="45" width="45" src="https://www.gravatar.com/avatar/{{result.gravatar}}?d=retro&amp;s=90"></td>
