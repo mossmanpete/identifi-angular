@@ -165,6 +165,7 @@ angular.module('identifiAngular').controller 'MainController', [
         angular.forEach identities, (row) ->
           identity = {}
           angular.forEach row, (attr) ->
+            identity.distance = identity.distance or attr.dist
             switch attr.attr
               when 'email'
                 identity.email = attr.val

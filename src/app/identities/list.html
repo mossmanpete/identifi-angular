@@ -37,6 +37,7 @@
                 <span class="fa fa-bitcoin"></span> <span ng-bind-html="result.bitcoin|highlight:queryTerm"></span>
               </span>
             </small>
+            <span ng-if="result.distance" ng-bind="result.distance | ordinal" class="label label-default pull-right"></span>
           </td>
         </tr>
       </tbody>

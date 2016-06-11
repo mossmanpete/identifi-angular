@@ -18,3 +18,14 @@ angular.module('identifiAngular').filter 'highlight', ($sce) ->
       text = text.replace(new RegExp('(' + phrase + ')', 'gi'), '<b>$1</b>')
       return $sce.trustAsHtml text.toString()
     return text
+
+angular.module('identifiAngular').filter 'ordinal', ->
+  (input) ->
+    s = [
+      'th'
+      'st'
+      'nd'
+      'rd'
+    ]
+    v = input % 100
+    input + (s[(v - 20) % 10] or s[v] or s[0])
