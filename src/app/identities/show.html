@@ -63,7 +63,12 @@
                   <span ng-hide="!info.nickname || !info.name || info.nickname === info.name">
                     (<span class="text-muted" ng-bind="info.nickname"></span>)
                   </span>
+                  <span ng-if="distance == 0" class="label label-default pull-right">viewpoint</span>
+                  <span ng-if="distance > 0" ng-bind="distance | ordinal" class="label label-default pull-right"></span>
                 </h4>
+                <p>
+
+                </p>
                 <p>
                   <b ng-if="stats[0].received_positive">Received: <span ng-bind="stats[0].received_positive / (stats[0].received_positive+stats[0].received_neutral+stats[0].received_negative) * 100 | number:0"></span>% positive<br></b>
                   <span ng-if="stats[0].sent_positive">Sent: <span ng-bind="stats[0].sent_positive / (stats[0].sent_positive+stats[0].sent_neutral+stats[0].sent_negative) * 100 | number:0"></span>% positive</span>
@@ -103,7 +108,10 @@
 
       <div ng-if="isUniqueType && trustedBy.length > 0" class="stats-box mar-bot10">
         <h5>Trusted by</h5>
-        <a ng-repeat="id in trustedBy" class="trusted-by mar-right5 mar-bot5" ui-sref="identities.show({ type: id.linkTo[0], value: id.linkTo[1] })" title=""><img alt="" src="https://www.gravatar.com/avatar/{{id.gravatar}}?d=retro&amp;s=120" height=60 class="gravatar" uib-tooltip="{{ id.name || id.linkTo[1] }}"></a>
+        <a ng-repeat="id in trustedBy" class="trusted-by mar-right5 mar-bot5" ui-sref="identities.show({ type: id.linkTo[0], value: id.linkTo[1] })" title="">
+          <img alt="" src="https://www.gravatar.com/avatar/{{id.gravatar}}?d=retro&amp;s=120" height=60 class="gravatar" uib-tooltip="{{ id.name || id.linkTo[1] }}">
+          <span class="distance" ng-bind="id.distance | ordinal"></span>
+        </a>
       </div>
 
         </div>

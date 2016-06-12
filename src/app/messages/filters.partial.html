@@ -15,7 +15,7 @@
     </ul>
     <div class="alert alert-info">
       <p>Viewing as
-        <a ui-sref="identities.show({ type: viewpoint.viewpointType, value: viewpoint.viewpointValue })" data-id-type="keyID" data-id-value="1DqrzTcimQp3Ye88oHgxdU7DBTsM2TRYFj" class="id-link" ng-bind="viewpoint.viewpointName"></a>
+        <a ui-sref="identities.show({ type: viewpoint[0], value: viewpoint[1] })" data-id-type="keyID" data-id-value="1DqrzTcimQp3Ye88oHgxdU7DBTsM2TRYFj" class="id-link" ng-bind="viewpoint[1]"></a>
       </p>
       <p>Max distance from viewpoint:</p>
       <div class="btn-group trust-distance-selector">

@@ -1319,16 +1319,31 @@ a {
 
 .trusted-by {
 	display: inline-block;
+	position: relative;
+
 	/*
 	-moz-box-shadow: inset 0 -20px 20px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: inset 0 -20px 20px rgba(0, 0, 0, 0.5);
   box-shadow: inset 0 -20px 20px rgba(0, 0, 0, 0.5);
+	*/
 	position: relative;
 	img {
 		position: relative;
-		z-index: -1;
+		z-index: 1;
 	}
-	*/
+
+	.distance {
+		z-index: 2;
+		position: absolute;
+		right: 2px;
+		top: 2px;
+		color: #fff;
+		text-shadow: 0 0 1px #000;
+		font-size: 75%;
+		line-height: 75%;
+		font-weight: bold;
+	}
+
 }
 
 .table-hover>tbody>tr:hover {

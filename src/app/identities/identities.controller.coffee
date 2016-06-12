@@ -21,6 +21,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.sent = []
     $scope.received = []
     $scope.trustedBy = []
+    $scope.distance = null
     $scope.newAttribute =
       type: ''
       value: $stateParams.value
@@ -71,7 +72,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           isCurrent: true
         for key of $scope.connections
           conn = $scope.connections[key]
-          console.log "1"
           switch conn.name
             when 'email'
               conn.iconStyle = 'glyphicon glyphicon-envelope'
@@ -94,7 +94,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               $scope.info.nickname = $scope.info.nickname or conn.value
               conn.iconStyle = 'glyphicon glyphicon-font'
             when 'name'
-              console.log 2
               $scope.info.name = $scope.info.name or conn.value
               conn.iconStyle = 'glyphicon glyphicon-font'
             when 'tel', 'phone'
@@ -286,13 +285,15 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       , ->
         if trustpaths.length == 0
           return
-        shortestPath = Object.keys(trustpaths).length
+        $scope.distance = (trustpaths[0].path_string.split(':').length - 3) / 2
         trustedByExists = {}
         angular.forEach trustpaths, (path, i) ->
           if path.path_string
             arr = path.path_string.split(':')
             if arr.length >= 5
-              obj = { linkTo: [arr[arr.length-5], arr[arr.length-4]] }
+              obj =
+                linkTo: [arr[arr.length-5], arr[arr.length-4]]
+                distance: (arr.length - 3) / 2 - 1
               if not trustedByExists[obj.linkTo.join(':')]
                 trustedByExists[obj.linkTo.join(':')] = true
                 obj[arr[arr.length-5]] = arr[arr.length-4]
