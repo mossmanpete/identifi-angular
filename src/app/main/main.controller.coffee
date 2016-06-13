@@ -45,12 +45,12 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.filters = $scope.filters or config.defaultFilters
     if $scope.authentication.user
-      $rootScope.viewpoint =
+      $scope.viewpoint =
         viewpointName: $scope.authentication.user.displayName
         viewpointType: 'email'
         viewpointValue: $scope.authentication.user.email
     else
-      $rootScope.viewpoint = $rootScope.viewpoint or ['keyID', '/pbxjXjwEsojbSfdM3wGWfE24F4fX3GasmoHXY3yYPM='] # TODO: default viewpoint
+      $scope.viewpoint = $scope.viewpoint or config.defaultViewpoint
 
 
     ###
@@ -160,7 +160,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $rootScope.pageTitle = ''
       limit = limit or 20
       q = Identities.query angular.extend({ search_value: searchValue },
-          { limit: limit, offset: $scope.filters.offset }, if $scope.filters.maxDistance > -1 then $rootScope.viewpoint else {}), (identities) ->
+          { limit: limit, offset: $scope.filters.offset }, if $scope.filters.max_distance > -1 then $scope.viewpoint else {}), (identities) ->
         $scope.ids.list = $scope.ids.list or []
         angular.forEach identities, (row) ->
           identity = {}

@@ -183,7 +183,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.stats = Identities.stats(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
-      }, if $scope.filters.maxDistance > -1 then ['a', 'b'] else 0), -> # then ApplicationConfiguration.defaultViewpoint
+      }, if $scope.filters.max_distance > -1 then $scope.viewpoint else 0), ->
         $scope.info.email = $scope.info.email or $scope.stats.email
       )
 
@@ -196,7 +196,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         type: $scope.filters.type
         offset: $scope.filters.sentOffset
         limit: $scope.filters.limit
-      }, 0), -> # if $scope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
+      }, 0), -> # if $scope.filters.max_distance > -1 then ApplicationConfiguration.defaultViewpoint else 0
         $scope.processMessages sent, { authorIsSelf: true }
         if $scope.filters.sentOffset == 0
           $scope.sent = sent
@@ -223,7 +223,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         type: $scope.filters.type
         offset: $scope.filters.receivedOffset
         limit: $scope.filters.limit
-      }, 0), -> # if $scope.filters.maxDistance > -1 then ApplicationConfiguration.defaultViewpoint else 0
+      }, 0), -> # if $scope.filters.max_distance > -1 then ApplicationConfiguration.defaultViewpoint else 0
         $scope.processMessages received, { recipientIsSelf: true }
         if $scope.filters.receivedOffset == 0
           $scope.received = received
@@ -278,8 +278,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $rootScope.pageTitle = ' - ' + $scope.idValue
       $scope.getConnections()
       trustpaths = Identities.trustpaths
-        idType: $rootScope.viewpoint[0]
-        idValue: $rootScope.viewpoint[1]
+        idType: $scope.viewpoint.viewpoint_name
+        idValue: $scope.viewpoint.viewpoint_value
         target_name: $scope.idType
         target_value: $scope.idValue
       , ->

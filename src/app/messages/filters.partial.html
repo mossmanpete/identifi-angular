@@ -15,15 +15,15 @@
     </ul>
     <div class="alert alert-info">
       <p>Viewing as
-        <a ui-sref="identities.show({ type: viewpoint[0], value: viewpoint[1] })" data-id-type="keyID" data-id-value="1DqrzTcimQp3Ye88oHgxdU7DBTsM2TRYFj" class="id-link" ng-bind="viewpoint[1]"></a>
+        <a ui-sref="identities.show({ type: viewpoint.viewpoint_name, value: viewpoint.viewpoint_value })" data-id-type="keyID" data-id-value="1DqrzTcimQp3Ye88oHgxdU7DBTsM2TRYFj" class="id-link" ng-bind="viewpoint.viewpoint_value"></a>
       </p>
       <p>Max distance from viewpoint:</p>
       <div class="btn-group trust-distance-selector">
-        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: -1})" ng-class="{active: filters.maxDistance === -1}">✕</button>
-        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: 1})" ng-class="{active: filters.maxDistance === 1}">1</button>
-        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: 2})" ng-class="{active: filters.maxDistance === 2}">2</button>
-        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: 3})" ng-class="{active: filters.maxDistance === 3}">3</button>
-        <button type="button" class="btn btn-default" ng-click="setFilters({maxDistance: 0})" ng-class="{active: filters.maxDistance === 0}">∞</button>
+        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: -1})" ng-class="{active: filters.max_distance === -1}" uib-tooltip="Distance filter off">✕</button>
+        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 1})" ng-class="{active: filters.max_distance === 1}">1</button>
+        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 2})" ng-class="{active: filters.max_distance === 2}">2</button>
+        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 3})" ng-class="{active: filters.max_distance === 3}">3</button>
+        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 0})" ng-class="{active: filters.max_distance === 0}" uib-tooltip="Unlimited">∞</button>
       </div>
     </div>
   </div>
