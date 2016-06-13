@@ -22,13 +22,13 @@ angular.module('identifiAngular').controller 'MainController', [
                         onlogout: ->
     ###
     $scope.authentication = {} # Authentication
-    $scope.queryTerm = ''
+    $rootScope.queryTerm = ''
     $scope.previousSearchValue = ''
     $scope.filters = config.defaultFilters
     $scope.ids = { list: [] }
 
     $scope.addAttribute = ->
-      $location.path '#/identities/create/' + $scope.queryTerm
+      $location.path '#/identities/create/' + $rootScope.queryTerm
 
     $scope.login = ->
       Persona.request()
@@ -40,7 +40,7 @@ angular.module('identifiAngular').controller 'MainController', [
       event.currentTarget.blur()
 
     $scope.logoClicked = ->
-      $scope.queryTerm = ''
+      $rootScope.queryTerm = ''
       $scope.searchKeydown()
 
     $scope.filters = $scope.filters or config.defaultFilters
@@ -151,7 +151,7 @@ angular.module('identifiAngular').controller 'MainController', [
       return
 
     $scope.search = (query, limit) ->
-      searchValue = query or $scope.queryTerm or ''
+      searchValue = query or $rootScope.queryTerm or ''
       if searchValue != $scope.previousSearchValue
         $scope.filters.offset = 0
         $scope.ids.list = []
@@ -226,14 +226,14 @@ angular.module('identifiAngular').controller 'MainController', [
           $state.go 'identities.show', { type: id.linkTo.type, value: id.linkTo.value }
         when -1
           clearTimeout $scope.timer
-          $scope.queryTerm = ''
+          $rootScope.queryTerm = ''
           $scope.search()
         when 33, 34, 35, 36, 37, 39
         else
           el = angular.element(event.currentTarget)
           clearTimeout $scope.timer
           wait = setTimeout((->
-            $scope.queryTerm = el.val()
+            $rootScope.queryTerm = el.val()
             $scope.search()
             return
           ), 300)
@@ -242,5 +242,5 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.dropdownSearchSelect = (item) ->
       $state.go('identities.show', { type: item.linkTo.type, value: item.linkTo.value })
-      $scope.queryTerm = ''
+      $rootScope.queryTerm = ''
 ]

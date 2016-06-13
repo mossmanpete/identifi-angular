@@ -22,6 +22,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.received = []
     $scope.trustedBy = []
     $scope.distance = null
+    $rootScope.queryTerm = $stateParams.search if $stateParams.search
     $scope.newAttribute =
       type: ''
       value: $stateParams.value
@@ -30,10 +31,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       sentOffset: 0
       offset: 0
       type: null
-
-    $scope.goToID = (type, value) ->
-      $location.path '/identities/' + encodeURIComponent(type) + '/' + encodeURIComponent(value)
-      return
 
     $scope.collapseLevel = {}
     $scope.collapseFilters = $window.innerWidth < 992
@@ -272,8 +269,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.findOne = ->
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
-      $scope.isUniqueType = true # ApplicationConfiguration.uniqueAttributeTypes.indexOf($scope.idType) > -1
+      $scope.isUniqueType = config.uniqueAttributeTypes.indexOf($scope.idType) > -1
       if !$scope.isUniqueType
+        console.log "going to id ", $scope.idValue
+        $state.go 'identities.list', { search: $scope.idValue }
         $scope.tabs[2].active = true
       $rootScope.pageTitle = ' - ' + $scope.idValue
       $scope.getConnections()

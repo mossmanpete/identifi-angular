@@ -11,6 +11,8 @@ angular.module 'identifiAngular'
         templateUrl: 'app/identities/list.html'
         controller: 'IdentitiesController'
         controllerAs: 'identities'
+        params:
+          search: ''
       .state 'identities.show',
         url: '/identities/:type/:value'
         templateUrl: 'app/identities/show.html'
