@@ -34,6 +34,13 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.collapseLevel = {}
     $scope.collapseFilters = $window.innerWidth < 992
+    $scope.slider =
+      value: 0
+      options:
+        floor: -3
+        ceil: 3
+        hidePointerLabels: true
+        hideLimitLabels: true
 
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
