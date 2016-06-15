@@ -7,11 +7,12 @@ angular.module('identifiAngular').controller 'MainController', [
   '$state'
   'Identities',
   'config',
+  'localStorageService'
 
   #'Authentication'
   #'Menus'
   #'Persona'
-  ($scope, $rootScope, $location, $http, $state, Identities, config) -> # Authentication, Menus, Persona
+  ($scope, $rootScope, $location, $http, $state, Identities, config, localStorageService) -> # Authentication, Menus, Persona
     ###
     Persona.watch
       loggedInUser: Authentication.user.email
@@ -21,11 +22,30 @@ angular.module('identifiAngular').controller 'MainController', [
           # FIXME
                         onlogout: ->
     ###
+
+    # set authentication
     $scope.authentication = {} # Authentication
+    token = $location.search().token
+    if token
+      jws = KJUR.jws.JWS.parse(token).payloadObj
+      $scope.authentication.token = token
+      $scope.authentication.user = jws.user
+      localStorageService.set('token', token)
+      $state.go('identities.list')
+    else
+      token = localStorageService.get('token')
+      if token
+        jws = KJUR.jws.JWS.parse(token).payloadObj
+        $scope.authentication.token = token
+        $scope.authentication.user = jws.user
+
     $rootScope.queryTerm = ''
     $scope.previousSearchValue = ''
     $scope.filters = config.defaultFilters
     $scope.ids = { list: [] }
+
+    $http.get('/api').then (res) ->
+      $scope.nodeInfo = res.data
 
     $scope.addAttribute = ->
       $location.path '#/identities/create/' + $rootScope.queryTerm
@@ -34,6 +54,9 @@ angular.module('identifiAngular').controller 'MainController', [
       Persona.request()
 
     $scope.logout = ->
+      $scope.authentication = {}
+      localStorageService.clearAll()
+      $state.go('identities.list')
       Persona.logout()
 
     $scope.removeFocus = (event) ->

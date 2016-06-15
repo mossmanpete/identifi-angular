@@ -1,7 +1,7 @@
 angular.module 'identifiAngular',
   ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages',
   'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr', 'angular-parallax',
-  'infinite-scroll']
+  'infinite-scroll', 'LocalStorageModule']
 
 angular.module('identifiAngular').filter 'escape', [ ->
   (input) ->
