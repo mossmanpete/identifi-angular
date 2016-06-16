@@ -122,11 +122,8 @@
               <uib-tab-heading>Received <br class="visible-xs">({{0+stats[0].received_positive+stats[0].received_neutral+stats[0].received_negative}})</uib-tab-heading>
 
               <div ng-show="authentication.user" class="panel panel-default panel-success">
-                <div class="panel-heading visible-xs">
-                    <h3 class="panel-title"><a data-toggle="collapse" data-target="#write-feedback"><span class="glyphicon glyphicon-chevron-down"></span> Write feedback</a></h3>
-                </div>
-                <div class="panel-body collapse in" id="write-feedback">
-                  <form ng-controller="MessagesController" ng-submit="create($event, { type: 'rating', rating: newMessage.rating, comment: newMessage.comment })">
+                <div class="panel-body" id="write-feedback">
+                  <form ng-controller="MessagesController" ng-submit="create($event, { type: 'rating', rating: newMessage.rating, comment: newMessage.comment, recipient: [[idType, idValue]] })">
                     <div class="form-group">
                       <textarea name="comment" class="form-control" id="comment" ng-model="newMessage.comment" placeholder="Write feedback"></textarea>
                     </div>
@@ -153,12 +150,12 @@
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
-                      <li ng-class="{active: (filters.type === null) }" ng-click="setFilters({ type: null })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
+                      <li ng-class="{active: (filters.type === null) }" ng-click="setFilters({ type: null })"><a>All</a></li>
                       <li ng-class="{active: (filters.type === 'rating'), hidden: true }" ng-click="setFilters({type: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
-                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].received_positive}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].received_neutral}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].received_negative}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">Verification</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span><span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].received_positive}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="visible-xs-inline glyphicon glyphicon-question-sign"></span><span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].received_neutral}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="visible-xs-inline glyphicon glyphicon-thumbs-down"></span><span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].received_negative}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="visible-xs-inline glyphicon glyphicon-ok"></span><span class="hidden-xs">Verification</span></a></li>
                       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
                     </ul>
                   </div>
@@ -174,12 +171,12 @@
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
-                      <li ng-class="{active: (filters.type === null) }" ng-click="setFilters({ type: null })"><a><span class="glyphicon glyphicon-home"></span> All</a></li>
-                      <li ng-class="{active: (filters.type === 'rating'), hidden: true }" ng-click="setFilters({type: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
-                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].sent_positive}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].sent_neutral}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].sent_negative}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> <span class="hidden-xs">Verification</span></a></li>
+                      <li ng-class="{active: (filters.type === null) }" ng-click="setFilters({ type: null })"><a>All</a></li>
+                      <li ng-class="{active: (filters.type === 'rating'), hidden: true }" ng-click="setFilters({type: 'rating'})"><a><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span>Rating</a></li>
+                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span><span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].sent_positive}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="visible-xs-inline glyphicon glyphicon-question-sign"></span><span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].sent_neutral}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="visible-xs-inline glyphicon glyphicon-thumbs-down"></span><span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].sent_negative}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="visible-xs-inline glyphicon glyphicon-ok"></span><span class="hidden-xs">Verification</span></a></li>
                       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
                     </ul>
                   </div>
@@ -200,8 +197,8 @@
                           <a ng-if="id.iconStyle&&id.link" class="pull-left btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span></a>
                           <span ng-if="id.iconStyle&&!id.link" class="pull-left btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span></a>
                           <span class="visible-xs pull-right">
-                            <button autocomplete="off" ng-controller="MessagesController" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'verify_identity', recipientType: idType, recipientValue: idValue, recipientType2: id.name, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
-                            <button autocomplete="off" ng-controller="MessagesController" name="unverify" class="ladda-button btn btn-default btn-unverify" ng-click="create($event, { type: 'unverify_identity', recipientType: idType, recipientValue: idValue, recipientType2: id.name, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
+                            <button autocomplete="off" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'verify_identity', recipient: [[idType, idValue], [id.name, id.value]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
+                            <button autocomplete="off" name="unverify" class="ladda-button btn btn-default btn-unverify" ng-click="create($event, { type: 'unverify_identity', recipient: [[idType, idValue], [id.name, id.value]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
                           </span>
                         </td>
                         <td colspan="3">
@@ -212,8 +209,8 @@
                           <input class="form-control linkedComment" type="text" placeholder="comment" disabled>
                         </td>-->
                         <td class="hidden-xs">
-                          <button autocomplete="off" ng-controller="MessagesController" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'verify_identity', recipientType: idType, recipientValue: idValue, recipientType2: id.name, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
-                          <button autocomplete="off" ng-controller="MessagesController" name="unverify" class="ladda-button btn btn-default btn-unverify" ng-click="create($event, { type: 'unverify_identity', recipientType: idType, recipientValue: idValue, recipientType2: id.name, recipientValue2: id.value }, id)" ng-disabled="!authentication.user" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
+                          <button autocomplete="off" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'verify_identity', recipient: [[idType, idValue], [id.name, id.value]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out"><span class="ladda-label"><span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}</span><span class="ladda-spinner"></span></button>
+                          <button autocomplete="off" name="unverify" class="ladda-button btn btn-default btn-unverify" ng-click="create($event, { type: 'unverify_identity', recipient: [[idType, idValue], [id.name, id.value]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out"><span class="ladda-label"><span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}</span><span class="ladda-spinner"></span></button>
                         </td>
                       </tr>
                       <tr ng-repeat-end uib-collapse="!id.collapse" ng-if="!id.isCurrent" class="active connectingmsgs">
@@ -240,14 +237,14 @@
                           </div>
                         </td>
                       </tr>
-                      <tr class="active add-row" ng-controller="MessagesController">
+                      <tr class="active add-row">
                         <td></td>
                         <td colspan="3">
-                          <input id="addValue" ng-model="newConnection.value" class="form-control" name="linkedValue" type="text" placeholder="value" ng-disabled="!authentication.user">
-                          <input id="addType" ng-model="newConnection.type" class="form-control" name="linkedType" type="text" placeholder="type" ng-disabled="!authentication.user">
+                          <input id="addValue" ng-model="newVerification.value" class="form-control" name="linkedValue" type="text" placeholder="value" ng-disabled="!authentication.user">
+                          <input id="addType" ng-model="newVerification.type" class="form-control" name="linkedType" type="text" placeholder="type" ng-disabled="!authentication.user">
                         </td>
                         <!--<td><input id="addComment" class="form-control" name="linkedComment" type="text" placeholder="comment" disabled></td> -->
-                        <td><button autocomplete="off" id="addButton" ng-click="create($event, { type: 'verify_identity', recipientType: idType, recipientValue: idValue, recipientType2: newConnection.type, recipientValue2: newConnection.value }, { confirmations: 0, refutations: 0, type: newConnection.type, value: newConnection.value })" class="ladda-button btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user"><span class="ladda-label"><span class="glyphicon glyphicon-plus"></span> Add</span><span class="ladda-spinner"></span></button></td>
+                        <td><button autocomplete="off" id="addButton" ng-click="create($event, { type: 'verify_identity', recipient: [[idType, idValue], [newVerification.type, newVerification.value]] }, { confirmations: 0, refutations: 0, type: newVerification.type, value: newVerification.value })" class="ladda-button btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user"><span class="ladda-label"><span class="glyphicon glyphicon-plus"></span> Add</span><span class="ladda-spinner"></span></button></td>
                       </tr>
                   </tbody>
                 </table>

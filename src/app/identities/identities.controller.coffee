@@ -44,20 +44,21 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
-      if args.message.data.type == 'verify_identity'
+      console.log 'MessageAdded handler'
+      if args.message.signedData.type == 'verify_identity'
         args.id.confirmations += 1
-        if $scope.connections.indexOf(args.id) == -1
+        if $scope.connections && $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
-      else if args.message.data.type == 'unverify_identity'
+      else if args.message.signedData.type == 'unverify_identity'
         args.id.refutations += 1
         if $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
-      else if args.message.data.type == 'rating'
+      else if args.message.signedData.type == 'rating'
         if messagesAdded
           $scope.received.shift()
+        $scope.processMessages [args.message]
         $scope.received.unshift args.message
         messagesAdded = true
-        $scope.processMessages $scope.received
 
     $scope.$on 'SearchChanged', (event, args) ->
       $scope.search args.queryTerm, args.limit
@@ -200,7 +201,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         type: $scope.filters.type
         offset: $scope.filters.sentOffset
         limit: $scope.filters.limit
-      }, 0), -> # if $scope.filters.max_distance > -1 then ApplicationConfiguration.defaultViewpoint else 0
+      }, 0), -> # if $scope.filters.max_distance > -1 then ApplicationConfiguration.fallbackViewpoint else 0
         $scope.processMessages sent, { authorIsSelf: true }
         if $scope.filters.sentOffset == 0
           $scope.sent = sent
@@ -227,7 +228,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         type: $scope.filters.type
         offset: $scope.filters.receivedOffset
         limit: $scope.filters.limit
-      }, 0), -> # if $scope.filters.max_distance > -1 then ApplicationConfiguration.defaultViewpoint else 0
+      }, 0), -> # if $scope.filters.max_distance > -1 then ApplicationConfiguration.fallbackViewpoint else 0
         $scope.processMessages received, { recipientIsSelf: true }
         if $scope.filters.receivedOffset == 0
           $scope.received = received

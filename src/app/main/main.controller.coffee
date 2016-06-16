@@ -46,17 +46,68 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $http.get('/api').then (res) ->
       $scope.nodeInfo = res.data
+      if res.data.keyID
+        $scope.viewpoint =
+          name: 'this node'
+          viewpoint_name: 'keyID'
+          viewpoint_value: res.data.keyID
+
+    setViewpoint = ->
+      if $scope.authentication.user and false # disabled for now
+        $scope.viewpoint =
+          name: $scope.authentication.user.name
+          viewpoint_name: $scope.authentication.user.idType
+          viewpoint_value: $scope.authentication.user.idValue
+      else
+        $scope.viewpoint = $scope.viewpoint or config.fallbackViewpoint
+    setViewpoint()
+
+    $scope.newMessage =
+      rating: 1
+      comment: ''
+    $scope.newVerification =
+      type: ''
+      value: ''
+    # Create new Message
+    $scope.create = (event, params, id) ->
+      event.stopPropagation()
+      # Create new Message object
+      message =
+        context: 'identifi'
+        maxRating: 3
+        minRating: -3
+      angular.extend message, params
+      options =
+        headers:
+          'Authorization': 'Bearer ' + $scope.authentication.token
+      $http.post('/api/messages', message, options).then ((response) ->
+        # Clear form fields
+        $scope.newMessage.comment = ''
+        $scope.newMessage.rating = 1
+        $scope.newVerification.type = ''
+        $scope.newVerification.value = ''
+        $scope.$root.$broadcast 'MessageAdded',
+          message: response.data
+          id: id
+        return
+      ), (errorResponse) ->
+        $scope.error = errorResponse.data.message
+        return
+      return
 
     $scope.addAttribute = ->
       $location.path '#/identities/create/' + $rootScope.queryTerm
 
     $scope.login = ->
+      $scope.filters.max_distance = -1 # because the user doesn't have a trust index yet
       Persona.request()
 
     $scope.logout = ->
+      $scope.filters.max_distance = 0 # temp
       $scope.authentication = {}
       localStorageService.clearAll()
       $state.go('identities.list')
+      setViewpoint()
       Persona.logout()
 
     $scope.removeFocus = (event) ->
@@ -67,14 +118,6 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.searchKeydown()
 
     $scope.filters = $scope.filters or config.defaultFilters
-    if $scope.authentication.user
-      $scope.viewpoint =
-        viewpointName: $scope.authentication.user.displayName
-        viewpointType: 'email'
-        viewpointValue: $scope.authentication.user.email
-    else
-      $scope.viewpoint = $scope.viewpoint or config.defaultViewpoint
-
 
     ###
     $scope.authentication = Authentication

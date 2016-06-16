@@ -6,20 +6,14 @@ angular.module('identifiAngular').controller 'MessagesController', [
   '$window'
   '$stateParams'
   '$location'
+  '$http'
   # 'Authentication'
   'Messages'
   'config'
-  ($scope, $rootScope, $window, $stateParams, $location, Messages, config) -> #, Authentication
-    $scope.idType = $stateParams.idType
-    $scope.idValue = $stateParams.idValue
+  ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, config) -> #, Authentication
+    $scope.idType = $stateParams.type
+    $scope.idValue = $stateParams.value
     $scope.messages = []
-    $scope.newMessage =
-      type: 'rating'
-      rating: 1
-      comment: ''
-    $scope.newConnection =
-      type: ''
-      value: ''
     angular.extend $scope.filters,
       type: null
       offset: 0
@@ -45,30 +39,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.collapseFilters = $window.innerWidth < 992
 
-    # Create new Message
-
-    $scope.create = (event, params, id) ->
-      event.stopPropagation()
-      # Create new Message object
-      message = new Messages(
-        recipientType: $scope.idType
-        recipientValue: $scope.idValue)
-      angular.extend message, params
-      message.$save ((response) ->
-        # Clear form fields
-        $scope.newMessage.comment = ''
-        $scope.newMessage.rating = 1
-        $scope.newConnection.type = ''
-        $scope.newConnection.value = ''
-        $scope.$root.$broadcast 'MessageAdded',
-          message: message
-          id: id
-        return
-      ), (errorResponse) ->
-        $scope.error = errorResponse.data.message
-        return
-      return
-
     $scope.find = (offset) ->
       $rootScope.pageTitle = ' - Latest messages'
       if !isNaN(offset)
@@ -79,7 +49,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
         offset: $scope.filters.offset
         limit: 50
       }, $scope.filters, if $scope.filters.max_distance > -1 then $scope.viewpoint else {})
-      console.log params
       messages = Messages.query params, ->
         $scope.processMessages messages
         if $scope.filters.offset == 0
