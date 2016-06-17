@@ -214,6 +214,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.filters.sentOffset = $scope.filters.sentOffset + sent.length
         if sent.length < $scope.filters.limit
           $scope.sent.finished = true
+      , (error) ->
+        $scope.sent.finished = true
       )
       if offset == 0
         $scope.sent = {}
@@ -241,6 +243,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.filters.receivedOffset = $scope.filters.receivedOffset + received.length
         if received.length < $scope.filters.limit
           $scope.received.finished = true
+      , (error) ->
+        $scope.sent.finished = true
       )
       if offset == 0
         $scope.received = {}

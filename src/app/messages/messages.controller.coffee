@@ -79,7 +79,12 @@ angular.module('identifiAngular').controller 'MessagesController', [
       $scope.message = Messages.get { id: $stateParams.id }, ->
         $scope.processMessages([$scope.message])
         $rootScope.pageTitle = ' - Message ' + $stateParams.id
-        $scope.message.strData = JSON.stringify($scope.message.data, undefined, 2)
+        showRawData =
+          hash: $scope.message.hash
+          data: $scope.message.data
+          priority: $scope.message.priority
+          jws: $scope.message.jws
+        $scope.message.strData = JSON.stringify(showRawData, undefined, 2)
         $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
         $scope.message.recipientGravatar = CryptoJS.MD5($scope.message.recipientEmail or $scope.message.data.recipient[0][1]).toString()
 

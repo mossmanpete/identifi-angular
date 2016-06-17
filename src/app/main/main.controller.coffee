@@ -100,15 +100,13 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.login = ->
       $scope.filters.max_distance = -1 # because the user doesn't have a trust index yet
-      Persona.request()
 
     $scope.logout = ->
-      $scope.filters.max_distance = 0 # temp
+      $scope.filters.max_distance = 0
       $scope.authentication = {}
       localStorageService.clearAll()
       $state.go('identities.list')
       setViewpoint()
-      Persona.logout()
 
     $scope.removeFocus = (event) ->
       event.currentTarget.blur()
@@ -265,6 +263,8 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.filters.offset = $scope.filters.offset + identities.length
         if identities.length < limit
           $scope.ids.finished = true
+      , (error) ->
+        $scope.ids.finished = true
       $scope.ids.query = q
       return q.$promise.then ->
         return $scope.ids.list
