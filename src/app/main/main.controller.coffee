@@ -39,7 +39,8 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.authentication.token = token
         $scope.authentication.user = jws.user
 
-    $rootScope.queryTerm = ''
+    $scope.query = {}
+    $scope.query.term = ''
     $scope.previousSearchValue = ''
     $scope.filters = config.defaultFilters
     $scope.ids = { list: [] }
@@ -96,7 +97,7 @@ angular.module('identifiAngular').controller 'MainController', [
       return
 
     $scope.addAttribute = ->
-      $location.path '#/identities/create/' + $rootScope.queryTerm
+      $location.path '#/identities/create/' + $scope.query.term
 
     $scope.login = ->
       $scope.filters.max_distance = -1 # because the user doesn't have a trust index yet
@@ -112,8 +113,13 @@ angular.module('identifiAngular').controller 'MainController', [
       event.currentTarget.blur()
 
     $scope.logoClicked = ->
-      $rootScope.queryTerm = ''
-      $scope.searchKeydown()
+      if $state.is 'identities.list'
+        if $scope.query.term != ''
+          $scope.query.term = ''
+          $scope.search()
+      else
+        $scope.query.term = ''
+        $state.go 'identities.list'
 
     $scope.filters = $scope.filters or config.defaultFilters
 
@@ -215,7 +221,7 @@ angular.module('identifiAngular').controller 'MainController', [
       return
 
     $scope.search = (query, limit) ->
-      searchValue = query or $rootScope.queryTerm or ''
+      searchValue = query or $scope.query.term or ''
       if searchValue != $scope.previousSearchValue
         $scope.filters.offset = 0
         $scope.ids.list = []
@@ -225,7 +231,8 @@ angular.module('identifiAngular').controller 'MainController', [
       limit = limit or 20
       q = Identities.query angular.extend({ search_value: searchValue },
           { limit: limit, offset: $scope.filters.offset }, if $scope.filters.max_distance > -1 then $scope.viewpoint else {}), (identities) ->
-        $scope.ids.list = $scope.ids.list or []
+        if !$scope.ids.list or $scope.filters.offset is 0
+          $scope.ids.list = []
         angular.forEach identities, (row) ->
           identity = {}
           angular.forEach row, (attr) ->
@@ -291,14 +298,14 @@ angular.module('identifiAngular').controller 'MainController', [
           $state.go 'identities.show', { type: id.linkTo.type, value: id.linkTo.value }
         when -1
           clearTimeout $scope.timer
-          $rootScope.queryTerm = ''
+          $scope.query.term = ''
           $scope.search()
         when 33, 34, 35, 36, 37, 39
         else
           el = angular.element(event.currentTarget)
           clearTimeout $scope.timer
           wait = setTimeout((->
-            $rootScope.queryTerm = el.val()
+            $scope.query.term = el.val()
             $scope.search()
             return
           ), 300)
@@ -307,5 +314,5 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.dropdownSearchSelect = (item) ->
       $state.go('identities.show', { type: item.linkTo.type, value: item.linkTo.value })
-      $rootScope.queryTerm = ''
+      $scope.query.term = ''
 ]

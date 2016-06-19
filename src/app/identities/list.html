@@ -1,7 +1,7 @@
 <div class="container">
   <section >
     <div class="mar-top40-xs"></div>
-    <div ng-if="!queryTerm && !authentication.user" class="jumbotron">
+    <div ng-if="!query.term && !authentication.user" class="jumbotron">
       <div class="align-center"><h1>Global address book</h1></div>
 
       <div class="row">
@@ -11,30 +11,30 @@
       </div>
     </div>
 
-    <table id="search-results" class="table table-hover" infinite-scroll="search(queryTerm)" infinite-scroll-distance="2" infinite-scroll-disabled="!ids.query.$resolved || ids.finished">
+    <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="2" infinite-scroll-disabled="!ids.query.$resolved || ids.finished">
       <tbody>
         <tr ng-repeat="result in ids.list" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
           <td class="gravatar-col"><img alt="" class="img-circle" height="45" width="45" src="https://www.gravatar.com/avatar/{{result.gravatar}}?d=retro&amp;s=90"></td>
-          <td><a ng-bind-html="result.name|highlight:queryTerm" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })"></a>
+          <td><a ng-bind-html="result.name|highlight:query.term" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })"></a>
             <small ng-if="!result.name" class="list-group-item-text">
-              <span ng-bind-html="result[0][0]|highlight:queryTerm"></span>
+              <span ng-bind-html="result[0][0]|highlight:query.term"></span>
             </small><br>
             <small>
-              <span ng-if="result.nickname" ng-bind-html="result.nickname|highlight:queryTerm" class="mar-right10"></span>
+              <span ng-if="result.nickname" ng-bind-html="result.nickname|highlight:query.term" class="mar-right10"></span>
               <span ng-if="result.email" class="mar-right10">
-                <span class="glyphicon glyphicon-envelope"></span> <span ng-bind-html="result.email|highlight:queryTerm"></span>
+                <span class="glyphicon glyphicon-envelope"></span> <span ng-bind-html="result.email|highlight:query.term"></span>
               </span>
               <span ng-if="result.facebook" class="mar-right10">
-                <span class="fa fa-facebook"></span> <span ng-bind-html="result.facebook|highlight:queryTerm"></span>
+                <span class="fa fa-facebook"></span> <span ng-bind-html="result.facebook|highlight:query.term"></span>
               </span>
               <span ng-if="result.twitter" class="mar-right10">
-                <span class="fa fa-twitter"></span> <span ng-bind-html="result.twitter|highlight:queryTerm"></span>
+                <span class="fa fa-twitter"></span> <span ng-bind-html="result.twitter|highlight:query.term"></span>
               </span>
               <span ng-if="result.googlePlus" class="mar-right10">
-                <span class="fa fa-google-plus"></span> <span ng-bind-html="result.googlePlus|highlight:queryTerm"></span>
+                <span class="fa fa-google-plus"></span> <span ng-bind-html="result.googlePlus|highlight:query.term"></span>
               </span>
               <span ng-if="result.bitcoin" class="mar-right10">
-                <span class="fa fa-bitcoin"></span> <span ng-bind-html="result.bitcoin|highlight:queryTerm"></span>
+                <span class="fa fa-bitcoin"></span> <span ng-bind-html="result.bitcoin|highlight:query.term"></span>
               </span>
             </small>
             <span ng-if="result.distance == 0" class="label label-default pull-right">viewpoint</span>

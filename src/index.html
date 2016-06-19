@@ -71,18 +71,18 @@
           <form class="navbar-form navbar-left nav-search" ng-submit="addAttribute()" role="search" ng-if="'identities.list' | isState">
             <div class="inner-addon right-addon">
               <i class="fa fa-search"></i>
-              <input type="text" ng-keydown="searchKeydown($event)" ng-model="queryTerm" autocomplete="off" autofocus value="" class="nav-search-field search-search form-control" placeholder="Search">
+              <input type="text" ng-keydown="searchKeydown($event)" ng-model="query.term" autocomplete="off" autofocus value="" class="nav-search-field search-search form-control" placeholder="Search">
             </div>
           </form>
 
           <div ng-if="!('identities.list' | isState)" class="navbar-form navbar-left nav-search hidden-xs">
             <div class="inner-addon right-addon">
               <i class="fa fa-search"></i>
-              <input type="text" ng-model="queryTerm"
+              <input type="text" ng-model="query.term"
               placeholder="Search"
               uib-typeahead="identity.name for identity in search($viewValue, 5)"
               typeahead-no-results="noResults" class="form-control nav-search-field"
-              typeahead-on-select="dropdownSearchSelect($item);queryTerm=''"
+              typeahead-on-select="dropdownSearchSelect($item);query.term=''"
               typeahead-focus-on-select="false">
             </div>
             <span ng-if="noResults" auto-close="disabled" is-open="true" uib-dropdown uib-dropdown-toggle>

@@ -22,7 +22,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.received = []
     $scope.trustedBy = []
     $scope.distance = null
-    $rootScope.queryTerm = $stateParams.search if $stateParams.search
+    $scope.query.term = $stateParams.search if $stateParams.search
     $scope.newAttribute =
       type: ''
       value: $stateParams.value
