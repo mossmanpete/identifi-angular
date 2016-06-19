@@ -38,6 +38,10 @@
        url('/assets/fonts/Lato-900/Lato-900.woff') format('woff');
 }
 
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
 body {
 	color:#777;
 	background: #f7f7f7;
