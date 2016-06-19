@@ -42,26 +42,13 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.query = {}
     $scope.query.term = ''
     $scope.previousSearchValue = ''
-    $scope.filters = config.defaultFilters
     $scope.ids = { list: [] }
 
     $http.get('/api').then (res) ->
       $scope.nodeInfo = res.data
       if res.data.keyID
-        $scope.viewpoint =
-          name: 'this node'
-          viewpoint_name: 'keyID'
-          viewpoint_value: res.data.keyID
-
-    setViewpoint = ->
-      if $scope.authentication.user and false # disabled for now
-        $scope.viewpoint =
-          name: $scope.authentication.user.name
-          viewpoint_name: $scope.authentication.user.idType
-          viewpoint_value: $scope.authentication.user.idValue
-      else
-        $scope.viewpoint = $scope.viewpoint or config.fallbackViewpoint
-    setViewpoint()
+        $scope.filters.viewpoint_name = 'keyID'
+        $scope.filters.viewpoint_value = res.data.keyID
 
     $scope.newMessage =
       rating: 1

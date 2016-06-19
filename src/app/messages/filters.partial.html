@@ -13,18 +13,6 @@
       <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> Verification</a></li>
       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
     </ul>
-    <div class="alert alert-info">
-      <p>Viewing as
-        <a ui-sref="identities.show({ type: viewpoint.viewpoint_name, value: viewpoint.viewpoint_value })" data-id-type="keyID" data-id-value="1DqrzTcimQp3Ye88oHgxdU7DBTsM2TRYFj" class="id-link" ng-bind="viewpoint.name"></a>
-      </p>
-      <p>Max distance from viewpoint:</p>
-      <div class="btn-group trust-distance-selector">
-        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: -1})" ng-class="{active: filters.max_distance === -1}" uib-tooltip="Distance filter off">✕</button>
-        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 1})" ng-class="{active: filters.max_distance === 1}">1</button>
-        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 2})" ng-class="{active: filters.max_distance === 2}">2</button>
-        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 3})" ng-class="{active: filters.max_distance === 3}">3</button>
-        <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 0})" ng-class="{active: filters.max_distance === 0}" uib-tooltip="Unlimited">∞</button>
-      </div>
-    </div>
+    <div ng-include="'app/messages/distance-selector.partial.html'"></div>
   </div>
 </div>

@@ -35,7 +35,5 @@ angular.module 'identifiAngular'
       .state 'about',
         url: '/about'
         templateUrl: 'app/main/about.html'
-        controller: 'MainController'
-        controllerAs: 'main'
 
     $urlRouterProvider.otherwise '/'

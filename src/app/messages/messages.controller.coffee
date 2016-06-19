@@ -48,7 +48,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
         idValue: $scope.idValue
         offset: $scope.filters.offset
         limit: 50
-      }, $scope.filters, if $scope.filters.max_distance > -1 then $scope.viewpoint else {})
+      }, $scope.filters)
       messages = Messages.query params, ->
         $scope.processMessages messages
         if $scope.filters.offset == 0

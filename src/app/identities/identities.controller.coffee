@@ -185,20 +185,22 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.stats = Identities.stats(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
-      }, if $scope.filters.max_distance > -1 then $scope.viewpoint else 0), ->
+      }), ->
         $scope.info.email = $scope.info.email or $scope.stats.email
       )
 
     $scope.getSentMsgs = (offset) ->
       if !isNaN(offset)
         $scope.filters.sentOffset = offset
-      sent = Identities.sent(angular.extend($scope.filters, {
+      sent = Identities.sent(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
         type: $scope.filters.type
         offset: $scope.filters.sentOffset
         limit: $scope.filters.limit
-      }, 0), -> # if $scope.filters.max_distance > -1 then ApplicationConfiguration.fallbackViewpoint else 0
+        viewpoint_name: null
+        viewpoint_value: null
+      }), ->
         $scope.processMessages sent, { authorIsSelf: true }
         if $scope.filters.sentOffset == 0
           $scope.sent = sent
@@ -221,13 +223,13 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.getReceivedMsgs = (offset) ->
       if !isNaN(offset)
         $scope.filters.receivedOffset = offset
-      received = Identities.received(angular.extend($scope.filters, {
+      received = Identities.received(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
         type: $scope.filters.type
         offset: $scope.filters.receivedOffset
         limit: $scope.filters.limit
-      }, 0), -> # if $scope.filters.max_distance > -1 then ApplicationConfiguration.fallbackViewpoint else 0
+      }, if $scope.filters.max_distance == -1 then { viewpoint_name: null, viewpoint_value: null }), ->
         $scope.processMessages received, { recipientIsSelf: true }
         if $scope.filters.receivedOffset == 0
           $scope.received = received
@@ -285,31 +287,23 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.tabs[2].active = true
       $rootScope.pageTitle = ' - ' + $scope.idValue
       $scope.getConnections()
-      trustpaths = Identities.trustpaths
-        idType: $scope.viewpoint.viewpoint_name
-        idValue: $scope.viewpoint.viewpoint_value
-        target_name: $scope.idType
-        target_value: $scope.idValue
-      , ->
-        if trustpaths.length == 0
-          return
-        $scope.distance = (trustpaths[0].path_string.split(':').length - 3) / 2
-        trustedByExists = {}
-        angular.forEach trustpaths, (path, i) ->
-          if path.path_string
-            arr = path.path_string.split(':')
-            if arr.length >= 5
-              obj =
-                linkTo: [arr[arr.length-5], arr[arr.length-4]]
-                distance: (arr.length - 3) / 2 - 1
-              if not trustedByExists[obj.linkTo.join(':')]
-                trustedByExists[obj.linkTo.join(':')] = true
-                obj[arr[arr.length-5]] = arr[arr.length-4]
-                obj.gravatar = CryptoJS.MD5(arr[arr.length-4]).toString()
-                $scope.trustedBy.push(obj)
+
+      console.log "filters", $scope.filters
+      $scope.trustedBy = Identities.received(angular.extend({}, $scope.filters, {
+        idType: $scope.idType
+        idValue: $scope.idValue
+        orderBy: 'distance'
+        max_distance: 0
+        direction: 'ASC'
+        type: 'rating:positive'
+        offset: $scope.filters.receivedOffset
+        limit: $scope.filters.limit
+      }), ->
+        $scope.processMessages $scope.trustedBy, { recipientIsSelf: true }
+        console.log $scope.trustedBy
+      )
 
     if $state.is 'identities.list'
-      console.log 'identities.list'
       $scope.search()
     else if $state.is 'identities.show'
       $scope.findOne()
