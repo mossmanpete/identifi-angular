@@ -282,13 +282,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.idValue = $stateParams.value
       $scope.isUniqueType = config.uniqueAttributeTypes.indexOf($scope.idType) > -1
       if !$scope.isUniqueType
-        console.log "going to id ", $scope.idValue
         $state.go 'identities.list', { search: $scope.idValue }
         $scope.tabs[2].active = true
       $rootScope.pageTitle = ' - ' + $scope.idValue
       $scope.getConnections()
 
-      console.log "filters", $scope.filters
       $scope.trustedBy = Identities.received(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
@@ -297,10 +295,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         direction: 'ASC'
         type: 'rating:positive'
         offset: $scope.filters.receivedOffset
-        limit: $scope.filters.limit
+        limit: 20
       }), ->
         $scope.processMessages $scope.trustedBy, { recipientIsSelf: true }
-        console.log $scope.trustedBy
       )
 
     if $state.is 'identities.list'

@@ -43,12 +43,12 @@ angular.module('identifiAngular').controller 'MessagesController', [
       $rootScope.pageTitle = ' - Latest messages'
       if !isNaN(offset)
         $scope.filters.offset = offset
-      params = angular.extend({
+      params = angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
         offset: $scope.filters.offset
         limit: 50
-      }, $scope.filters)
+      }, if $scope.filters.max_distance == -1 then { viewpoint_name: null, viewpoint_value: null })
       messages = Messages.query params, ->
         $scope.processMessages messages
         if $scope.filters.offset == 0
