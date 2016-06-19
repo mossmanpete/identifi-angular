@@ -231,7 +231,6 @@ angular.module('identifiAngular').controller 'MainController', [
           angular.forEach row, (attr) ->
             if identity.distance == undefined and parseInt(attr.dist) >= 0
               identity.distance = attr.dist
-              console.log attr.dist
             switch attr.attr
               when 'email'
                 identity.email = attr.val

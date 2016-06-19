@@ -60,9 +60,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.received.unshift args.message
         messagesAdded = true
 
-    $scope.$on 'SearchChanged', (event, args) ->
-      $scope.search args.queryTerm, args.limit
-
     $scope.getConnections = ->
       $scope.connections = Identities.connections({
         idType: $scope.idType
@@ -218,7 +215,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.sent.finished = true
       )
       if offset == 0
-        $scope.sent = {}
+        $scope.sent = []
       $scope.sent.$resolved = sent.$resolved
 
     $scope.getReceivedMsgs = (offset) ->
@@ -247,7 +244,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.sent.finished = true
       )
       if offset == 0
-        $scope.received = {}
+        $scope.received = []
       $scope.received.$resolved = received.$resolved
 
     $scope.getPhotosFromTwitter = (profileUrl) ->
@@ -310,5 +307,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
                 obj[arr[arr.length-5]] = arr[arr.length-4]
                 obj.gravatar = CryptoJS.MD5(arr[arr.length-4]).toString()
                 $scope.trustedBy.push(obj)
-    return
+
+    if $state.is 'identities.list'
+      console.log 'identities.list'
+      $scope.search()
+    else if $state.is 'identities.show'
+      $scope.findOne()
 ]
