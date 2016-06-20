@@ -286,6 +286,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.tabs[2].active = true
       $rootScope.pageTitle = ' - ' + $scope.idValue
       $scope.getConnections()
+      if $scope.idType == $scope.filters.viewpoint_name and $scope.idValue == $scope.filters.viewpoint_value
+        $scope.distance = 0
 
       $scope.trustedBy = Identities.received(angular.extend({}, $scope.filters, {
         idType: $scope.idType
@@ -298,6 +300,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         limit: 20
       }), ->
         $scope.processMessages $scope.trustedBy, { recipientIsSelf: true }
+        if !$scope.distance and $scope.trustedBy.length
+          $scope.distance = $scope.trustedBy[0].distance + 1
       )
 
     if $state.is 'identities.list'
