@@ -18,10 +18,10 @@
           <div class="col-md-9 col-md-offset-3">
             <ul class="list-inline tab-list">
               <li ng-if="isUniqueType">
-                <a href="" ng-class="{ active: tabs[0].active }" ng-click="tabs[0].active = true"><span class="hidden-xs">Received </span>({{0+stats[0].received_positive+stats[0].received_neutral+stats[0].received_negative}})</a>
+                <a href="" ng-class="{ active: tabs[0].active }" ng-click="tabs[0].active = true"><span class="hidden-xs">Received </span>({{0+stats.received_positive+stats.received_neutral+stats.received_negative}})</a>
               </li>
               <li ng-if="isUniqueType">
-                <a href="" ng-class="{ active: tabs[1].active }" ng-click="tabs[1].active = true"><span class="hidden-xs">Sent </span>({{0+stats[0].sent_positive+stats[0].sent_neutral+stats[0].sent_negative}})</a>
+                <a href="" ng-class="{ active: tabs[1].active }" ng-click="tabs[1].active = true"><span class="hidden-xs">Sent </span>({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative}})</a>
               </li>
               <li>
                 <a href="" ng-class="{ active: tabs[2].active }" ng-click="tabs[2].active = true"><span class="hidden-xs">Identity </span>(<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved">0</span>)</a>
@@ -36,7 +36,7 @@
         <div class="col-md-3 id-left-column">
         <div ng-if="isUniqueType">
         <div>
-          <p class="hidden-md hidden-lg" ng-hide="!stats[0].name">
+          <p class="hidden-md hidden-lg" ng-hide="!stats.name">
             <span ng-bind="idValue" id="id-value"></span>
             <small class="text-muted">
               <span ng-hide="idType === 'url'" ng-bind="idType" id="id-type"></span>
@@ -70,33 +70,33 @@
 
                 </p>
                 <p>
-                  <b ng-if="stats[0].received_positive">Received: <span ng-bind="stats[0].received_positive / (stats[0].received_positive+stats[0].received_neutral+stats[0].received_negative) * 100 | number:0"></span>% positive<br></b>
-                  <span ng-if="stats[0].sent_positive">Sent: <span ng-bind="stats[0].sent_positive / (stats[0].sent_positive+stats[0].sent_neutral+stats[0].sent_negative) * 100 | number:0"></span>% positive</span>
+                  <b ng-if="stats.received_positive">Received: <span ng-bind="stats.received_positive / (stats.received_positive+stats.received_neutral+stats.received_negative) * 100 | number:0"></span>% positive<br></b>
+                  <span ng-if="stats.sent_positive">Sent: <span ng-bind="stats.sent_positive / (stats.sent_positive+stats.sent_neutral+stats.sent_negative) * 100 | number:0"></span>% positive</span>
                 </p>
                 <!--
                 <p class="received-stats">
                   <div><strong>Received</strong></div>
                   <div>
                     <strong>
-                      <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="stats[0].received_positive">-</span></span>
-                      <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="stats[0].received_neutral">-</span></span>
-                      <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="stats[0].received_negative">-</span></span>
+                      <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="stats.received_positive">-</span></span>
+                      <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="stats.received_neutral">-</span></span>
+                      <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="stats.received_negative">-</span></span>
                     </strong>
                   </div>
                 </p>
                 <p>
                   <div>Sent</div>
                   <div>
-                    <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="stats[0].sent_positive">-</span></span>
-                    <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="stats[0].sent_neutral">-</span></span>
-                    <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="stats[0].sent_negative">-</span></span>
+                    <span class="positive"><span class="glyphicon glyphicon-thumbs-up"></span> <span ng-bind="stats.sent_positive">-</span></span>
+                    <span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> <span ng-bind="stats.sent_neutral">-</span></span>
+                    <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="stats.sent_negative">-</span></span>
                   </div>
                 </p> -->
                 <div ng-if="isUniqueType" class="mar-top10 quick-contact">
                   <ul class="list-unstyled">
                     <li ng-repeat="id in connections" ng-if="id.quickContact"><a ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span><span ng-bind="id.linkName || id.value"></span></a></li>
                     <li>
-                      <span class="fa fa-calendar"></span>First seen: <span ng-if="stats[0].first_seen" ng-bind="stats[0].first_seen|date:'mediumDate'"></span><span ng-if="!stats[0].first_seen">-</span>
+                      <span class="fa fa-calendar"></span>First seen: <span ng-if="stats.first_seen" ng-bind="stats.first_seen|date:'mediumDate'"></span><span ng-if="!stats.first_seen">-</span>
                     </li>
                   </ul>
                 </div>
@@ -130,7 +130,7 @@
           <!-- Nav tabs -->
           <uib-tabset>
             <uib-tab active="tabs[0].active" ng-if="isUniqueType">
-              <uib-tab-heading>Received <br class="visible-xs">({{0+stats[0].received_positive+stats[0].received_neutral+stats[0].received_negative}})</uib-tab-heading>
+              <uib-tab-heading>Received <br class="visible-xs">({{0+stats.received_positive+stats.received_neutral+stats.received_negative}})</uib-tab-heading>
 
               <div ng-show="authentication.user" class="panel panel-default panel-success">
                 <div class="panel-body" id="write-feedback">
@@ -163,9 +163,9 @@
                     <ul class="nav nav-pills msg-type-filter">
                       <li ng-class="{active: (filters.type === null) }" ng-click="setFilters({ type: null })"><a>All</a></li>
                       <li ng-class="{active: (filters.type === 'rating'), hidden: true }" ng-click="setFilters({type: 'rating'})"><a><span class="glyphicon glyphicon-thumbs-up"></span> Rating</a></li>
-                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span><span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].received_positive}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="visible-xs-inline glyphicon glyphicon-question-sign"></span><span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].received_neutral}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="visible-xs-inline glyphicon glyphicon-thumbs-down"></span><span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].received_negative}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span><span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats.received_positive}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="visible-xs-inline glyphicon glyphicon-question-sign"></span><span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats.received_neutral}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="visible-xs-inline glyphicon glyphicon-thumbs-down"></span><span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats.received_negative}})</span></a></li>
                       <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="visible-xs-inline glyphicon glyphicon-ok"></span><span class="hidden-xs">Verification</span></a></li>
                       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
                     </ul>
@@ -177,16 +177,16 @@
               <div ng-if="!received.$resolved" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
             <uib-tab active="tabs[1].active" ng-if="isUniqueType">
-              <uib-tab-heading>Sent ({{0+stats[0].sent_positive+stats[0].sent_neutral+stats[0].sent_negative}})</uib-tab-heading>
+              <uib-tab-heading>Sent ({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative}})</uib-tab-heading>
               <div infinite-scroll="getSentMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!sent.$resolved || sent.finished || !tabs[1].active">
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
                       <li ng-class="{active: (filters.type === null) }" ng-click="setFilters({ type: null })"><a>All</a></li>
                       <li ng-class="{active: (filters.type === 'rating'), hidden: true }" ng-click="setFilters({type: 'rating'})"><a><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span>Rating</a></li>
-                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span><span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats[0].sent_positive}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="visible-xs-inline glyphicon glyphicon-question-sign"></span><span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats[0].sent_neutral}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="visible-xs-inline glyphicon glyphicon-thumbs-down"></span><span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats[0].sent_negative}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span><span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+stats.sent_positive}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="visible-xs-inline glyphicon glyphicon-question-sign"></span><span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+stats.sent_neutral}})</span></a></li>
+                      <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="visible-xs-inline glyphicon glyphicon-thumbs-down"></span><span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+stats.sent_negative}})</span></a></li>
                       <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="visible-xs-inline glyphicon glyphicon-ok"></span><span class="hidden-xs">Verification</span></a></li>
                       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
                     </ul>

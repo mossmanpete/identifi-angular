@@ -29,5 +29,5 @@ angular.module('identifiAngular').factory 'Identities', [
       stats:
         action: 'GET'
         params: method: 'stats'
-        isArray: true
+        isArray: false
 ]
