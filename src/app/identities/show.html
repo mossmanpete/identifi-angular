@@ -46,8 +46,17 @@
           <div class="stats-box">
             <div class="row">
               <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12">
-                <p>
-                  <a ng-href="" data-toggle="tooltip" data-placement="right"><img ng-src="{{profilePhotoUrl}}" width="230" height="230" class="img-thumbnail mar-right5"></a>
+                <p class="align-center">
+                  <identicon id="{ gravatar: gravatar }"
+                    border="4"
+                    positive-score="stats.received_positive"
+                    negative-score="stats.received_negative"
+                    width="230">
+                  </identicon>
+                  <!-- <a ng-href="" class="circle {{profileImageCircleClass}}">
+                    <span class="arc"></span>
+                    <img ng-src="{{profilePhotoUrl}}" width="230" height="230" class="profile-image mar-right5">
+                  </a> -->
                 </p>
               </div>
               <div class="col-xs-6 col-sm-6 col-md-12 col-lg-12 mar-bot10 mar-top10">

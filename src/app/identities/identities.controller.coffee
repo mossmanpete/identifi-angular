@@ -186,7 +186,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.stats = Identities.stats(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
-      }), ->
+      }), (res) ->
         $scope.info.email = $scope.info.email or $scope.stats.email
       )
 
@@ -265,9 +265,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.getPhotosFromGravatar = ->
       email = $scope.info.email or $scope.idValue
       $scope.gravatar = CryptoJS.MD5(email).toString()
-      if !$scope.isUniqueType
-        return
-      $scope.profilePhotoUrl = $scope.profilePhotoUrl or 'http://www.gravatar.com/avatar/' + $scope.gravatar + '?d=retro&s=210'
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
