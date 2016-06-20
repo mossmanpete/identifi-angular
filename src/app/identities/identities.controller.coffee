@@ -20,7 +20,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.info = {}
     $scope.sent = []
     $scope.received = []
-    $scope.trustedBy = []
+    $scope.thumbsUp = []
+    $scope.thumbsDown = []
     $scope.distance = null
     $scope.query.term = $stateParams.search if $stateParams.search
     $scope.newAttribute =
@@ -289,7 +290,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       if $scope.idType == $scope.filters.viewpoint_name and $scope.idValue == $scope.filters.viewpoint_value
         $scope.distance = 0
 
-      $scope.trustedBy = Identities.received(angular.extend({}, $scope.filters, {
+      $scope.thumbsUp = Identities.received(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
         order_by: 'distance'
@@ -297,11 +298,24 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         direction: 'asc'
         type: 'rating:positive'
         offset: $scope.filters.receivedOffset
-        limit: 20
+        limit: 12
       }), ->
-        $scope.processMessages $scope.trustedBy, { recipientIsSelf: true }
-        if !$scope.distance and $scope.trustedBy.length
-          $scope.distance = $scope.trustedBy[0].distance + 1
+        $scope.processMessages $scope.thumbsUp, { recipientIsSelf: true }
+        if !$scope.distance and $scope.thumbsUp.length
+          $scope.distance = $scope.thumbsUp[0].distance + 1
+      )
+
+      $scope.thumbsDown = Identities.received(angular.extend({}, $scope.filters, {
+        idType: $scope.idType
+        idValue: $scope.idValue
+        order_by: 'distance'
+        max_distance: 0
+        direction: 'asc'
+        type: 'rating:negative'
+        offset: $scope.filters.receivedOffset
+        limit: 12
+      }), ->
+        $scope.processMessages $scope.thumbsDown, { recipientIsSelf: true }
       )
 
     if $state.is 'identities.list'

@@ -106,9 +106,17 @@
         </div>
       </div>
 
-      <div ng-if="isUniqueType && trustedBy.length > 0" class="stats-box mar-bot10">
-        <h5>Trusted by</h5>
-        <a ng-repeat="id in trustedBy" class="distance-container mar-right5 mar-bot5" ui-sref="identities.show({ type: id.linkToAuthor[0], value: id.linkToAuthor[1] })" title="">
+      <div ng-if="isUniqueType && thumbsUp.length > 0" class="stats-box mar-bot10">
+        <h5>Thumbs up</h5>
+        <a ng-repeat="id in thumbsUp" class="distance-container mar-right5 mar-bot5" ui-sref="identities.show({ type: id.linkToAuthor[0], value: id.linkToAuthor[1] })" title="">
+          <img alt="" src="https://www.gravatar.com/avatar/{{id.gravatar}}?d=retro&amp;s=120" height=60 class="gravatar" uib-tooltip="{{ id.name || id.linkToAuthor[1] }}">
+          <span class="distance" ng-bind="id.distance | ordinal"></span>
+        </a>
+      </div>
+
+      <div ng-if="isUniqueType && thumbsDown.length > 0" class="stats-box mar-bot10">
+        <h5>Thumbs down</h5>
+        <a ng-repeat="id in thumbsDown" class="distance-container mar-right5 mar-bot5" ui-sref="identities.show({ type: id.linkToAuthor[0], value: id.linkToAuthor[1] })" title="">
           <img alt="" src="https://www.gravatar.com/avatar/{{id.gravatar}}?d=retro&amp;s=120" height=60 class="gravatar" uib-tooltip="{{ id.name || id.linkToAuthor[1] }}">
           <span class="distance" ng-bind="id.distance | ordinal"></span>
         </a>
