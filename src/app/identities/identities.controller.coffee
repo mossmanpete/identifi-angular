@@ -290,9 +290,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.trustedBy = Identities.received(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
-        orderBy: 'distance'
+        order_by: 'distance'
         max_distance: 0
-        direction: 'ASC'
+        direction: 'asc'
         type: 'rating:positive'
         offset: $scope.filters.receivedOffset
         limit: 20

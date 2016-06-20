@@ -144,16 +144,22 @@ angular.module('identifiAngular').controller 'MainController', [
         msg.linkToAuthor = msg.data.author[0]
         i = undefined
         i = 0
+        smallestIndex = 1000
         while i < msg.data.author.length
-          if config.uniqueAttributeTypes.indexOf(msg.data.author[i][0]) > -1
+          index = config.uniqueAttributeTypes.indexOf(msg.data.author[i][0])
+          if index > -1 and index < smallestIndex
+            smallestIndex = index
             msg.linkToAuthor = msg.data.author[i]
           else if msg.data.author[i][0] in ['name', 'nickname']
             msg.authorName = msg.data.author[i][1]
           i++
         msg.linkToRecipient = msg.data.recipient[0]
         i = 0
+        smallestIndex = 1000
         while i < msg.data.recipient.length
-          if config.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0]) > -1
+          index = config.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0])
+          if index > -1 and index < smallestIndex
+            smallestIndex = index
             msg.linkToRecipient = msg.data.recipient[i]
           else if msg.data.recipient[i][0] in ['name', 'nickname']
             msg.recipientName = msg.data.recipient[i][1]
@@ -222,6 +228,7 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.ids.list = []
         angular.forEach identities, (row) ->
           identity = {}
+          smallestIndex = 1000
           angular.forEach row, (attr) ->
             if identity.distance == undefined and parseInt(attr.dist) >= 0
               identity.distance = attr.dist
@@ -243,8 +250,12 @@ angular.module('identifiAngular').controller 'MainController', [
                   identity.facebook = attr.val.split('facebook.com/')[1]
                 if attr.val.indexOf('plus.google.com/') > -1
                   identity.googlePlus = attr.val.split('plus.google.com/')[1]
+            index = config.uniqueAttributeTypes.indexOf(attr.attr)
             if !identity.linkTo
               identity.linkTo = { type: attr.attr, value: attr.val }
+            if index > -1 and index < smallestIndex
+              identity.linkTo = { type: attr.attr, value: attr.val }
+              smallestIndex = index
             if !identity.gravatar
               identity.gravatar = CryptoJS.MD5(attr.val).toString()
           if !identity.name
