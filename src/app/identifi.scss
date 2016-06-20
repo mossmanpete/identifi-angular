@@ -1366,7 +1366,7 @@ a {
 	}
 }
 
-.trusted-by {
+.distance-container {
 	display: inline-block;
 	position: relative;
 
@@ -1392,7 +1392,10 @@ a {
 		line-height: 75%;
 		font-weight: bold;
 	}
+}
 
+.id-link .distance-container .distance {
+  right: 5px;
 }
 
 .table-hover>tbody>tr:hover {

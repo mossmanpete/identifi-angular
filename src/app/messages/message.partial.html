@@ -2,7 +2,13 @@
   <p class="">
     <span class="mar-left5 pull-right" ng-class="msg.iconStyle" ng-repeat="n in msg.iconCount track by $index"></span>
     <strong>
-      <a ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" class="id-link"><img height="30" width="30" alt="" src="https://www.gravatar.com/avatar/{{msg.gravatar}}?d=retro&amp;s=30" class="gravatar mar-right10"><span ng-bind="(msg.authorIsSelf && info.name)||msg.authorName||msg.linkToAuthor[1]"></span></a>
+      <a ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" class="id-link">
+        <span class="distance-container">
+          <img height="30" width="30" alt="" src="https://www.gravatar.com/avatar/{{msg.gravatar}}?d=retro&amp;s=30" class="gravatar mar-right10">
+          <span ng-if="msg.distance" class="distance" ng-bind="msg.distance | ordinal"></span>
+        </span>
+        <span ng-bind="(msg.authorIsSelf && info.name)||msg.authorName||msg.linkToAuthor[1]"></span>
+      </a>
     </strong>
     <small><i class="glyphicon glyphicon-play"></i></small>
     <a ui-sref="identities.show({ type: msg.linkToRecipient[0], value: msg.linkToRecipient[1] })" ng-bind="(msg.recipientIsSelf && info.name)||msg.recipientName||msg.linkToRecipient[1]" class="id-link"></a>
