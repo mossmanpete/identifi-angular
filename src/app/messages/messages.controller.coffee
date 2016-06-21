@@ -15,7 +15,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.idValue = $stateParams.value
     $scope.messages = []
     angular.extend $scope.filters,
-      type: null
+      type: 'rating'
       offset: 0
 
     $scope.iconCount = (rating) ->

@@ -10,8 +10,8 @@ angular.module 'identifiAngular'
       <div class="identicon"
         ng-style="{ 'width': width, 'height': width }">
         <div ng-if="(positiveScore + negativeScore > 0)" class="pie" ng-style="{ 'background-color': '#A94442', 'background-image':
-              'linear-gradient(' + positiveScore / (positiveScore + negativeScore) * 360 + 'deg, transparent 50%, #3C763D 50%),
-              linear-gradient(0deg, #3C763D 50%, transparent 50%)',
+              positiveScore ? 'linear-gradient(' + positiveScore / (positiveScore + negativeScore) * 360 + 'deg, transparent 50%, #3C763D 50%),
+              linear-gradient(0deg, #3C763D 50%, transparent 50%)' : 'none',
               'width': width,
               'transform': 'rotate(' + ((-positiveScore / (positiveScore + negativeScore) * 360 - 180) / 2) + 'deg)' }">
         </div>

@@ -274,7 +274,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         sentOffset: 0
       $scope.getReceivedMsgs 0
       $scope.getSentMsgs 0
-      $scope.getStats()
+      if filters.max_distance != undefined
+        $scope.getStats()
 
     $scope.findOne = ->
       $scope.idType = $stateParams.type
