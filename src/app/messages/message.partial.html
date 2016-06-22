@@ -15,5 +15,15 @@
      - <a ui-sref="messages.show({ id: msg.hash })" ng-bind="msg.data.timestamp|date:'medium'" class="text-muted small" style="display:inline-block;"></a>
   </p>
 
+  <p ng-if="msg.data.type == 'verify_identity' || msg.data.type == 'unverify_identity'">
+    <small ng-repeat="recipient in msg.data.recipient">
+      {{recipient[0]}}:
+      <span ng-if="recipient[0] == 'email' || recipient[0] == 'url'" ng-bind-html="recipient[1] | linky"></span>
+      <span ng-if="!(recipient[0] == 'email' || recipient[0] == 'url')" ng-bind="recipient[1]"></span>
+      <i class="fa fa-link" ng-if="!$last && msg.data.type == 'verify_identity'"></i>
+      <i class="fa fa-chain-broken" ng-if="!$last && msg.data.type == 'unverify_identity'"></i> 
+    </small>
+  </p>
+
   <p ng-bind-html="msg.data.comment|linky"></p>
 </div>
