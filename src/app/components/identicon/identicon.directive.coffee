@@ -11,7 +11,8 @@ angular.module 'identifiAngular'
         ng-style="{ 'width': width, 'height': width }">
         <div class="pie" ng-style="{
               'background-color': (positiveScore + negativeScore) > 0 ? '#A94442' : 'rgba(0,0,0,0.2)',
-              'background-image': positiveScore ? 'linear-gradient(' + positiveScore / (positiveScore + negativeScore) * 360 + 'deg, transparent 50%, #3C763D 50%),
+              'background-image':
+              positiveScore ? 'linear-gradient(' + positiveScore / (positiveScore + negativeScore) * 360 + 'deg, transparent 50%, #3C763D 50%),
               linear-gradient(0deg, #3C763D 50%, transparent 50%)' : 'none',
               'width': width,
               'box-shadow': (positiveScore > negativeScore * 20) ? '0px 0px ' + border * positiveScore / 50 + 'px 1px #3C763D' : 'none',
