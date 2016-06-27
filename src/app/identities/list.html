@@ -14,7 +14,7 @@
     <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="2" infinite-scroll-disabled="!ids.query.$resolved || ids.finished">
       <tbody>
         <tr ng-repeat="result in ids.list" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
-          <td class="gravatar-col"><identicon id="result" border="0" width="46"></identicon></td>
+          <td class="gravatar-col"><identicon id="result" border="3" width="46" positive-score="result.pos" negative-score="result.neg"></identicon></td>
           <td><a ng-bind-html="result.name|highlight:query.term" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })"></a>
             <small ng-if="!result.name" class="list-group-item-text">
               <span ng-bind-html="result[0][0]|highlight:query.term"></span>

@@ -232,6 +232,12 @@ angular.module('identifiAngular').controller 'MainController', [
           angular.forEach row, (attr) ->
             if identity.distance == undefined and parseInt(attr.dist) >= 0
               identity.distance = attr.dist
+            if identity.pos == undefined and parseInt(attr.pos) > 0
+              identity.pos = attr.pos
+              console.log "pos", identity.pos
+            if identity.neg == undefined and parseInt(attr.neg) > 0
+              identity.neg = attr.neg
+              console.log "neg", identity.neg
             switch attr.attr
               when 'email'
                 identity.email = attr.val
