@@ -300,7 +300,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         limit: 12
       }), ->
         $scope.processMessages $scope.thumbsUp, { recipientIsSelf: true }
-        if !$scope.distance and $scope.thumbsUp.length
+        if isNaN(parseInt($scope.distance)) and $scope.thumbsUp.length
           $scope.distance = $scope.thumbsUp[0].distance + 1
       )
 
