@@ -1313,13 +1313,13 @@ a {
   }
 }
 
-/*
 .square .identicon {
   &, .pie, img {
     border-radius: 0;
+    transform: none !important;
   }
+  //overflow: hidden;
 }
-*/
 
 .identicon {
   margin: auto;
