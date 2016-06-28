@@ -1318,7 +1318,10 @@ a {
     border-radius: 0;
     transform: none !important;
   }
-  //overflow: hidden;
+}
+
+.no-glow .pie {
+  box-shadow: none !important;
 }
 
 .identicon {
