@@ -49,6 +49,8 @@ angular.module('identifiAngular').controller 'MainController', [
       if res.data.keyID
         $scope.filters.viewpoint_name = 'keyID'
         $scope.filters.viewpoint_value = res.data.keyID
+    .finally ->
+      $scope.apiReady = true
 
     $scope.newMessage =
       rating: 1
@@ -220,7 +222,6 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.list = []
         $scope.ids.finished = false
       $scope.previousSearchValue = searchValue
-      $rootScope.pageTitle = ''
       limit = limit or 20
       q = Identities.query angular.extend({ search_value: searchValue },
           { limit: limit, offset: $scope.filters.offset }, if $scope.filters.max_distance > -1 then $scope.viewpoint else {}), (identities) ->
