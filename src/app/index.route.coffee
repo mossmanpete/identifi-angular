@@ -13,6 +13,7 @@ angular.module 'identifiAngular'
         controllerAs: 'identities'
         params:
           search: ''
+        title: 'Identifi - Global Address Book'
       .state 'identities.show',
         url: '/identities/:type/:value'
         templateUrl: 'app/identities/show.html'
@@ -27,6 +28,7 @@ angular.module 'identifiAngular'
         templateUrl: 'app/messages/list.html'
         controller: 'MessagesController'
         controllerAs: 'messages'
+        title: 'Identifi - Latest messages'
       .state 'messages.show',
         url: '/:id'
         templateUrl: 'app/messages/show.html'
@@ -35,5 +37,6 @@ angular.module 'identifiAngular'
       .state 'about',
         url: '/about'
         templateUrl: 'app/main/about.html'
+        title: 'Identifi - About'
 
     $urlRouterProvider.otherwise '/'

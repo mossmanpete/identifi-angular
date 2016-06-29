@@ -151,6 +151,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               conn.rowClass = 'danger'
           $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
         $scope.getPhotosFromGravatar()
+        $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
 
         $scope.connectionClicked = (event, id) ->
           id.collapse = !id.collapse
@@ -284,7 +285,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       if !$scope.isUniqueType
         $state.go 'identities.list', { search: $scope.idValue }
         $scope.tabs[2].active = true
-      $rootScope.pageTitle = ' - ' + $scope.idValue
+      $scope.setPageTitle $scope.idValue
       $scope.getConnections()
       if $scope.idType == $scope.filters.viewpoint_name and $scope.idValue == $scope.filters.viewpoint_value
         $scope.distance = 0

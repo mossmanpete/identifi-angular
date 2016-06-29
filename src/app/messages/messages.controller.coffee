@@ -40,7 +40,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.collapseFilters = $window.innerWidth < 992
 
     $scope.find = (offset) ->
-      $rootScope.pageTitle = ' - Latest messages'
       if !isNaN(offset)
         $scope.filters.offset = offset
       params = angular.extend({}, $scope.filters, {
@@ -78,7 +77,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.findOne = ->
       $scope.message = Messages.get { id: $stateParams.id }, ->
         $scope.processMessages([$scope.message])
-        $rootScope.pageTitle = ' - Message ' + $stateParams.id
+        $scope.setPageTitle 'Message ' + $stateParams.id
         showRawData =
           hash: $scope.message.hash
           data: $scope.message.data

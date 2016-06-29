@@ -44,6 +44,11 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.previousSearchValue = ''
     $scope.ids = { list: [] }
 
+    $scope.setPageTitle = (title) ->
+      $rootScope.pageTitle = 'Identifi'
+      if (title)
+        $rootScope.pageTitle += ' - ' + title
+
     $http.get('/api').then (res) ->
       $scope.nodeInfo = res.data
       if res.data.keyID
