@@ -1,6 +1,6 @@
-<div class="container">
+<div class="container no-padding-xs">
   <section >
-    <div class="mar-top40-xs"></div>
+    <div class="mar-top25-xs"></div>
     <div ng-if="!query.term && !authentication.user" class="jumbotron">
       <div class="align-center"><h1>Global address book</h1></div>
 
@@ -20,7 +20,7 @@
               <span ng-bind-html="result[0][0]|highlight:query.term"></span>
             </small><br>
             <small>
-              <span ng-if="result.nickname" ng-bind-html="result.nickname|highlight:query.term" class="mar-right10"></span>
+              <span ng-if="result.nickname && result.name != result.nickname" ng-bind-html="result.nickname|highlight:query.term" class="mar-right10"></span>
               <span ng-if="result.email" class="mar-right10">
                 <span class="glyphicon glyphicon-envelope"></span> <span ng-bind-html="result.email|highlight:query.term"></span>
               </span>

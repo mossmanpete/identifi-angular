@@ -1136,6 +1136,10 @@ Media queries
 	  padding-top: 50px;
   }
 
+  .nav > li > a {
+    padding: 10px;
+  }
+
   .navbar-nav {
     margin-top: 0;
   }
@@ -1167,6 +1171,13 @@ Media queries
 	.stats .col-md-3 {
 		margin-bottom: 30px;
 	}
+
+  .stats-box {
+    .identicon {
+      max-width: 45vw;
+      max-height: 45vw;
+    }
+  }
 }
 
 .navbar-brand {
@@ -1301,9 +1312,6 @@ a {
 
 .stats-box {
   h4 { display: inline; }
-	@media (max-width: 991px) {
-		background: rgba(255,255,255,0.75);
-	}
 
   .profile-image {
     border-radius: 50%;
@@ -1368,7 +1376,8 @@ a {
 .cover {
   height: 200px;
   background-image: url('/assets/images/cover.jpg');
-  background-size: 100%;
+  background-size: cover;
+  background-position: 50% 0px;
   background-repeat: no-repeat;
 }
 
@@ -1486,9 +1495,18 @@ a {
 }
 
 @media (max-width: 767px) {
-  .mar-top40-xs {
-    margin-top: 40px;
+  .mar-top25-xs {
+    margin-top: 25px;
   }
+
+  .no-padding-xs {
+    padding: 0 !important;
+  }
+
+  .cover {
+    height: 150px;
+  }
+
   .jumbotron {
     h1 { margin-top: 0; margin-bottom: 20px; font-size: 1.5em; }
     p { font-size: 1em; }
