@@ -15,7 +15,10 @@
       <tbody>
         <tr ng-repeat="result in ids.list" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
           <td class="gravatar-col"><identicon id="result" border="3" width="46" positive-score="result.pos" negative-score="result.neg"></identicon></td>
-          <td><a ng-bind-html="result.name|highlight:query.term" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })"></a>
+          <td>
+            <span ng-if="result.distance == 0" class="label label-default pull-right">viewpoint</span>
+            <span ng-if="result.distance > 0" ng-bind="result.distance | ordinal" class="label label-default pull-right"></span>
+            <a ng-bind-html="result.name|highlight:query.term" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })"></a>
             <small ng-if="!result.name" class="list-group-item-text">
               <span ng-bind-html="result[0][0]|highlight:query.term"></span>
             </small><br>
@@ -37,8 +40,6 @@
                 <span class="fa fa-bitcoin"></span> <span ng-bind-html="result.bitcoin|highlight:query.term"></span>
               </span>
             </small>
-            <span ng-if="result.distance == 0" class="label label-default pull-right">viewpoint</span>
-            <span ng-if="result.distance > 0" ng-bind="result.distance | ordinal" class="label label-default pull-right"></span>
           </td>
         </tr>
       </tbody>

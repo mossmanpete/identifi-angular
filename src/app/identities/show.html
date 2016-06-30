@@ -133,7 +133,7 @@
 
       <div ng-if="isUniqueType && thumbsUp.length > 0" class="stats-box mar-bot10">
         <h5>Thumbs up</h5>
-        <a ng-repeat="msg in thumbsUp" class="distance-container mar-right5 mar-bot5" ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" title="">
+        <a ng-repeat="msg in thumbsUp" ng-class="{ 'hidden-xs': $index > 3 }" class="distance-container mar-right5 mar-bot5" ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" title="">
           <identicon id="msg" class="square no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
           <span class="distance" ng-bind="msg.distance | ordinal"></span>
         </a>
@@ -141,13 +141,13 @@
 
       <div ng-if="isUniqueType && thumbsDown.length > 0" class="stats-box mar-bot10">
         <h5>Thumbs down</h5>
-        <a ng-repeat="msg in thumbsDown" class="distance-container mar-right5 mar-bot5" ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" title="">
+        <a ng-repeat="msg in thumbsDown" ng-class="{ 'hidden-xs': $index > 3 }" class="distance-container mar-right5 mar-bot5" ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" title="">
           <identicon id="msg" class="square no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
           <span class="distance" ng-bind="msg.distance | ordinal"></span>
         </a>
       </div>
 
-      <div ng-include="'app/messages/distance-selector.partial.html'"></div>
+      <div class="hidden-xs" ng-include="'app/messages/distance-selector.partial.html'"></div>
 
 
     </div>
