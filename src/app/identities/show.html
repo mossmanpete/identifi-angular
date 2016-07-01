@@ -61,7 +61,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-xs-12 mar-bot10 mar-top10">
+              <div class="col-xs-12 col-sm-6 col-md-12 mar-bot10 mar-top10">
                 <h4>
                   <span class="visible-xs visible-sm" ng-if="!(info.name||info.nickname)">
                     <span ng-bind="idValue"></span>
@@ -126,35 +126,36 @@
                   </ul>
                 </div>
               </div>
+              <div class="col-xs-12 col-sm-6 col-md-12 mar-top10">
+                <div ng-if="isUniqueType && thumbsUp.length > 0" class="stats-box mar-bot10">
+                  <h5>Thumbs up</h5>
+                  <a ng-repeat="msg in thumbsUp"
+                    ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 4 }"
+                    class="distance-container mar-right5 mar-bot5"
+                    ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
+                    title=""
+                    uib-tooltip="{{ msg.authorName || msg.linkToAuthor[1] }}">
+                    <identicon id="msg" class="square no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
+                    <span class="distance" ng-bind="msg.distance | ordinal"></span>
+                  </a>
+                </div>
+
+                <div ng-if="isUniqueType && thumbsDown.length > 0" class="stats-box mar-bot10">
+                  <h5>Thumbs down</h5>
+                  <a ng-repeat="msg in thumbsDown"
+                  ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 4 }"
+                  class="distance-container mar-right5 mar-bot5"
+                  ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
+                  title=""
+                  uib-tooltip="{{ msg.authorName || msg.linkToAuthor[1] }}">
+                    <identicon id="msg" class="square no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
+                    <span class="distance" ng-bind="msg.distance | ordinal"></span>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div ng-if="isUniqueType && thumbsUp.length > 0" class="stats-box mar-bot10">
-        <h5>Thumbs up</h5>
-        <a ng-repeat="msg in thumbsUp"
-          ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 10 }"
-          class="distance-container mar-right5 mar-bot5"
-          ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
-          title=""
-          uib-tooltip="{{ msg.authorName || msg.linkToAuthor[1] }}">
-          <identicon id="msg" class="square no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
-          <span class="distance" ng-bind="msg.distance | ordinal"></span>
-        </a>
-      </div>
-
-      <div ng-if="isUniqueType && thumbsDown.length > 0" class="stats-box mar-bot10">
-        <h5>Thumbs down</h5>
-        <a ng-repeat="msg in thumbsDown"
-        ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 10 }"
-        class="distance-container mar-right5 mar-bot5"
-        ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
-        title=""
-        uib-tooltip="{{ msg.authorName || msg.linkToAuthor[1] }}">
-          <identicon id="msg" class="square no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
-          <span class="distance" ng-bind="msg.distance | ordinal"></span>
-        </a>
       </div>
 
       <div class="hidden-xs" ng-include="'app/messages/distance-selector.partial.html'"></div>

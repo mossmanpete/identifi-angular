@@ -1,13 +1,13 @@
 <div class="alert alert-info">
-  <p>Viewing as
-    <a ui-sref="identities.show({ type: filters.viewpoint_name, value: filters.viewpoint_value })" class="id-link" ng-bind="'this node'"></a>
-  </p>
-  <p>Max distance from viewpoint:</p>
-  <div class="btn-group trust-distance-selector">
+  Viewing as
+  <a ui-sref="identities.show({ type: filters.viewpoint_name, value: filters.viewpoint_value })" class="id-link" ng-bind="'this node'"></a>.
+  <br class="hidden-sm">
+  Max distance from viewpoint:
+  <span class="btn-group trust-distance-selector">
     <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: -1})" ng-class="{active: filters.max_distance === -1}" uib-tooltip="Distance filter off">✕</button>
     <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 1})" ng-class="{active: filters.max_distance === 1}">1</button>
     <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 2})" ng-class="{active: filters.max_distance === 2}">2</button>
     <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 3})" ng-class="{active: filters.max_distance === 3}">3</button>
     <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: 0})" ng-class="{active: filters.max_distance === 0}" uib-tooltip="Unlimited">∞</button>
-  </div>
+  </span>
 </div>
