@@ -1146,6 +1146,18 @@ Media queries
     padding: 10px;
   }
 
+  .navbar-nav .open .dropdown-menu {
+    position: absolute;
+    right: 0;
+    left: -150px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  }
+
   .navbar-nav {
     margin-top: 0;
   }
@@ -1541,6 +1553,9 @@ a {
   }
 
   #connections .table {
+    table-layout: fixed;
+    word-wrap: break-word;
+    
     &table, thead, tbody, th, td, tr {
       display: block;
     }

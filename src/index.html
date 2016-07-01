@@ -46,7 +46,7 @@
         				</a>
         			</li>
               <li ng-cloak ng-show="authentication.user"><a href="" ng-click="logout()" class="glyphicon glyphicon-log-out"></span></a></li>
-              <li uib-dropdown class="hidden-xs dropdown" ng-hide="authentication.user || !nodeInfo.loginOptions.length">
+              <li uib-dropdown class="dropdown" ng-hide="authentication.user || !nodeInfo.loginOptions.length">
                 <a href="#" class="dropdown-toggle login-button" uib-dropdown-toggle="dropdown"><span class="glyphicon glyphicon-log-in"></span> Log in <b class="caret"></b></a>
                 <ul uib-dropdown-menu class="dropdown-menu login-menu">
                   <li ng-if="nodeInfo.loginOptions.indexOf('persona') > -1">
