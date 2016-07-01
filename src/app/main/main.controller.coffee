@@ -31,7 +31,9 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.authentication.token = token
       $scope.authentication.user = jws.user
       localStorageService.set('token', token)
-      $state.go('identities.list')
+      previousState = localStorageService.get('state') || 'identities.list'
+      previousStateParams = localStorageService.get('stateParams') || {}
+      $state.go(previousState, previousStateParams)
     else
       token = localStorageService.get('token')
       if token
@@ -101,7 +103,6 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.authentication = {}
       localStorageService.clearAll()
       $state.go('identities.list')
-      setViewpoint()
 
     $scope.removeFocus = (event) ->
       event.currentTarget.blur()
