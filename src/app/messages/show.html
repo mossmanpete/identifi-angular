@@ -37,19 +37,17 @@
         </div>
       </div>
     </div>
+    <div class="panel" ng-repeat="msg in [message]" style="{{msg.bgColor}}" ng-include="'app/messages/message.partial.html'"></div>
     <div class="panel panel-default">
-      <div class="panel-heading" style="{{ message.bgColor }}">
+      <div class="panel-heading">
         <h3 class="panel-title">
-          {{ message.data.type }}
-          <span class="mar-left5 pull-right" ng-class="message.iconStyle" ng-repeat="n in message.iconCount track by $index"></span>
+          Details
         </h3>
       </div>
-      <div class="panel-body" ng-if="message.data.rating || message.data.comment">
-        <p ng-if="message.data.rating"><strong>Score:</strong> <span ng-bind="message.data.rating"></span>
-          <small>(<span ng-bind="message.data.minRating"></span>...<span ng-bind="message.data.maxRating"></span>)</small>
+      <div class="panel-body">
+        <p ng-repeat="(key, value) in message.data" ng-if="key != 'recipient' && key != 'author'">
+          <b>{{key}}:</b> {{value}}
         </p>
-        <p ng-if="message.data.comment"><strong>Comment:</strong> <span ng-bind="message.data.comment"></span></p>
-        <p ng-if="message.data.context"><strong>Context:</strong> <span ng-bind="message.data.context"></span></p>
       </div>
     </div>
     <p>Message origin verified by: <a ng-bind="message.signerName||message.signer_keyid" ui-sref="identities.show({type: 'keyID', value: message.signer_keyid })"></a></p>
