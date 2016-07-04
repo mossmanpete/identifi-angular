@@ -148,7 +148,7 @@ angular.module('identifiAngular').controller 'MainController', [
         msg = messages[key]
         msg[k] = v for k, v of msgOptions
         msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
-        msg.gravatar = CryptoJS.MD5(msg.data.author[0][1]).toString()
+        msg.gravatar = CryptoJS.MD5(msg.author_email || msg.data.author[0][1]).toString()
         msg.linkToAuthor = msg.data.author[0]
         i = undefined
         i = 0
