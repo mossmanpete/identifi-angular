@@ -200,8 +200,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         type: $scope.filters.type
         offset: $scope.filters.sentOffset
         limit: $scope.filters.limit
-        viewpoint_name: null
-        viewpoint_value: null
+        max_distance: -1
       }), ->
         $scope.processMessages sent, { authorIsSelf: true }
         if $scope.filters.sentOffset == 0
@@ -231,7 +230,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         type: $scope.filters.type
         offset: $scope.filters.receivedOffset
         limit: $scope.filters.limit
-      }, if $scope.filters.max_distance == -1 then { viewpoint_name: null, viewpoint_value: null }), ->
+      }), ->
         $scope.processMessages received, { recipientIsSelf: true }
         if $scope.filters.receivedOffset == 0
           $scope.received = received

@@ -204,6 +204,7 @@ angular.module('identifiAngular').controller 'MainController', [
               alpha = (rating - neutralRating + 0.5) / minRatingDiff / 1.25 + 0.2
               msg.bgColor = 'background-color:rgba(242,222,222,' + alpha + ');'
             else
+              msg.bgColor = 'background-color: #fcf8e3;'
               msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
 
     # Collapsing the menu after navigation
