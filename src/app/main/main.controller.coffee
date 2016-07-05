@@ -158,8 +158,8 @@ angular.module('identifiAngular').controller 'MainController', [
           if index > -1 and index < smallestIndex
             smallestIndex = index
             msg.linkToAuthor = msg.data.author[i]
-          else if msg.data.author[i][0] in ['name', 'nickname']
-            msg.authorName = msg.data.author[i][1]
+          else if !msg.author_name and msg.data.author[i][0] in ['name', 'nickname']
+            msg.author_name = msg.data.author[i][1]
           i++
         msg.linkToRecipient = msg.data.recipient[0]
         i = 0
@@ -169,8 +169,8 @@ angular.module('identifiAngular').controller 'MainController', [
           if index > -1 and index < smallestIndex
             smallestIndex = index
             msg.linkToRecipient = msg.data.recipient[i]
-          else if msg.data.recipient[i][0] in ['name', 'nickname']
-            msg.recipientName = msg.data.recipient[i][1]
+          else if !msg.recipient_name and msg.data.recipient[i][0] in ['name', 'nickname']
+            msg.recipient_name = msg.data.recipient[i][1]
           i++
         signedData = msg.data
         alpha = undefined
