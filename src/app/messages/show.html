@@ -1,15 +1,12 @@
 <section ng-init="findOne()">
-  <div class="col-md-8 col-md-offset-2">
-    <p><strong ng-bind="message.data.timestamp|date:'medium'"></strong></p>
+  <div class="col-md-8 col-md-offset-2 msg-col">
+    <div class="panel msg" ng-repeat="msg in [message]" style="{{msg.bgColor}}" ng-include="'app/messages/message.partial.html'"></div>
     <div class="row">
       <div class="col-sm-6">
-        <h4>From:</h4>
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">
-              <img alt="" src="https://www.gravatar.com/avatar/{{message.authorGravatar}}?d=retro&amp;s=30" class="img-rounded mar-bot5 mar-right5">
-              <span ng-bind="message.author_name"></span>
-              <span class="glyphicon glyphicon-play"></span>
+              From
             </h3>
           </div>
           <div class="panel-body">
@@ -20,13 +17,10 @@
         </div>
       </div>
       <div class="col-sm-6">
-        <h4>To:</h4>
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">
-              <img alt="" src="https://www.gravatar.com/avatar/{{message.recipientGravatar}}?d=retro&amp;s=30" class="img-rounded mar-bot5 mar-right5">
-              <span ng-bind="message.recipient_name"></span>
-              <span class="glyphicon glyphicon-play"></span>
+              To
             </h3>
           </div>
           <div class="panel-body">
@@ -37,7 +31,6 @@
         </div>
       </div>
     </div>
-    <div class="panel" ng-repeat="msg in [message]" style="{{msg.bgColor}}" ng-include="'app/messages/message.partial.html'"></div>
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">

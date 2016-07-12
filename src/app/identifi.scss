@@ -1222,6 +1222,23 @@ h1 {
   color: inherit;
 }
 
+.modal-content {
+  .msg {
+    margin-top: 15px;
+  }
+
+  @media(min-width:992px) {
+    border: 0;
+    .msg-col {
+      margin-bottom: 30px;
+      background: white;
+      border: 1px solid #999;
+      border-radius: 6px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+  }
+}
+
 .panel {
   word-wrap: break-word;
 	box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
@@ -1555,7 +1572,7 @@ a {
   #connections .table {
     table-layout: fixed;
     word-wrap: break-word;
-    
+
     &table, thead, tbody, th, td, tr {
       display: block;
     }

@@ -8,11 +8,12 @@ angular.module('identifiAngular').controller 'MainController', [
   'Identities',
   'config',
   'localStorageService'
+  '$uibModal'
 
   #'Authentication'
   #'Menus'
   #'Persona'
-  ($scope, $rootScope, $location, $http, $state, Identities, config, localStorageService) -> # Authentication, Menus, Persona
+  ($scope, $rootScope, $location, $http, $state, Identities, config, localStorageService, $uibModal) -> # Authentication, Menus, Persona
     ###
     Persona.watch
       loggedInUser: Authentication.user.email
@@ -115,6 +116,29 @@ angular.module('identifiAngular').controller 'MainController', [
       else
         $scope.query.term = ''
         $state.go 'identities.list'
+
+    $scope.setMsgRawData = (msg) ->
+      showRawData =
+        hash: msg.hash
+        data: msg.data
+        priority: msg.priority
+        jws: msg.jws
+      msg.strData = JSON.stringify(showRawData, undefined, 2)
+
+    $scope.openMessage = (event, message, size) ->
+      t = event.target
+      return if angular.element(t).closest('a').length
+      $scope.setMsgRawData(message)
+      $scope.message = message
+      modalInstance = $uibModal.open(
+        animation: $scope.animationsEnabled
+        templateUrl: 'app/messages/show.modal.html'
+        controller: 'MainController'
+        size: size
+        scope: $scope
+      )
+      $scope.$on '$stateChangeStart', ->
+        modalInstance.close()
 
     $scope.filters = $scope.filters or config.defaultFilters
 
