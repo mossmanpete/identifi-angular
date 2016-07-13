@@ -13,6 +13,12 @@
 
     <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="2" infinite-scroll-disabled="!ids.query.$resolved || ids.finished">
       <tbody>
+        <tr ng-if="!query.term || !ids.list.length" ui-sref="identities.create" class="search-result-row">
+          <td class="gravatar-col align-center"><span style="line-height:46px" class="glyphicon glyphicon-plus"></span></td>
+          <td>
+            <a ui-sref="identities.create">Add entry</a>
+          </td>
+        </tr>
         <tr ng-repeat="result in ids.list" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
           <td class="gravatar-col"><identicon id="result" border="3" width="46" positive-score="result.pos" negative-score="result.neg"></identicon></td>
           <td>

@@ -1,6 +1,12 @@
 <section ng-init="findOne()">
   <div class="col-md-8 col-md-offset-2 msg-col">
     <div class="panel msg" ng-repeat="msg in [message]" style="{{msg.bgColor}}" ng-include="'app/messages/message.partial.html'"></div>
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        Message origin verified by:
+        <a ng-bind="message.signerName||message.signer_keyid" ui-sref="identities.show({type: 'keyID', value: message.signer_keyid })"></a>
+      </div>
+    </div>
     <div class="row">
       <div class="col-sm-6">
         <div class="panel panel-default">
@@ -43,7 +49,6 @@
         </p>
       </div>
     </div>
-    <p>Message origin verified by: <a ng-bind="message.signerName||message.signer_keyid" ui-sref="identities.show({type: 'keyID', value: message.signer_keyid })"></a></p>
     <p><button class="btn btn-default" ng-click="collapseRawData = !collapseRawData">Show raw data</button></p>
     <pre uib-collapse="!collapseRawData" ng-bind="message.strData"></pre>
   </div>

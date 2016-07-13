@@ -14,6 +14,11 @@ angular.module 'identifiAngular'
         params:
           search: ''
         title: 'Identifi - Global Address Book'
+      .state 'identities.create',
+        url: '/identities/create'
+        templateUrl: 'app/identities/create.html'
+        controller: 'IdentitiesController'
+        controllerAs: 'identities'
       .state 'identities.show',
         url: '/identities/:type/:value'
         templateUrl: 'app/identities/show.html'
