@@ -68,17 +68,21 @@ angular.module('identifiAngular').controller 'MainController', [
       value: ''
     # Create new Message
     $scope.create = (event, params, id) ->
-      event.stopPropagation()
+      event.stopPropagation() if event
       # Create new Message object
       message =
         context: 'identifi'
-        maxRating: 3
-        minRating: -3
+
+      if params.type == 'rating'
+        angular.extend message,
+          maxRating: 3
+          minRating: -3
       angular.extend message, params
       options =
         headers:
           'Authorization': 'Bearer ' + $scope.authentication.token
-      $http.post('/api/messages', message, options).then ((response) ->
+      r = $http.post('/api/messages', message, options)
+      r.then ((response) ->
         # Clear form fields
         $scope.newMessage.comment = ''
         $scope.newMessage.rating = 1
@@ -89,9 +93,9 @@ angular.module('identifiAngular').controller 'MainController', [
           id: id
         return
       ), (errorResponse) ->
-        $scope.error = errorResponse.data.message
+        $scope.error = errorResponse.data || JSON.stringify(errorResponse)
         return
-      return
+      return r
 
     $scope.addAttribute = ->
       $location.path '#/identities/create/' + $scope.query.term

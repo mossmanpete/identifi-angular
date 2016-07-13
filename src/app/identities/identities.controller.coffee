@@ -45,7 +45,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
-      console.log 'MessageAdded handler'
+      return unless $state.is 'identities.show'
       if args.message.signedData.type == 'verify_identity'
         args.id.confirmations += 1
         if $scope.connections && $scope.connections.indexOf(args.id) == -1
@@ -60,6 +60,24 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.processMessages [args.message]
         $scope.received.unshift args.message
         messagesAdded = true
+
+    $scope.addEntry = (event, entry) ->
+      recipient = []
+      if entry.name
+        recipient.push ['name', entry.name]
+      if entry.email
+        recipient.push ['email', entry.email]
+      if entry.url
+        recipient.push ['url', entry.url]
+      if entry.phone
+        recipient.push ['phone', entry.phone]
+      params =
+        type: 'verify_identity'
+        recipient: recipient
+      $scope.create(event, params).then (success) ->
+        $state.go 'messages.show', { id: success.data.hash }
+      , (error) ->
+        console.log "error", error
 
     $scope.getConnections = ->
       $scope.connections = Identities.connections({

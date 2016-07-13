@@ -1,29 +1,42 @@
-<div class="container mar-bot30" ng-controller="IdentitiesController">
+<div ng-init="newEntry = {}" class="container mar-bot30" ng-controller="IdentitiesController">
   <div class="row">
     <div class="col-xs-12 col-sm-8 col-sm-offset-2">
       <h3>Add entry</h3>
+      <div class="panel panel-danger" ng-if="error">
+        <div class="panel-heading" ng-bind="error"></div>
+      </div>
       <div class="panel panel-info" ng-hide="authentication.user || !nodeInfo.loginOptions.length">
         <div class="panel-heading">Please log in to add entries.</div>
       </div>
-      <form class="form" ng-submit="createIdentity()">
+      <form class="form" name="addEntryForm" ng-submit="addEntry($event, newEntry)">
         <div class="form-group">
           <label for="idName">Name</label>
-          <input type="text" id="idName" class="form-control">
+          <input type="text" autofocus id="idName" ng-model="newEntry.name" class="form-control">
         </div>
         <div class="form-group">
-          <label for="idName">Email</label>
-          <input type="text" id="idName" class="form-control">
+          <label for="idEmail">Email</label>
+          <input type="email"
+                  id="idEmail"
+                  ng-model="newEntry.email"
+                  class="form-control">
         </div>
         <div class="form-group">
-          <label for="idName">Phone number</label>
-          <input type="text" id="idName" class="form-control">
+          <label for="idPhone">Phone number</label>
+          <input  type="text"
+                  name="idPhone"
+                  id="idPhone"
+                  ng-model="newEntry.phone"
+                  class="form-control">
+          <p class="help-block">International format, no special characters other than leading +</p>
         </div>
         <div class="form-group">
-          <label for="idName">Url</label>
-          <input type="text" id="idName" class="form-control">
+          <label for="idUrl">Url</label>
+          <input type="url" id="idUrl" ng-model="newEntry.url" class="form-control">
           <p class="help-block">Social media profile or other personal url</p>
         </div>
-        <button class="btn btn-primary" ng-disabled="!(authentication.user || !nodeInfo.loginOptions.length)">Add entry</button>
+        <button class="btn btn-primary"
+        ng-disabled="!(authentication.user || !nodeInfo.loginOptions.length) || !(newEntry.email || newEntry.url || newEntry.phone)">
+          Add entry</button>
       </form>
     </div>
 </div>
