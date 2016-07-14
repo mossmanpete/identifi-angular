@@ -1368,6 +1368,7 @@ a {
 }
 
 .identicon {
+  vertical-align: middle;
   margin: auto;
   border-radius: 50%;
   text-align: center;
@@ -1577,12 +1578,17 @@ a {
       display: block;
     }
     td {
-      .visible-xs { display: inline !important; }
       border-top: 0 !important;
     }
     tr {
       border-top: 1px solid #DDD;
     }
+  }
+}
+
+#connections .table {
+  .identicon {
+    display: inline-block;
   }
 }
 

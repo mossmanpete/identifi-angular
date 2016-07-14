@@ -46,11 +46,13 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
       return unless $state.is 'identities.show'
-      if args.message.signedData.type == 'verify_identity'
+      if args.message.signedData.type == 'verify_identity' and not args.id.confirmed
+        args.id.confirmed = true
         args.id.confirmations += 1
         if $scope.connections && $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
-      else if args.message.signedData.type == 'unverify_identity'
+      else if args.message.signedData.type == 'unverify_identity' and not args.id.refuted
+        args.id.refuted = true
         args.id.refutations += 1
         if $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
