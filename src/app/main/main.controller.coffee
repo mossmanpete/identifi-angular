@@ -47,6 +47,8 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.previousSearchValue = ''
     $scope.ids = { list: [] }
 
+    $scope.phoneRegex = /^\+?\d+$/
+
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
       if (title)

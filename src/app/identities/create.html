@@ -10,33 +10,36 @@
       </div>
       <form class="form" name="addEntryForm" ng-submit="addEntry($event, newEntry)">
         <div class="form-group">
-          <label for="idName">Name</label>
-          <input type="text" autofocus id="idName" ng-model="newEntry.name" class="form-control">
+          <label for="idName">Name *</label>
+          <input type="text" required autofocus id="idName" name="idName" ng-model="newEntry.name" class="form-control">
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error': addEntryForm.idEmail.$invalid }">
           <label for="idEmail">Email</label>
           <input type="email"
                   id="idEmail"
+                  name="idEmail"
                   ng-model="newEntry.email"
                   class="form-control">
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error': addEntryForm.idPhone.$invalid }">
           <label for="idPhone">Phone number</label>
           <input  type="text"
                   name="idPhone"
                   id="idPhone"
+                  ng-pattern="phoneRegex"
                   ng-model="newEntry.phone"
                   class="form-control">
           <p class="help-block">International format, no special characters other than leading +</p>
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-class="{ 'has-error': addEntryForm.idUrl.$invalid }">
           <label for="idUrl">Url</label>
-          <input type="url" id="idUrl" ng-model="newEntry.url" class="form-control">
+          <input type="url" id="idUrl" name="idUrl" ng-model="newEntry.url" class="form-control">
           <p class="help-block">Social media profile or other personal url</p>
         </div>
         <button class="btn btn-primary"
-        ng-disabled="!(authentication.user || !nodeInfo.loginOptions.length) || !(newEntry.email || newEntry.url || newEntry.phone)">
+        ng-disabled="!(authentication.user || !nodeInfo.loginOptions.length) || !(newEntry.email || newEntry.url || newEntry.phone) || (addEntryForm.idName.$invalid || addEntryForm.idEmail.$invalid || addEntryForm.idPhone.$invalid || addEntryForm.idUrl.$invalid)">
           Add entry</button>
+        <p class="help-block">More details can be added afterwards.</p>
       </form>
     </div>
 </div>
