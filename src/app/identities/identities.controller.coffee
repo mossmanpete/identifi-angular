@@ -124,6 +124,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               conn.btnStyle = 'btn-success'
               conn.link = 'tel:' + conn.value
               conn.quickContact = true
+            when 'coverPhoto'
+              if conn.value.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+                $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(https://ipfs.io' + conn.value + ')' }
+            when 'profilePhoto'
+              if conn.value.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+                $scope.profilePhoto = $scope.profilePhoto or conn.value
             when 'url'
               conn.link = conn.value
               if conn.value.indexOf('facebook.com/') > -1
@@ -138,7 +144,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
                 conn.link = conn.value
                 conn.linkName = conn.value.split('twitter.com/')[1]
                 conn.quickContact = true
-                $scope.getPhotosFromTwitter conn.value
               else if conn.value.indexOf('plus.google.com/') > -1
                 conn.iconStyle = 'fa fa-google-plus'
                 conn.btnStyle = 'btn-google-plus'
@@ -269,18 +274,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       if offset == 0
         $scope.received = []
       $scope.received.$resolved = received.$resolved
-
-    $scope.getPhotosFromTwitter = (profileUrl) ->
-      if !$scope.isUniqueType
-        return
-
-      ###
-            if (Authentication.user.providerData.profile_banner_url) {
-              return { 'background-image': 'url(' + Authentication.user.providerData.profile_banner_url + ')' };
-            }
-      ###
-
-      null
 
     $scope.getPhotosFromGravatar = ->
       email = $scope.info.email or $scope.idValue

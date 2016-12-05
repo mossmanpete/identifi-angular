@@ -1410,10 +1410,10 @@ a {
 }
 
 .cover {
-  height: 200px;
+  height: 300px;
   background-image: url('/assets/images/cover.jpg');
   background-size: cover;
-  background-position: 50% 0px;
+  background-position: 50% 0;
   background-repeat: no-repeat;
 }
 
@@ -1422,7 +1422,7 @@ a {
   left:0;
   right:0;
   top:50px;
-  height:300px;
+  height:400px;
   background-color:#ffffff;
   border-bottom: 1px solid #efefef;
 }
@@ -1508,10 +1508,10 @@ a {
     display: none;
   }
   .id-right-column {
-    margin-top: 300px;
+    margin-top: 400px;
   }
   .id-left-column {
-    margin-top: 76px;
+    margin-top: 176px;
   }
 
    .filters, #write-feedback
@@ -1523,10 +1523,12 @@ a {
 @media (max-width: 991px) {
   .cover {
     border-bottom: 1px solid #efefef;
+    height: 200px;
   }
   .cover-container {
     background-color: inherit;
     border: 0;
+    height: 300px;
   }
 }
 
