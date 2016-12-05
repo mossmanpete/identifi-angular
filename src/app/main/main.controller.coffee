@@ -172,11 +172,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.isCollapsed = !$scope.isCollapsed
 
     $scope.processMessages = (messages, msgOptions) ->
-      for key of messages
-        if isNaN(key)
-          continue
-        msg = messages[key]
-        msg[k] = v for k, v of msgOptions
+      processMessage = (msg) ->
         msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
         msg.gravatar = CryptoJS.MD5(msg.author_email || msg.data.author[0][1]).toString()
         msg.linkToAuthor = msg.data.author[0]
@@ -236,6 +232,14 @@ angular.module('identifiAngular').controller 'MainController', [
             else
               msg.bgColor = 'background-color: #fcf8e3;'
               msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
+
+      angular.forEach messages, (msg, key) ->
+        msg[k] = v for k, v of msgOptions
+        if not msg.jws
+          $http.get('https://ipfs.io/ipfs/' + msg.hash).then (res) ->
+            msg.jws = res.data
+            processMessage(msg)
+        else processMessage(msg)
 
     # Collapsing the menu after navigation
     $scope.$on '$stateChangeSuccess', ->

@@ -6,7 +6,7 @@
       </div>
       <div class="col-md-8">
         <div infinite-scroll="find()" infinite-scroll-distance="2" infinite-scroll-disabled="!messages.$resolved || messages.finished">
-          <div class="panel" ng-repeat="msg in messages" style="{{msg.bgColor}}" ng-include="'app/messages/message.partial.html'" ng-click="openMessage($event, msg, 'lg')"></div>
+          <div class="panel" ng-repeat="msg in messages" ng-if="msg.data" style="{{msg.bgColor}}" ng-include="'app/messages/message.partial.html'" ng-click="openMessage($event, msg, 'lg')"></div>
         </div>
         <div us-spinner ng-if="!messages.$resolved" style="position:relative;padding:20px"></div>
         <div class="alert alert-info text-center" ng-if="messages.$resolved && !messages.length">
