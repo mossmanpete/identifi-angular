@@ -10,6 +10,7 @@ var browserSyncSpa = require('browser-sync-spa');
 var util = require('util');
 
 var proxyMiddleware = require('http-proxy-middleware');
+const IDENTIFI_API_URL = process.env.IDENTIFI_API_URL || 'http://identi.fi';
 
 function browserSyncInit(baseDir, browser) {
   browser = browser === undefined ? 'default' : browser;
@@ -33,7 +34,7 @@ function browserSyncInit(baseDir, browser) {
    *
    * For more details and option, https://github.com/chimurai/http-proxy-middleware/blob/v0.9.0/README.md
    */
-  server.middleware = proxyMiddleware('/api', {target: 'http://localhost:4944', changeOrigin: true});
+  server.middleware = proxyMiddleware('/api', {target: IDENTIFI_API_URL, changeOrigin: true});
 
   browserSync.instance = browserSync.init({
     startPath: '/',
