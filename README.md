@@ -13,4 +13,6 @@ gulp serve
 ```
 
 Uses identi.fi as default API endpoint. If you want to use a local Identifi API:
-  export IDENTIFI_API_URL=http://localhost:4944
+```
+export IDENTIFI_API_URL=http://localhost:4944
+```
