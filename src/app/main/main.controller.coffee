@@ -321,7 +321,6 @@ angular.module('identifiAngular').controller 'MainController', [
         return $scope.ids.list
 
     $scope.searchKeydown = (event) ->
-      console.log "searchKeydown"
       switch (if event then event.which else -1)
         when 38
           event.preventDefault()
