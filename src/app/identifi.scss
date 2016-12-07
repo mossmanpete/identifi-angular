@@ -1372,7 +1372,7 @@ a {
   margin: auto;
   border-radius: 50%;
   text-align: center;
-  display: block;
+  display: inline-block;
   position: relative;
   margin: auto;
   max-width: 100%;
@@ -1480,6 +1480,8 @@ a {
 	.distance {
 		z-index: 2;
 		position: absolute;
+    left:0;
+    top:0;
     width: 100%;
     text-align: right;
 		top: 2px;

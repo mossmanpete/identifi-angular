@@ -214,9 +214,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         idType: $scope.idType
         idValue: $scope.idValue
       }), (res) ->
-        console.log res
         angular.extend($scope.stats, res)
-        console.log $scope.stats
         $scope.info.email = $scope.info.email or $scope.stats.email
       )
 

@@ -1,0 +1,7 @@
+<a class="search-result-row">
+  <span class="distance-container mar-right10">
+    <identicon id="{ gravatar: match.label.gravatar }" border="3" width="46" positive-score="match.label.pos" negative-score="match.label.neg"></identicon>
+    <span ng-if="match.label.distance >= 0" class="distance" ng-bind="match.label.distance | ordinal"></span>
+  </span>
+  <span ng-bind-html="match.label.name | uibTypeaheadHighlight:query"></span>
+</a>
