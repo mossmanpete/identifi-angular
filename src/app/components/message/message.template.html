@@ -1,5 +1,5 @@
-<div class="panel msg" style="{{$ctrl.msgData.bgColor}}" ng-if="$ctrl.msgData.data">
-  <div class="panel-body message-panel">
+<div class="panel msg" ng-class="{'panel-info':$ctrl.msgData.data.type == 'verify_identity'}" style="{{$ctrl.msgData.bgColor}}" ng-if="$ctrl.msgData.data">
+  <div class="message-panel" ng-class="{ 'panel-body': $ctrl.msgData.data.type != 'verify_identity', 'panel-heading': $ctrl.msgData.data.type == 'verify_identity' }">
     <p class="">
       <span class="mar-left5 pull-right" ng-class="$ctrl.msgData.iconStyle" ng-repeat="n in $ctrl.msgData.iconCount track by $index"></span>
       <strong>
