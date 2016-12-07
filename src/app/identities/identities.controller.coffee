@@ -18,6 +18,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       { active: false }
     ]
     $scope.info = {}
+    $scope.stats = {}
     $scope.sent = []
     $scope.received = []
     $scope.thumbsUp = []
@@ -209,10 +210,13 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       )
 
     $scope.getStats = ->
-      $scope.stats = Identities.stats(angular.extend({}, $scope.filters, {
+      Identities.stats(angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
       }), (res) ->
+        console.log res
+        angular.extend($scope.stats, res)
+        console.log $scope.stats
         $scope.info.email = $scope.info.email or $scope.stats.email
       )
 
