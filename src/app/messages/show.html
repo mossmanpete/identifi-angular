@@ -1,6 +1,6 @@
 <section ng-init="findOne()">
   <div class="col-md-8 col-md-offset-2 msg-col">
-    <div class="panel msg" ng-repeat="msg in [message]" style="{{msg.bgColor}}" ng-include="'app/messages/message.partial.html'"></div>
+    <message msg-data="msg" page-info="info" ng-repeat="msg in [message]"></message>
     <div class="panel panel-info">
       <div class="panel-heading">
         Message origin verified by:

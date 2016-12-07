@@ -1,0 +1,31 @@
+<div class="panel msg" style="{{$ctrl.msgData.bgColor}}">
+  <div class="panel-body message-panel" ng-if="$ctrl.msgData.data">
+    <p class="">
+      <span class="mar-left5 pull-right" ng-class="$ctrl.msgData.iconStyle" ng-repeat="n in $ctrl.msgData.iconCount track by $index"></span>
+      <strong>
+        <a ui-sref="identities.show({ type: $ctrl.msgData.linkToAuthor[0], value: $ctrl.msgData.linkToAuthor[1] })" class="id-link">
+          <span class="distance-container mar-right10">
+            <identicon id="$ctrl.msgData" class="" border="3" width="35" positive-score="$ctrl.msgData.author_pos" negative-score="$ctrl.msgData.author_neg"></identicon>
+            <span ng-if="$ctrl.msgData.distance >= 0" class="distance" ng-bind="$ctrl.msgData.distance | ordinal"></span>
+          </span>
+          <span ng-bind="($ctrl.msgData.authorIsSelf && ($ctrl.pageInfo.name || $ctrl.pageInfo.nickname))||$ctrl.msgData.author_name||$ctrl.msgData.linkToAuthor[1]"></span>
+        </a>
+      </strong>
+      <small><i class="glyphicon glyphicon-play"></i></small>
+      <a ui-sref="identities.show({ type: $ctrl.msgData.linkToRecipient[0], value: $ctrl.msgData.linkToRecipient[1] })" ng-bind="($ctrl.msgData.recipientIsSelf && ($ctrl.pageInfo.name || $ctrl.pageInfo.nickname))||$ctrl.msgData.recipient_name||$ctrl.msgData.linkToRecipient[1]" class="id-link"></a>
+       - <a ui-sref="messages.show({ id: $ctrl.msgData.hash })" ng-bind="$ctrl.msgData.data.timestamp|date:'medium'" class="text-muted small" style="display:inline-block;"></a>
+    </p>
+
+    <p ng-if="$ctrl.msgData.data.type == 'verify_identity' || $ctrl.msgData.data.type == 'unverify_identity'">
+      <small ng-repeat="recipient in $ctrl.msgData.data.recipient">
+        {{recipient[0]}}:
+        <span ng-if="recipient[0] == 'email' || recipient[0] == 'url'" ng-bind-html="recipient[1] | linky"></span>
+        <span ng-if="!(recipient[0] == 'email' || recipient[0] == 'url')" ng-bind="recipient[1]"></span>
+        <i class="fa fa-link" ng-if="!$last && $ctrl.msgData.data.type == 'verify_identity'"></i>
+        <i class="fa fa-chain-broken" ng-if="!$last && $ctrl.msgData.data.type == 'unverify_identity'"></i>
+      </small>
+    </p>
+
+    <p ng-bind-html="$ctrl.msgData.data.comment|linky"></p>
+  </div>
+</div>
