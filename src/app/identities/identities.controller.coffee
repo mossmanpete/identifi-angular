@@ -12,11 +12,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   'Identities'
   'config'
   ($scope, $state, $rootScope, $window, $stateParams, $location, $http, Identities, config) -> #, Authentication
-    $scope.tabs = [
-      { active: true }
-      { active: false }
-      { active: false }
-    ]
+    $scope.activeTab = 0
+    $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.info = {}
     $scope.stats = {}
     $scope.sent = []

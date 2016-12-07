@@ -1,5 +1,5 @@
-<div class="panel msg" style="{{$ctrl.msgData.bgColor}}">
-  <div class="panel-body message-panel" ng-if="$ctrl.msgData.data">
+<div class="panel msg" style="{{$ctrl.msgData.bgColor}}" ng-if="$ctrl.msgData.data">
+  <div class="panel-body message-panel">
     <p class="">
       <span class="mar-left5 pull-right" ng-class="$ctrl.msgData.iconStyle" ng-repeat="n in $ctrl.msgData.iconCount track by $index"></span>
       <strong>

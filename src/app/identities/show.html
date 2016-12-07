@@ -18,13 +18,13 @@
           <div class="col-md-9 col-md-offset-3">
             <ul class="list-inline tab-list">
               <li ng-if="isUniqueType">
-                <a href="" ng-class="{ active: tabs[0].active }" ng-click="tabs[0].active = true"><span class="hidden-xs">Received </span>({{0+stats.received_positive+stats.received_neutral+stats.received_negative}})</a>
+                <a href="" ng-class="{ active: activeTab == 0 }" ng-click="activateTab(0)"><span class="hidden-xs">Received </span>({{0+stats.received_positive+stats.received_neutral+stats.received_negative}})</a>
               </li>
               <li ng-if="isUniqueType">
-                <a href="" ng-class="{ active: tabs[1].active }" ng-click="tabs[1].active = true"><span class="hidden-xs">Sent </span>({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative}})</a>
+                <a href="" ng-class="{ active: activeTab == 1 }" ng-click="activateTab(1)"><span class="hidden-xs">Sent </span>({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative}})</a>
               </li>
               <li>
-                <a href="" ng-class="{ active: tabs[2].active }" ng-click="tabs[2].active = true"><span class="hidden-xs">Identity </span>(<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved">0</span>)</a>
+                <a href="" ng-class="{ active: activeTab == 2 }" ng-click="activateTab(2)"><span class="hidden-xs">Identity </span>(<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved">0</span>)</a>
               </li>
             </ul>
           </div>
@@ -168,8 +168,8 @@
     </div>
         <div class="col-md-8 id-right-column">
           <!-- Nav tabs -->
-          <uib-tabset>
-            <uib-tab active="tabs[0].active" ng-if="isUniqueType">
+          <uib-tabset active="activeTab">
+            <uib-tab ng-if="isUniqueType">
               <uib-tab-heading>
                 <span class="hidden-xs">Received ({{0+stats.received_positive+stats.received_neutral+stats.received_negative}})</span>
                 <span class="visible-xs">Recv ({{0+stats.received_positive+stats.received_neutral+stats.received_negative}})</span>
@@ -200,7 +200,7 @@
                 </div>
               </div>
 
-              <div infinite-scroll="getReceivedMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!received.$resolved || received.finished || !tabs[0].active">
+              <div infinite-scroll="getReceivedMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!received.$resolved || received.finished || activeTab != 0">
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
@@ -219,9 +219,9 @@
               <div ng-if="received.$resolved && received.length == 0" class="alert alert-info text-center">No messages to show</div>
               <div ng-if="!received.$resolved" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
-            <uib-tab active="tabs[1].active" ng-if="isUniqueType">
+            <uib-tab ng-if="isUniqueType">
               <uib-tab-heading>Sent ({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative}})</uib-tab-heading>
-              <div infinite-scroll="getSentMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!sent.$resolved || sent.finished || !tabs[1].active">
+              <div infinite-scroll="getSentMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!sent.$resolved || sent.finished || activeTab != 1">
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
@@ -240,7 +240,7 @@
               <div ng-if="sent.$resolved && sent.length == 0" class="alert alert-info text-center">No messages to show</div>
               <div ng-if="!sent.$resolved" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
-            <uib-tab active="tabs[2].active" ng-if="true">
+            <uib-tab ng-if="true">
                 <uib-tab-heading>Id<span class="hidden-xs">entity</span> (<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved"></span>)</uib-tab-heading>
                 <div id="connections">
                   <!-- <input id="authenticity_token" name="authenticity_token" type="hidden" value="z1JM7ffnFK7gOv6S3yzG9UFyakukYHikAU94/3TcT2o="> -->
