@@ -9,8 +9,9 @@ angular.module('identifiAngular').controller 'MessagesController', [
   '$http'
   # 'Authentication'
   'Messages'
+  'Identities'
   'config'
-  ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, config) -> #, Authentication
+  ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, Identities, config) -> #, Authentication
     $scope.idType = $stateParams.type
     $scope.idValue = $stateParams.value
     $scope.messages = []
@@ -76,11 +77,16 @@ angular.module('identifiAngular').controller 'MessagesController', [
     # Find existing Message
     $scope.findOne = ->
       if $stateParams.id
-        $scope.message = Messages.get { id: $stateParams.id }, ->
+        $scope.message = Messages.get
+          id: $stateParams.id
+          viewpoint_name: $scope.filters.viewpoint_name
+          viewpoint_value: $scope.filters.viewpoint_value
+          max_distance: $scope.filters.max_distance
+        , ->
           $scope.processMessages([$scope.message])
           $scope.setPageTitle 'Message ' + $stateParams.id
           $scope.setMsgRawData($scope.message)
           $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
           $scope.message.recipientGravatar = CryptoJS.MD5($scope.message.recipientEmail or $scope.message.data.recipient[0][1]).toString()
-
+          $scope.getMessageVerifiedBy()
 ]
