@@ -177,29 +177,32 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
 
         $scope.connectionClicked = (event, id) ->
-          id.collapse = !id.collapse
-          id.connecting_msgs = id.connecting_msgs or Identities.connecting_msgs(angular.extend({
-            idType: $scope.idType
-            idValue: $scope.idValue
-            target_name: id.name
-            target_value: id.value
-          }, $scope.filters), ->
-            for key of id.connecting_msgs
-              if isNaN(key)
-                i++
-                continue
-              msg = id.connecting_msgs[key]
-              msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
-              msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.data.author[0][1]).toString()
-              msg.linkToAuthor = msg.data.author[0]
-              i = undefined
-              i = 0
-              while i < msg.data.author.length
-                if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.author[i][0] > -1)
-                  msg.linkToAuthor = msg.data.author[i]
-                  break
-                i++
-          )
+          if id.connecting_msgs
+            id.collapse = !id.collapse
+          else
+            id.connecting_msgs = Identities.connecting_msgs(angular.extend({
+              idType: $scope.idType
+              idValue: $scope.idValue
+              target_name: id.name
+              target_value: id.value
+            }, $scope.filters), ->
+              for key of id.connecting_msgs
+                if isNaN(key)
+                  i++
+                  continue
+                msg = id.connecting_msgs[key]
+                msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
+                msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.data.author[0][1]).toString()
+                msg.linkToAuthor = msg.data.author[0]
+                i = undefined
+                i = 0
+                while i < msg.data.author.length
+                  if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.author[i][0] > -1)
+                    msg.linkToAuthor = msg.data.author[i]
+                    break
+                  i++
+              id.collapse = !id.collapse
+            )
 
         $scope.getStats()
         $scope.getReceivedMsgs 0

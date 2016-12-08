@@ -297,7 +297,7 @@
                                     <span ng-bind="msg.author_name||msg.data.author[0][1]"></span>
                                   </a>
                                 </strong>
-                                 - <a ui-sref="messages.show({ id: msg.hash })" ng-bind="msg.data.timestamp|date:'mediumDate'" class="text-muted small" style="display:inline-block;"></a>
+                                 - <span ng-bind="msg.data.timestamp|date:'mediumDate'" class="text-muted small" style="display:inline-block;"></span>
                             </div>
                           </div>
                         </td>
