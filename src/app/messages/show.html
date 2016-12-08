@@ -7,7 +7,7 @@
         <a ng-if="false" ng-bind="message.signerName||message.signer_keyid" ui-sref="identities.show({type: 'keyID', value: message.signer_keyid })"></a>
         <strong ng-if="verifiedBy">
           <a ui-sref="identities.show({ type: 'keyID', value: message.signer_keyid })" class="id-link">
-            <span class="distance-container mar-right10">
+            <span class="distance-container mar-right5">
               <identicon id="verifiedBy" class="" border="3" width="35" positive-score="verifiedBy.pos" negative-score="verifiedBy.neg"></identicon>
               <span ng-if="verifiedBy.dist >= 0" class="distance" ng-bind="verifiedBy.dist | ordinal"></span>
             </span>

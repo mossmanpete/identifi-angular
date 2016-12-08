@@ -145,9 +145,10 @@ angular.module('identifiAngular').controller 'MainController', [
               when 'name'
                 profile.name = v.val unless profile.name
               when 'nickname'
-                profile.name = v.val unless profile.name
+                profile.nickname = v.val unless profile.nickname
               when 'email'
                 profile.gravatar = CryptoJS.MD5(v.val).toString()
+        profile.name = profile.nickname if profile.nickname and not profile.name
         profile.name = id.value unless profile.name
         profile.gravatar = CryptoJS.MD5(id.value).toString() unless profile.gravatar
         callback(profile)
