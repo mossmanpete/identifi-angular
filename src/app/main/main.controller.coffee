@@ -59,6 +59,8 @@ angular.module('identifiAngular').controller 'MainController', [
       if res.data.keyID
         $scope.filters.viewpoint_name = 'keyID'
         $scope.filters.viewpoint_value = res.data.keyID
+        $scope.getIdentityProfile { type: 'keyID', value: res.data.keyID }, (profile) ->
+          $scope.nodeInfo.profile = profile
     .finally ->
       $scope.apiReady = true
 
@@ -131,32 +133,32 @@ angular.module('identifiAngular').controller 'MainController', [
         jws: msg.jws
       msg.strData = JSON.stringify(showRawData, undefined, 2)
 
-    $scope.getMessageVerifiedBy = ->
-      $scope.verifiedBy = {}
-      Identities.query { idType: 'keyID', idValue: $scope.message.signer_keyid }, (res) ->
-        verifiedBy = {}
+    $scope.getIdentityProfile = (id, callback) ->
+      profile = {}
+      Identities.query { idType: id.type, idValue: id.value }, (res) ->
         if res[0] and res[0][0]
-          verifiedBy.dist = res[0][0].dist + 0
-          verifiedBy.pos = res[0][0].pos
-          verifiedBy.neg = res[0][0].neg
+          profile.dist = res[0][0].dist + 0
+          profile.pos = res[0][0].pos
+          profile.neg = res[0][0].neg
           for k, v of res[0]
             switch v.attr
               when 'name'
-                verifiedBy.name = v.val unless verifiedBy.name
+                profile.name = v.val unless profile.name
               when 'nickname'
-                verifiedBy.name = v.val unless verifiedBy.name
+                profile.name = v.val unless profile.name
               when 'email'
-                verifiedBy.gravatar = CryptoJS.MD5(v.val).toString()
-        verifiedBy.name = $scope.message.signer_keyid unless verifiedBy.name
-        verifiedBy.gravatar = CryptoJS.MD5($scope.message.signer_keyid).toString() unless verifiedBy.gravatar
-        $scope.verifiedBy = verifiedBy
+                profile.gravatar = CryptoJS.MD5(v.val).toString()
+        profile.name = id.value unless profile.name
+        profile.gravatar = CryptoJS.MD5(id.value).toString() unless profile.gravatar
+        callback(profile)
 
     $scope.openMessage = (event, message, size) ->
       t = event.target
       return if angular.element(t).closest('a').length
       $scope.setMsgRawData(message)
       $scope.message = message
-      $scope.getMessageVerifiedBy()
+      $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signer_keyid }, (profile) ->
+        $scope.verifiedBy = profile
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/messages/show.modal.html'

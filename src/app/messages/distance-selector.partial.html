@@ -1,7 +1,14 @@
 <div class="alert alert-info">
-  Viewing as
-  <a ui-sref="identities.show({ type: filters.viewpoint_name, value: filters.viewpoint_value })" class="id-link" ng-bind="'this node'"></a>.
-  <br class="hidden-sm"> 
+  Viewing as:&nbsp;  
+  <strong ng-if="nodeInfo.profile">
+    <a ui-sref="identities.show({ type: filters.viewpoint_name, value: filters.viewpoint_value })" class="id-link">
+      <span class="distance-container mar-right10">
+        <identicon id="nodeInfo.profile" class="" border="3" width="35" positive-score="nodeInfo.profile.pos" negative-score="nodeInfo.profile.neg"></identicon>
+      </span>
+      <span ng-bind="nodeInfo.profile.name"></span>
+    </a>
+  </strong>
+  <br class="hidden-sm">
   Max distance from viewpoint:
   <span class="btn-group trust-distance-selector">
     <button type="button" class="btn btn-default" ng-click="setFilters({max_distance: -1})" ng-class="{active: filters.max_distance === -1}" uib-tooltip="Distance filter off">✕</button>

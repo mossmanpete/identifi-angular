@@ -88,5 +88,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
           $scope.setMsgRawData($scope.message)
           $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
           $scope.message.recipientGravatar = CryptoJS.MD5($scope.message.recipientEmail or $scope.message.data.recipient[0][1]).toString()
-          $scope.getMessageVerifiedBy()
+          $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signer_keyid }, (profile) ->
+            $scope.verifiedBy = profile
 ]
