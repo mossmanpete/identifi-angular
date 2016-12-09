@@ -10,7 +10,7 @@ var browserSyncSpa = require('browser-sync-spa');
 var util = require('util');
 
 var proxyMiddleware = require('http-proxy-middleware');
-const IDENTIFI_API_URL = process.env.IDENTIFI_API_URL || 'http://identi.fi';
+const IDENTIFI_API_URL = process.env.IDENTIFI_API_URL || 'https://identi.fi';
 
 function browserSyncInit(baseDir, browser) {
   browser = browser === undefined ? 'default' : browser;
