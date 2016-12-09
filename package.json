@@ -1,6 +1,6 @@
 {
   "name": "identifi-angular",
-  "version": "0.0.99",
+  "version": "0.0.100",
   "dependencies": {},
   "files": "dist",
   "main": "index.js",
