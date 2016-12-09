@@ -1,8 +1,10 @@
 # Identities service used to communicate Identities REST endpoints
 angular.module('identifiAngular').factory 'Identities', [
-  '$resource'
-  ($resource) ->
-    $resource 'api/identities/:idType/:idValue/:method', {},
+  '$resource', '$location'
+  ($resource, $location) ->
+    path = $location.absUrl()
+    host = if path.match /\/ipfs\// then 'http://identi.fi/' else '' # TODO: http mixed content
+    $resource host + 'api/identities/:idType/:idValue/:method', {},
       connections:
         action: 'GET'
         params: method: 'verifications'

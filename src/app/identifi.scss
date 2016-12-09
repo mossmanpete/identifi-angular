@@ -4,8 +4,8 @@
   font-style: normal;
   src: local('Lato Light'),
        local('Lato-300'),
-       url('/assets/fonts/Lato-300/Lato-300.woff2') format('woff2'),
-       url('/assets/fonts/Lato-300/Lato-300.woff') format('woff');
+       url('../assets/fonts/Lato-300/Lato-300.woff2') format('woff2'),
+       url('../assets/fonts/Lato-300/Lato-300.woff') format('woff');
 }
 
 @font-face {
@@ -14,8 +14,8 @@
   font-style: normal;
   src: local('Lato Regular'),
        local('Lato-regular'),
-       url('/assets/fonts/Lato-regular/Lato-regular.woff2') format('woff2'),
-       url('/assets/fonts/Lato-regular/Lato-regular.woff') format('woff');
+       url('../assets/fonts/Lato-regular/Lato-regular.woff2') format('woff2'),
+       url('../assets/fonts/Lato-regular/Lato-regular.woff') format('woff');
 }
 
 @font-face {
@@ -24,8 +24,8 @@
   font-style: normal;
   src: local('Lato Bold'),
        local('Lato-700'),
-       url('/assets/fonts/Lato-700/Lato-700.woff2') format('woff2'),
-       url('/assets/fonts/Lato-700/Lato-700.woff') format('woff');
+       url('../assets/fonts/Lato-700/Lato-700.woff2') format('woff2'),
+       url('../assets/fonts/Lato-700/Lato-700.woff') format('woff');
 }
 
 @font-face {
@@ -34,8 +34,8 @@
   font-style: normal;
   src: local('Lato Black'),
        local('Lato-900'),
-       url('/assets/fonts/Lato-900/Lato-900.woff2') format('woff2'),
-       url('/assets/fonts/Lato-900/Lato-900.woff') format('woff');
+       url('../assets/fonts/Lato-900/Lato-900.woff2') format('woff2'),
+       url('../assets/fonts/Lato-900/Lato-900.woff') format('woff');
 }
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
@@ -1411,7 +1411,7 @@ a {
 
 .cover {
   height: 300px;
-  background-image: url('/assets/images/cover.jpg');
+  background-image: url('../assets/images/cover.jpg');
   background-size: cover;
   background-position: 50% 0;
   background-repeat: no-repeat;
