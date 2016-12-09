@@ -199,7 +199,16 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.processMessages = (messages, msgOptions) ->
       processMessage = (msg) ->
-        msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
+        parsedJws = KJUR.jws.JWS.parse(msg.jws)
+        msg.data = parsedJws.payloadObj
+        # do signature verification here?
+        start = new Date().getTime()
+        unless msg.signer_keyid
+          keyHash = CryptoJS.SHA256(parsedJws.headerObj.kid)
+          msg.signer_keyid = CryptoJS.enc.Base64.stringify(keyHash)
+          end = new Date().getTime()
+          console.log('it took', end - start, end, start)
+
         msg.gravatar = CryptoJS.MD5(msg.author_email || msg.data.author[0][1]).toString()
         msg.linkToAuthor = msg.data.author[0]
         i = undefined
@@ -262,8 +271,8 @@ angular.module('identifiAngular').controller 'MainController', [
 
       angular.forEach messages, (msg, key) ->
         msg[k] = v for k, v of msgOptions
-        if not msg.jws
-          $http.get('https://ipfs.io/ipfs/' + msg.hash).then (res) ->
+        if msg.ipfs_hash and not msg.jws
+          $http.get('https://ipfs.io/ipfs/' + msg.ipfs_hash).then (res) ->
             msg.jws = res.data
             processMessage(msg)
         else processMessage(msg)

@@ -77,17 +77,32 @@ angular.module('identifiAngular').controller 'MessagesController', [
     # Find existing Message
     $scope.findOne = ->
       if $stateParams.id
-        $scope.message = Messages.get
-          id: $stateParams.id
-          viewpoint_name: $scope.filters.viewpoint_name
-          viewpoint_value: $scope.filters.viewpoint_value
-          max_distance: $scope.filters.max_distance
-        , ->
+        processResponse = ->
           $scope.processMessages([$scope.message])
-          $scope.setPageTitle 'Message ' + $stateParams.id
+          $scope.setPageTitle 'Message ' + hash
           $scope.setMsgRawData($scope.message)
           $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
           $scope.message.recipientGravatar = CryptoJS.MD5($scope.message.recipientEmail or $scope.message.data.recipient[0][1]).toString()
           $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signer_keyid }, (profile) ->
             $scope.verifiedBy = profile
+
+        getMessageFromApi = ->
+          $scope.message = Messages.get
+            id: hash
+            viewpoint_name: $scope.filters.viewpoint_name
+            viewpoint_value: $scope.filters.viewpoint_value
+            max_distance: $scope.filters.max_distance
+          , processResponse
+
+        hash = $stateParams.id
+        query = null
+        if hash.match /^Qm[1-9A-Za-z]{40,50}$/ # looks like an ipfs address
+          $http.get('https://ipfs.io/ipfs/' + hash).then (res) ->
+            $scope.message = { 'jws': res.data } # same format as the object returned by Messages.get
+          .then processResponse
+          .catch -> # fallback go local if ipfs.io not available
+            getMessageFromApi()
+        else
+          getMessageFromApi()
+
 ]
