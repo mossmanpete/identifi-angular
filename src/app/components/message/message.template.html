@@ -13,7 +13,7 @@
       </strong>
       <small><i class="glyphicon glyphicon-play"></i></small>
       <a ui-sref="identities.show({ type: $ctrl.msgData.linkToRecipient[0], value: $ctrl.msgData.linkToRecipient[1] })" ng-bind="($ctrl.msgData.recipientIsSelf && ($ctrl.pageInfo.name || $ctrl.pageInfo.nickname))||$ctrl.msgData.recipient_name||$ctrl.msgData.linkToRecipient[1]" class="id-link"></a>
-       - <a ui-sref="messages.show({ id: $ctrl.msgData.hash })" ng-bind="$ctrl.msgData.data.timestamp|date:'medium'" class="text-muted small" style="display:inline-block;"></a>
+       - <a ui-sref="messages.show({ id: ($ctrl.msgData.ipfs_hash || $ctrl.msgData.hash) })" ng-bind="$ctrl.msgData.data.timestamp|date:'medium'" class="text-muted small" style="display:inline-block;"></a>
     </p>
 
     <p ng-if="$ctrl.msgData.data.type == 'verify_identity' || $ctrl.msgData.data.type == 'unverify_identity'">
