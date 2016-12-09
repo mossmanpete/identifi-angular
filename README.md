@@ -1,6 +1,6 @@
 # identifi-angular
 
-Angular app that connects to the Identifi API.
+Angular app that connects to the Identifi API. Runs at https://identi.fi.
 
 ## Development
 ```
