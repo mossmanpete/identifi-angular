@@ -240,6 +240,7 @@ angular.module('identifiAngular').controller 'MainController', [
           when 'unverify_identity'
             msg.iconStyle = 'glyphicon glyphicon-remove negative'
             msg.hasSuccess = 'has-error'
+            msg.bgColor = 'background-color: #FFF0DE;border-color:#FFE2C6;'
           when 'rating'
             rating = signedData.rating
             neutralRating = (signedData.minRating + signedData.maxRating) / 2
