@@ -55,7 +55,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $rootScope.pageTitle += ' - ' + title
 
     path = $location.absUrl()
-    host = if path.match /\/ipfs\// then 'https://identi.fi' else ''
+    host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
     $http.get(host + '/api').then (res) ->
       $scope.nodeInfo = res.data
       if res.data.keyID
