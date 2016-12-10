@@ -4,6 +4,6 @@ angular.module('identifiAngular').factory 'Messages', [
   '$location'
   ($resource, $location) ->
     path = $location.absUrl()
-    host = if path.match /\/ipfs\// then 'https://identi.fi/' else '' # TODO: http mixed content
+    host = if path.match /\/ipfs\// then 'https://identi.fi/' else ''
     $resource host + 'api/messages/:id'
 ]
