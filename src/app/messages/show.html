@@ -16,48 +16,7 @@
         </strong>
       </div>
     </div>
-    <div class="row">
-      <div class="col-sm-6">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">
-              From
-            </h3>
-          </div>
-          <div class="panel-body">
-            <ul class="list list-unstyled">
-              <li ng-repeat="id in message.data.author"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ui-sref="identities.show({ type: id[0], value: id[1] })" data-original-title="" title=""></a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">
-              To
-            </h3>
-          </div>
-          <div class="panel-body">
-            <ul class="list list-unstyled">
-              <li ng-repeat="id in message.data.recipient"><span ng-bind="id[0]"></span>: <a ng-bind="id[1]" class="id-link" ui-sref="identities.show({ type: id[0], value: id[1] })" data-original-title="" title=""></a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">
-          Details
-        </h3>
-      </div>
-      <div class="panel-body">
-        <p ng-repeat="(key, value) in message.data" ng-if="key != 'recipient' && key != 'author'">
-          <b>{{key}}:</b> {{value}}
-        </p>
-      </div>
-    </div>
+    <p ng-if="message.data.context"><small>Context: {{message.data.context}}</small></p>
     <p><button class="btn btn-default" ng-click="collapseRawData = !collapseRawData">Show raw data</button></p>
     <pre uib-collapse="!collapseRawData" ng-bind="message.strData"></pre>
   </div>
