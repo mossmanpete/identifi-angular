@@ -124,7 +124,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               conn.quickContact = true
             when 'coverPhoto'
               if conn.value.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-                $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(https://ipfs.io' + conn.value + ')' }
+                $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(' + conn.value + ')' }
             when 'profilePhoto'
               if conn.value.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
                 $scope.profilePhoto = $scope.profilePhoto or conn.value
