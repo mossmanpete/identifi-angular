@@ -138,11 +138,11 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.getIdentityProfile = (id, callback) ->
       profile = {}
       Identities.query { idType: id.type, idValue: id.value }, (res) ->
-        if res[0] and res[0][0]
-          profile.dist = res[0][0].dist + 0
-          profile.pos = res[0][0].pos
-          profile.neg = res[0][0].neg
-          for k, v of res[0]
+        if res[0]
+          profile.dist = res[0].dist + 0
+          profile.pos = res[0].pos
+          profile.neg = res[0].neg
+          for k, v of res
             switch v.name
               when 'name'
                 profile.name = v.val unless profile.name
@@ -204,12 +204,9 @@ angular.module('identifiAngular').controller 'MainController', [
         parsedJws = KJUR.jws.JWS.parse(msg.jws)
         msg.data = parsedJws.payloadObj
         # do signature verification here?
-        start = new Date().getTime()
         unless msg.signer_keyid
           keyHash = CryptoJS.SHA256(parsedJws.headerObj.kid)
           msg.signer_keyid = CryptoJS.enc.Base64.stringify(keyHash)
-          end = new Date().getTime()
-          console.log('it took', end - start, end, start)
 
         msg.gravatar = CryptoJS.MD5(msg.author_email || msg.data.author[0][1]).toString()
         msg.linkToAuthor = msg.data.author[0]

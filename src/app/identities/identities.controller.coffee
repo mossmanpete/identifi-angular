@@ -85,12 +85,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         idValue: $scope.idValue
       }, ->
         mostConfirmations = if $scope.connections.length > 0 then $scope.connections[0].confirmations else 1
-        $scope.connections.unshift
-          name: $scope.idType
-          value: $scope.idValue
-          confirmations: 1
-          refutations: 0
-          isCurrent: true
         for key of $scope.connections
           conn = $scope.connections[key]
           switch conn.name
@@ -166,6 +160,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           if conn.val and conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
             conn.link = conn.val
             conn.linkName = conn.val
+            conn.iconStyle = 'glyphicon glyphicon-link'
+            conn.btnStyle = 'btn-default'
           if conn.confirmations + conn.refutations > 0
             percentage = conn.confirmations * 100 / (conn.confirmations + conn.refutations)
             if percentage >= 80
