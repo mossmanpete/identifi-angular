@@ -31,6 +31,16 @@
     "angular-mocks": "~1.5.9"
   },
   "overrides": {
+    "components-font-awesome": {
+      "main": [
+        "css/font-awesome.css",
+        "fonts/fontawesome-webfont.woff",
+        "fonts/fontawesome-webfont.woff2",
+        "fonts/fontawesome-webfont.ttf",
+        "fonts/fontawesome-webfont.eot",
+        "fonts/fontawesome-webfont.svg"
+      ]
+    },
     "bootstrap-sass": {
       "main": [
         "assets/stylesheets/_bootstrap.scss",
