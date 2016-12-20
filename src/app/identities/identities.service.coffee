@@ -7,7 +7,6 @@ angular.module('identifiAngular').factory 'Identities', [
     $resource host + 'api/identities/:idType/:idValue/:method', {},
       connections:
         action: 'GET'
-        params: method: 'verifications'
         isArray: true
       sent:
         action: 'GET'

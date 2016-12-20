@@ -97,72 +97,75 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             when 'email'
               conn.iconStyle = 'glyphicon glyphicon-envelope'
               conn.btnStyle = 'btn-success'
-              conn.link = 'mailto:' + conn.value
+              conn.link = 'mailto:' + conn.val
               conn.quickContact = true
-              $scope.info.email = $scope.info.email or conn.value
+              $scope.info.email = $scope.info.email or conn.val
             when 'bitcoin_address', 'bitcoin'
               conn.iconStyle = 'fa fa-bitcoin'
               conn.btnStyle = 'btn-primary'
-              conn.link = 'https://blockchain.info/address/' + conn.value
+              conn.link = 'https://blockchain.info/address/' + conn.val
               conn.quickContact = true
             when 'gpg_fingerprint', 'gpg_keyid'
               conn.iconStyle = 'fa fa-key'
               conn.btnStyle = 'btn-default'
-              conn.link = 'https://pgp.mit.edu/pks/lookup?op=get&search=0x' + conn.value
+              conn.link = 'https://pgp.mit.edu/pks/lookup?op=get&search=0x' + conn.val
             when 'account'
               conn.iconStyle = 'fa fa-at'
             when 'nickname'
-              $scope.info.nickname = $scope.info.nickname or conn.value
+              $scope.info.nickname = $scope.info.nickname or conn.val
               conn.iconStyle = 'glyphicon glyphicon-font'
             when 'name'
-              $scope.info.name = $scope.info.name or conn.value
+              $scope.info.name = $scope.info.name or conn.val
               conn.iconStyle = 'glyphicon glyphicon-font'
             when 'tel', 'phone'
               conn.iconStyle = 'glyphicon glyphicon-earphone'
               conn.btnStyle = 'btn-success'
-              conn.link = 'tel:' + conn.value
+              conn.link = 'tel:' + conn.val
               conn.quickContact = true
             when 'coverPhoto'
-              if conn.value.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-                $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(' + conn.value + ')' }
+              if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+                $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(' + conn.val + ')' }
             when 'profilePhoto'
-              if conn.value.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-                $scope.profilePhoto = $scope.profilePhoto or conn.value
+              if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+                $scope.profilePhoto = $scope.profilePhoto or conn.val
             when 'url'
-              conn.link = conn.value
-              if conn.value.indexOf('facebook.com/') > -1
+              conn.link = conn.val
+              if conn.val.indexOf('facebook.com/') > -1
                 conn.iconStyle = 'fa fa-facebook'
                 conn.btnStyle = 'btn-facebook'
-                conn.link = conn.value
-                conn.linkName = conn.value.split('facebook.com/')[1]
+                conn.link = conn.val
+                conn.linkName = conn.val.split('facebook.com/')[1]
                 conn.quickContact = true
-              else if conn.value.indexOf('twitter.com/') > -1
+              else if conn.val.indexOf('twitter.com/') > -1
                 conn.iconStyle = 'fa fa-twitter'
                 conn.btnStyle = 'btn-twitter'
-                conn.link = conn.value
-                conn.linkName = conn.value.split('twitter.com/')[1]
+                conn.link = conn.val
+                conn.linkName = conn.val.split('twitter.com/')[1]
                 conn.quickContact = true
-              else if conn.value.indexOf('plus.google.com/') > -1
+              else if conn.val.indexOf('plus.google.com/') > -1
                 conn.iconStyle = 'fa fa-google-plus'
                 conn.btnStyle = 'btn-google-plus'
-                conn.link = conn.value
-                conn.linkName = conn.value.split('plus.google.com/')[1]
+                conn.link = conn.val
+                conn.linkName = conn.val.split('plus.google.com/')[1]
                 conn.quickContact = true
-              else if conn.value.indexOf('linkedin.com/') > -1
+              else if conn.val.indexOf('linkedin.com/') > -1
                 conn.iconStyle = 'fa fa-linkedin'
                 conn.btnStyle = 'btn-linkedin'
-                conn.link = conn.value
-                conn.linkName = conn.value.split('linkedin.com/')[1]
+                conn.link = conn.val
+                conn.linkName = conn.val.split('linkedin.com/')[1]
                 conn.quickContact = true
-              else if conn.value.indexOf('github.com/') > -1
+              else if conn.val.indexOf('github.com/') > -1
                 conn.iconStyle = 'fa fa-github'
                 conn.btnStyle = 'btn-github'
-                conn.link = conn.value
-                conn.linkName = conn.value.split('github.com/')[1]
+                conn.link = conn.val
+                conn.linkName = conn.val.split('github.com/')[1]
                 conn.quickContact = true
               else
                 conn.iconStyle = 'glyphicon glyphicon-link'
                 conn.btnStyle = 'btn-default'
+          if conn.val and conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+            conn.link = conn.val
+            conn.linkName = conn.val
           if conn.confirmations + conn.refutations > 0
             percentage = conn.confirmations * 100 / (conn.confirmations + conn.refutations)
             if percentage >= 80
@@ -184,7 +187,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               idType: $scope.idType
               idValue: $scope.idValue
               target_name: id.name
-              target_value: id.value
+              target_value: id.val
             }, $scope.filters), ->
               for key of id.connecting_msgs
                 if isNaN(key)

@@ -121,7 +121,7 @@
                 </p> -->
                 <div ng-if="isUniqueType" class="mar-top10 quick-contact">
                   <ul class="list-unstyled">
-                    <li ng-repeat="id in connections" ng-if="id.quickContact"><a ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span><span ng-bind="id.linkName || id.value"></span></a></li>
+                    <li ng-repeat="id in connections" ng-if="id.quickContact"><a ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span><span ng-bind="id.linkName || id.val"></span></a></li>
                     <li>
                       <span class="fa fa-calendar"></span>First seen:
                        <span ng-if="stats.first_seen" ng-bind="stats.first_seen|date:'mediumDate'"></span>
@@ -249,7 +249,7 @@
                       <tr ng-repeat-start="id in connections" ng-if="!id.isCurrent" style="{{id.rowStyle}}" ng-class="id.rowClass" ng-click="connectionClicked($event, id)" class="id-row">
                         <td>
                           <div class="visible-xs mar-bot5">
-                            <a ui-sref="identities.show({ type: id.name, value: id.value })" ng-bind="id.linkName || id.value" class="id-link"></a>
+                            <a ui-sref="identities.show({ type: id.name, value: id.val })" ng-bind="id.linkName || id.val" class="id-link"></a>
                             <br>
                             <small ng-bind="id.name"></small>
                           </div>
@@ -260,7 +260,7 @@
                               <span ng-class="id.iconStyle"></span>
                             </a>
                             <div class="hidden-xs pull-left">
-                              <a ui-sref="identities.show({ type: id.name, value: id.value })" ng-bind="id.linkName || id.value" class="id-link"></a>
+                              <a ui-sref="identities.show({ type: id.name, value: id.val })" ng-bind="id.linkName || id.val" class="id-link"></a>
                               <br>
                               <small ng-bind="id.name"></small>
                             </div>
@@ -268,11 +268,11 @@
                               <input class="form-control linkedComment" type="text" placeholder="comment" disabled>
                             -->
                             <div class="pull-right">
-                              <button autocomplete="off" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'verify_identity', recipient: [[idType, idValue], [id.name, id.value]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out">
-                                <span class="positive glyphicon glyphicon-ok"></span> {{id.confirmations}}
+                              <button autocomplete="off" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'verify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out">
+                                <span class="positive glyphicon glyphicon-ok"></span> {{id.conf}}
                               </button>
-                              <button autocomplete="off" name="unverify" class="ladda-button btn btn-default btn-unverify" ng-click="create($event, { type: 'unverify_identity', recipient: [[idType, idValue], [id.name, id.value]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out">
-                                <span class="negative glyphicon glyphicon-remove"></span> {{id.refutations}}
+                              <button autocomplete="off" name="unverify" class="ladda-button btn btn-default btn-unverify" ng-click="create($event, { type: 'unverify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out">
+                                <span class="negative glyphicon glyphicon-remove"></span> {{id.ref}}
                               </button>
                             </div>
                             <div class="clear"></div>

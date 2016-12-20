@@ -143,7 +143,7 @@ angular.module('identifiAngular').controller 'MainController', [
           profile.pos = res[0][0].pos
           profile.neg = res[0][0].neg
           for k, v of res[0]
-            switch v.attr
+            switch v.name
               when 'name'
                 profile.name = v.val unless profile.name
               when 'nickname'
@@ -317,7 +317,7 @@ angular.module('identifiAngular').controller 'MainController', [
               identity.pos = attr.pos
             if identity.neg == undefined and parseInt(attr.neg) > 0
               identity.neg = attr.neg
-            switch attr.attr
+            switch attr.name
               when 'email'
                 identity.email = attr.val
                 identity.gravatar = CryptoJS.MD5(attr.val).toString()
@@ -335,11 +335,11 @@ angular.module('identifiAngular').controller 'MainController', [
                   identity.facebook = attr.val.split('facebook.com/')[1]
                 if attr.val.indexOf('plus.google.com/') > -1
                   identity.googlePlus = attr.val.split('plus.google.com/')[1]
-            index = config.uniqueAttributeTypes.indexOf(attr.attr)
+            index = config.uniqueAttributeTypes.indexOf(attr.name)
             if !identity.linkTo
-              identity.linkTo = { type: attr.attr, value: attr.val }
+              identity.linkTo = { type: attr.name, value: attr.val }
             if index > -1 and index < smallestIndex
-              identity.linkTo = { type: attr.attr, value: attr.val }
+              identity.linkTo = { type: attr.name, value: attr.val }
               smallestIndex = index
             if !identity.gravatar
               identity.gravatar = CryptoJS.MD5(attr.val).toString()
