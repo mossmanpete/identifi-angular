@@ -97,10 +97,10 @@ angular.module('identifiAngular').controller 'MessagesController', [
         hash = $stateParams.id
         query = null
         if hash.match /^Qm[1-9A-Za-z]{40,50}$/ # looks like an ipfs address
-          $http.get('https://ipfs.io/ipfs/' + hash).then (res) ->
+          $http.get('/ipfs/' + hash).then (res) ->
             $scope.message = { 'jws': res.data } # same format as the object returned by Messages.get
           .then processResponse
-          .catch -> # fallback go local if ipfs.io not available
+          .catch -> # fallback go local if ipfs not available
             getMessageFromApi()
         else
           getMessageFromApi()

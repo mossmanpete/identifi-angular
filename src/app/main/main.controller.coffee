@@ -271,7 +271,7 @@ angular.module('identifiAngular').controller 'MainController', [
       angular.forEach messages, (msg, key) ->
         msg[k] = v for k, v of msgOptions
         if msg.ipfs_hash and not msg.jws
-          $http.get('https://ipfs.io/ipfs/' + msg.ipfs_hash).then (res) ->
+          $http.get('/ipfs/' + msg.ipfs_hash).then (res) ->
             msg.jws = res.data
             processMessage(msg)
         else processMessage(msg)
