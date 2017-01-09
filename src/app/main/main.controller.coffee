@@ -9,11 +9,13 @@ angular.module('identifiAngular').controller 'MainController', [
   'config',
   'localStorageService'
   '$uibModal'
+  '$window'
 
   #'Authentication'
   #'Menus'
   #'Persona'
-  ($scope, $rootScope, $location, $http, $state, Identities, config, localStorageService, $uibModal) -> # Authentication, Menus, Persona
+  ($scope, $rootScope, $location, $http, $state, Identities, config,
+  localStorageService, $uibModal, $window) -> # Authentication, Menus, Persona
     ###
     Persona.watch
       loggedInUser: Authentication.user.email
@@ -63,6 +65,12 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.filters.viewpoint_value = res.data.keyID
         $scope.getIdentityProfile { type: 'keyID', value: res.data.keyID }, (profile) ->
           $scope.nodeInfo.profile = profile
+    .then ->
+      storage = new $window.merkleBtree.IPFSGatewayStorage()
+      $window.merkleBtree.MerkleBTree.getByHash('QmWXBTuicL68jxutngJhFjAW7obuS38Yi8H3bNNHUnrB1V/identities', storage)
+    .then (res) ->
+      $scope.identityIndex = res
+      console.log '$scope.identityIndex', $scope.identityIndex
     .finally ->
       $scope.apiReady = true
 
@@ -285,10 +293,10 @@ angular.module('identifiAngular').controller 'MainController', [
         return
       pos = el.getBoundingClientRect()
       if pos.top
-        if pos.top - 60 < window.pageYOffset
-          window.scrollTo 0, pos.top - 60
-        else if pos.bottom > window.pageYOffset + (window.innerHeight or document.documentElement.clientHeight)
-          window.scrollTo 0, pos.bottom - (window.innerHeight or document.documentElement.clientHeight) + 15
+        if pos.top - 60 < $window.pageYOffset
+          $window.scrollTo 0, pos.top - 60
+        else if pos.bottom > $window.pageYOffset + ($window.innerHeight or document.documentElement.clientHeight)
+          $window.scrollTo 0, pos.bottom - ($window.innerHeight or document.documentElement.clientHeight) + 15
       return
 
     $scope.search = (query, limit) ->
@@ -299,61 +307,64 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.finished = false
       $scope.previousSearchValue = searchValue
       limit = limit or 20
-      q = Identities.query angular.extend({ search_value: searchValue },
-          { limit: limit, offset: $scope.filters.offset }, if $scope.filters.max_distance > -1 then $scope.viewpoint else {}), (identities) ->
+      q = $scope.identityIndex.search(searchValue, limit)
+      .then (identities) ->
+        console.log 'identities', identities
         if !$scope.ids.list or $scope.filters.offset is 0
           $scope.ids.list = []
         angular.forEach identities, (row) ->
-          identity = {}
-          smallestIndex = 1000
-          angular.forEach row, (attr) ->
-            dist = parseInt(attr.dist)
-            if !isNaN(dist) and (identity.distance == undefined or (0 <= dist < identity.distance))
-              identity.distance = dist
-            if identity.pos == undefined and parseInt(attr.pos) > 0
-              identity.pos = attr.pos
-            if identity.neg == undefined and parseInt(attr.neg) > 0
-              identity.neg = attr.neg
-            switch attr.name
-              when 'email'
-                identity.email = attr.val
+          return unless row.value and row.value.length
+          $http.get '/ipfs/' + row.value
+          .then (row) ->
+            identity = {}
+            smallestIndex = 1000
+            angular.forEach row.data, (attr) ->
+              dist = parseInt(attr.dist)
+              if !isNaN(dist) and (identity.distance == undefined or (0 <= dist < identity.distance))
+                identity.distance = dist
+              if identity.pos == undefined and parseInt(attr.pos) > 0
+                identity.pos = attr.pos
+              if identity.neg == undefined and parseInt(attr.neg) > 0
+                identity.neg = attr.neg
+              switch attr.name
+                when 'email'
+                  identity.email = attr.val
+                  identity.gravatar = CryptoJS.MD5(attr.val).toString()
+                when 'name'
+                  identity.name = attr.val
+                when 'nickname'
+                  identity.nickname = attr.val
+                  identity.name = attr.val if !identity.name
+                when 'bitcoin', 'bitcoin_address'
+                  identity.bitcoin = attr.val
+                when 'url'
+                  if attr.val.indexOf('twitter.com/') > -1
+                    identity.twitter = attr.val.split('twitter.com/')[1]
+                  if attr.val.indexOf('facebook.com/') > -1
+                    identity.facebook = attr.val.split('facebook.com/')[1]
+                  if attr.val.indexOf('plus.google.com/') > -1
+                    identity.googlePlus = attr.val.split('plus.google.com/')[1]
+              index = config.uniqueAttributeTypes.indexOf(attr.name)
+              if !identity.linkTo
+                identity.linkTo = { type: attr.name, value: attr.val }
+              if index > -1 and index < smallestIndex
+                identity.linkTo = { type: attr.name, value: attr.val }
+                smallestIndex = index
+              if !identity.gravatar
                 identity.gravatar = CryptoJS.MD5(attr.val).toString()
-              when 'name'
-                identity.name = attr.val
-              when 'nickname'
-                identity.nickname = attr.val
-                identity.name = attr.val if !identity.name
-              when 'bitcoin', 'bitcoin_address'
-                identity.bitcoin = attr.val
-              when 'url'
-                if attr.val.indexOf('twitter.com/') > -1
-                  identity.twitter = attr.val.split('twitter.com/')[1]
-                if attr.val.indexOf('facebook.com/') > -1
-                  identity.facebook = attr.val.split('facebook.com/')[1]
-                if attr.val.indexOf('plus.google.com/') > -1
-                  identity.googlePlus = attr.val.split('plus.google.com/')[1]
-            index = config.uniqueAttributeTypes.indexOf(attr.name)
-            if !identity.linkTo
-              identity.linkTo = { type: attr.name, value: attr.val }
-            if index > -1 and index < smallestIndex
-              identity.linkTo = { type: attr.name, value: attr.val }
-              smallestIndex = index
-            if !identity.gravatar
-              identity.gravatar = CryptoJS.MD5(attr.val).toString()
-          if !identity.name
-            identity.name = row[0].val
-          $scope.ids.list.push(identity)
+            if !identity.name
+              identity.name = row[0].val
+            $scope.ids.list.push(identity)
+            $scope.ids.list[0].active = true
         if identities.length > 0
           $scope.ids.activeKey = 0
-          $scope.ids.list[0].active = true
         $scope.filters.offset = $scope.filters.offset + identities.length
         if identities.length < limit
           $scope.ids.finished = true
       , (error) ->
         $scope.ids.finished = true
       $scope.ids.query = q
-      return q.$promise.then ->
-        return $scope.ids.list
+      return q
 
     $scope.searchKeydown = (event) ->
       switch (if event then event.which else -1)
