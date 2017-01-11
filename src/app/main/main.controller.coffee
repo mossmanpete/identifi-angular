@@ -70,11 +70,9 @@ angular.module('identifiAngular').controller 'MainController', [
       $window.merkleBtree.MerkleBTree.getByHash('QmWXBTuicL68jxutngJhFjAW7obuS38Yi8H3bNNHUnrB1V/identities', storage)
     .then (res) ->
       $scope.identityIndex = res
-      console.log '$scope.identityIndex', $scope.identityIndex
       $window.merkleBtree.MerkleBTree.getByHash('QmNTtnoDre8nGX8aMwYUCA8ymkBHcWf8vq5kwYbrWWnD9t/messages_by_distance', storage)
     .then (res) ->
       $scope.messageIndex = res
-      console.log '$scope.messageIndex', $scope.messageIndex
     .finally ->
       $scope.apiReady = true
 
@@ -304,6 +302,7 @@ angular.module('identifiAngular').controller 'MainController', [
       return
 
     $scope.search = (query, limit) ->
+      $scope.ids.loading = true
       searchValue = query or $scope.query.term or ''
       if searchValue != $scope.previousSearchValue
         $scope.filters.offset = 0
@@ -313,7 +312,7 @@ angular.module('identifiAngular').controller 'MainController', [
       limit = limit or 20
       q = $scope.identityIndex.search(searchValue, limit)
       .then (identities) ->
-        console.log 'identities', identities
+        $scope.ids.loading = false
         if !$scope.ids.list or $scope.filters.offset is 0
           $scope.ids.list = []
         angular.forEach identities, (row) ->
@@ -367,7 +366,7 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.ids.finished = true
       , (error) ->
         $scope.ids.finished = true
-      $scope.ids.query = q
+        $scope.ids.loading = false
       return q
 
     $scope.searchKeydown = (event) ->

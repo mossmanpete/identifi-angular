@@ -11,9 +11,9 @@
       </div>
     </div>
 
-    <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="2" infinite-scroll-disabled="!ids.query.$resolved || ids.finished">
+    <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="2" infinite-scroll-disabled="ids.loading || ids.finished">
       <tbody>
-        <tr ng-if="!query.term || (ids.query.$resolved && !ids.list.length)" ui-sref="identities.create" class="search-result-row">
+        <tr ng-if="!query.term || (!ids.loading && !ids.list.length)" ui-sref="identities.create" class="search-result-row">
           <td class="gravatar-col align-center"><span style="line-height:46px" class="glyphicon glyphicon-plus"></span></td>
           <td>
             <a ui-sref="identities.create">Add entry</a>
@@ -50,7 +50,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="alert alert-info text-center" ng-if="ids.query.$resolved && !ids.list.length">
+    <div class="alert alert-info text-center" ng-if="!ids.loading && !ids.list.length">
       No results
     </div>
   </section>

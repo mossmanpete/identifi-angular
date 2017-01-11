@@ -14,7 +14,10 @@ angular.module('identifiAngular').controller 'MessagesController', [
   ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, Identities, config) -> #, Authentication
     $scope.idType = $stateParams.type
     $scope.idValue = $stateParams.value
-    $scope.messages = []
+    $scope.msgs =
+      loading: false
+      finished: false
+      list: []
     angular.extend $scope.filters,
       type: 'rating'
       offset: 0
@@ -41,6 +44,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.collapseFilters = $window.innerWidth < 992
 
     $scope.find = (offset) ->
+      $scope.msgs.loading = true
       if !isNaN(offset)
         $scope.filters.offset = offset
       params = angular.extend({}, $scope.filters, {
@@ -63,22 +67,21 @@ angular.module('identifiAngular').controller 'MessagesController', [
           return values
 
       p.then (messages) ->
-        console.log messages
+        $scope.$apply -> # for some reason this is needed...
+          $scope.msgs.loading = false
         $scope.processMessages messages
         if $scope.filters.offset == 0
-          $scope.messages = messages
+          $scope.msgs.list = messages
         else
           for key of messages
             if isNaN(key)
               continue
-            $scope.messages.push messages[key]
-        $scope.messages.$resolved = messages.$resolved
+            $scope.msgs.list.push messages[key]
         $scope.filters.offset = $scope.filters.offset + (messages.length or 0)
-        if messages.length < $scope.filters.limit
-          $scope.messages.finished = true
+        if messages.length < $scope.filters.limit - 1 # bug
+          $scope.msgs.finished = true
       if offset == 0
-        $scope.messages = {}
-      $scope.messages.$resolved = messages.$resolved
+        $scope.msgs.list = []
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
@@ -119,4 +122,5 @@ angular.module('identifiAngular').controller 'MessagesController', [
         else
           getMessageFromApi()
 
+    return
 ]
