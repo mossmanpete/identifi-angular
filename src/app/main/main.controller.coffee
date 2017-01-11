@@ -58,6 +58,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     path = $location.absUrl()
     host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
+    storage = new $window.merkleBtree.IPFSGatewayStorage()
     $http.get(host + '/api').then (res) ->
       $scope.nodeInfo = res.data
       if res.data.keyID
@@ -66,11 +67,14 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.getIdentityProfile { type: 'keyID', value: res.data.keyID }, (profile) ->
           $scope.nodeInfo.profile = profile
     .then ->
-      storage = new $window.merkleBtree.IPFSGatewayStorage()
       $window.merkleBtree.MerkleBTree.getByHash('QmWXBTuicL68jxutngJhFjAW7obuS38Yi8H3bNNHUnrB1V/identities', storage)
     .then (res) ->
       $scope.identityIndex = res
       console.log '$scope.identityIndex', $scope.identityIndex
+      $window.merkleBtree.MerkleBTree.getByHash('QmNTtnoDre8nGX8aMwYUCA8ymkBHcWf8vq5kwYbrWWnD9t/messages_by_distance', storage)
+    .then (res) ->
+      $scope.messageIndex = res
+      console.log '$scope.messageIndex', $scope.messageIndex
     .finally ->
       $scope.apiReady = true
 

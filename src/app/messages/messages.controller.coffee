@@ -49,7 +49,21 @@ angular.module('identifiAngular').controller 'MessagesController', [
         offset: $scope.filters.offset
         limit: 50
       }, if $scope.filters.max_distance == -1 then { viewpoint_name: null, viewpoint_value: null })
-      messages = Messages.query params, ->
+      p = null
+      if params.idType and params.idValue
+        # Get from API for now
+        p = Messages.query(params).$promise
+      else
+        # Get latest messages from ipfs index
+        p = $scope.messageIndex.search('', params.limit)
+        .then (res) ->
+          values = []
+          for pair in res
+            values.push(JSON.parse(pair.value)) if pair.value
+          return values
+
+      p.then (messages) ->
+        console.log messages
         $scope.processMessages messages
         if $scope.filters.offset == 0
           $scope.messages = messages
