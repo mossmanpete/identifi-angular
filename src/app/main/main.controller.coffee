@@ -10,12 +10,13 @@ angular.module('identifiAngular').controller 'MainController', [
   'localStorageService'
   '$uibModal'
   '$window'
+  '$q'
 
   #'Authentication'
   #'Menus'
   #'Persona'
   ($scope, $rootScope, $location, $http, $state, Identities, config,
-  localStorageService, $uibModal, $window) -> # Authentication, Menus, Persona
+  localStorageService, $uibModal, $window, $q) -> # Authentication, Menus, Persona
     ###
     Persona.watch
       loggedInUser: Authentication.user.email
@@ -315,9 +316,10 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.loading = false
         if !$scope.ids.list or $scope.filters.offset is 0
           $scope.ids.list = []
+        queries = []
         angular.forEach identities, (row) ->
           return unless row.value and row.value.length
-          $http.get '/ipfs/' + row.value
+          p = $http.get('/ipfs/' + row.value)
           .then (row) ->
             identity = {}
             smallestIndex = 1000
@@ -359,15 +361,14 @@ angular.module('identifiAngular').controller 'MainController', [
               identity.name = row[0].val
             $scope.ids.list.push(identity)
             $scope.ids.list[0].active = true
+          queries.push p
         if identities.length > 0
           $scope.ids.activeKey = 0
         $scope.filters.offset = $scope.filters.offset + identities.length
         if identities.length < limit
           $scope.ids.finished = true
-      , (error) ->
-        $scope.ids.finished = true
-        $scope.ids.loading = false
-      return q
+        return $q.all(queries)
+      return q.then -> $scope.ids.list
 
     $scope.searchKeydown = (event) ->
       switch (if event then event.which else -1)
