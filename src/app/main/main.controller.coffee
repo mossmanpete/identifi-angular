@@ -311,7 +311,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.finished = false
       $scope.previousSearchValue = searchValue
       limit = limit or 20
-      q = $scope.identityIndex.search(searchValue, limit)
+      q = $scope.identityIndex.searchText(searchValue, limit)
       .then (identities) ->
         $scope.ids.loading = false
         if !$scope.ids.list or $scope.filters.offset is 0

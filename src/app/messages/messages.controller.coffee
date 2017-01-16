@@ -59,7 +59,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
         p = Messages.query(params).$promise
       else
         # Get latest messages from ipfs index
-        p = $scope.messageIndex.search('', params.limit)
+        p = $scope.messageIndex.searchText('', params.limit)
         .then (res) ->
           values = []
           for pair in res
