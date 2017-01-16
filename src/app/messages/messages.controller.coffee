@@ -44,6 +44,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.collapseFilters = $window.innerWidth < 992
 
     $scope.find = (offset) ->
+      return if $scope.msgs.loading
       $scope.msgs.loading = true
       if !isNaN(offset)
         $scope.filters.offset = offset
@@ -62,24 +63,20 @@ angular.module('identifiAngular').controller 'MessagesController', [
         searchKey = ''
         if $scope.msgs.list.length
           searchKey = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
-        console.log 'searchKey', searchKey
         p = $scope.messageIndex.searchRange(searchKey, undefined, params.limit, false)
         .then (res) ->
           values = []
           for pair in res
             if pair.value
-              v = JSON.parse(pair.value)
+              v = pair.value
               v.searchKey = pair.key
               values.push(v)
           return values
 
       p.then (messages) ->
-        $scope.$apply -> # for some reason this is needed...
-          $scope.msgs.loading = false
         $scope.processMessages messages
         if $scope.filters.offset == 0
           $scope.msgs.list = messages
-          console.log messages
         else
           for key of messages
             if isNaN(key)
@@ -87,7 +84,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
             $scope.msgs.list.push messages[key]
         $scope.filters.offset = $scope.filters.offset + (messages.length or 0)
         if messages.length < $scope.filters.limit - 1 # bug
-          $scope.msgs.finished = true
+          $scope.$apply -> $scope.msgs.finished = true
+        $scope.$apply -> $scope.msgs.loading = false
       if offset == 0
         $scope.msgs.list = []
 

@@ -47,7 +47,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.query = {}
     $scope.query.term = ''
-    $scope.previousSearchValue = ''
+    $scope.previousSearchKey = ''
     $scope.ids = { list: [] }
 
     $scope.phoneRegex = /^\+?\d+$/
@@ -71,7 +71,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $window.merkleBtree.MerkleBTree.getByHash('QmWXBTuicL68jxutngJhFjAW7obuS38Yi8H3bNNHUnrB1V/identities', storage)
     .then (res) ->
       $scope.identityIndex = res
-      $window.merkleBtree.MerkleBTree.getByHash('QmNTtnoDre8nGX8aMwYUCA8ymkBHcWf8vq5kwYbrWWnD9t/messages_by_distance', storage)
+      $window.merkleBtree.MerkleBTree.getByHash('QmQGui75zAfxkChtdNy8yKpWf6nz8YWxSBmSi3w5dKGVKj/messages_by_distance', storage)
     .then (res) ->
       $scope.messageIndex = res
     .finally ->
@@ -138,6 +138,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.query.term = ''
         $scope.filters.offset = 0
         $scope.ids.list = []
+        $scope.ids.finished = false
         $state.go 'identities.list'
 
     $scope.setMsgRawData = (msg) ->
@@ -307,19 +308,18 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.search = (query, limit) ->
       return if $scope.ids.loading
       $scope.ids.loading = true
-      searchValue = query or $scope.query.term or ''
-      if searchValue != $scope.previousSearchValue
+      searchKey = (query or $scope.query.term or '').toLowerCase()
+      if searchKey != $scope.previousSearchKey
         $scope.filters.offset = 0
         $scope.ids.list = []
         $scope.ids.finished = false
-      $scope.previousSearchValue = searchValue
+      $scope.previousSearchKey = searchKey
       limit = limit or 20
+      cursor = false
       if $scope.ids.list.length
-        searchValue = $scope.ids.list[$scope.ids.list.length - 1].searchKey
-      console.log 'searchValue', searchValue
-      q = $scope.identityIndex.searchRange(searchValue, undefined, limit, false)
+        cursor = $scope.ids.list[$scope.ids.list.length - 1].searchKey
+      q = $scope.identityIndex.searchText(searchKey, limit, cursor)
       .then (identities) ->
-        $scope.ids.loading = false
         if !$scope.ids.list or $scope.filters.offset is 0
           $scope.ids.list = []
         queries = []
@@ -365,7 +365,7 @@ angular.module('identifiAngular').controller 'MainController', [
               if !identity.gravatar
                 identity.gravatar = CryptoJS.MD5(attr.val).toString()
             if !identity.name
-              identity.name = row[0].val
+              identity.name = row.data[0].val
             $scope.ids.list.push(identity)
             $scope.ids.list[0].active = true
           queries.push p
@@ -375,7 +375,9 @@ angular.module('identifiAngular').controller 'MainController', [
         if identities.length < limit
           $scope.ids.finished = true
         return $q.all(queries)
-      return q.then -> $scope.ids.list
+      return q.then ->
+        $scope.$apply -> $scope.ids.loading = false
+        $scope.ids.list
 
     $scope.searchKeydown = (event) ->
       switch (if event then event.which else -1)
