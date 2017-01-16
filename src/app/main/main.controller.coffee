@@ -136,6 +136,8 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.search()
       else
         $scope.query.term = ''
+        $scope.filters.offset = 0
+        $scope.ids.list = []
         $state.go 'identities.list'
 
     $scope.setMsgRawData = (msg) ->
@@ -303,6 +305,7 @@ angular.module('identifiAngular').controller 'MainController', [
       return
 
     $scope.search = (query, limit) ->
+      return if $scope.ids.loading
       $scope.ids.loading = true
       searchValue = query or $scope.query.term or ''
       if searchValue != $scope.previousSearchValue
@@ -311,7 +314,10 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.finished = false
       $scope.previousSearchValue = searchValue
       limit = limit or 20
-      q = $scope.identityIndex.searchText(searchValue, limit)
+      if $scope.ids.list.length
+        searchValue = $scope.ids.list[$scope.ids.list.length - 1].searchKey
+      console.log 'searchValue', searchValue
+      q = $scope.identityIndex.searchRange(searchValue, undefined, limit, false)
       .then (identities) ->
         $scope.ids.loading = false
         if !$scope.ids.list or $scope.filters.offset is 0
@@ -319,9 +325,10 @@ angular.module('identifiAngular').controller 'MainController', [
         queries = []
         angular.forEach identities, (row) ->
           return unless row.value and row.value.length
+          searchKey = row.key
           p = $http.get('/ipfs/' + row.value)
           .then (row) ->
-            identity = {}
+            identity = { searchKey: searchKey }
             smallestIndex = 1000
             angular.forEach row.data, (attr) ->
               dist = parseInt(attr.dist)

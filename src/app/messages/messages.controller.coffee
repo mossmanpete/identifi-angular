@@ -59,11 +59,18 @@ angular.module('identifiAngular').controller 'MessagesController', [
         p = Messages.query(params).$promise
       else
         # Get latest messages from ipfs index
-        p = $scope.messageIndex.searchText('', params.limit)
+        searchKey = ''
+        if $scope.msgs.list.length
+          searchKey = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
+        console.log 'searchKey', searchKey
+        p = $scope.messageIndex.searchRange(searchKey, undefined, params.limit, false)
         .then (res) ->
           values = []
           for pair in res
-            values.push(JSON.parse(pair.value)) if pair.value
+            if pair.value
+              v = JSON.parse(pair.value)
+              v.searchKey = pair.key
+              values.push(v)
           return values
 
       p.then (messages) ->
@@ -72,6 +79,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
         $scope.processMessages messages
         if $scope.filters.offset == 0
           $scope.msgs.list = messages
+          console.log messages
         else
           for key of messages
             if isNaN(key)

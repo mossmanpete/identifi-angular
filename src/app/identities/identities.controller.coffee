@@ -331,8 +331,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.processMessages $scope.thumbsDown, { recipientIsSelf: true }
       )
 
-    if $state.is 'identities.list'
-      $scope.search()
-    else if $state.is 'identities.show'
+    if $state.is 'identities.show'
       $scope.findOne()
 ]
