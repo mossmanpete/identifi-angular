@@ -68,10 +68,13 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.getIdentityProfile { type: 'keyID', value: res.data.keyID }, (profile) ->
           $scope.nodeInfo.profile = profile
     .then ->
-      $window.merkleBtree.MerkleBTree.getByHash('QmWxncDjdMMczw5wWwKh5aWPoQxdyonZWPH1JLxG15YKKV/identities', storage)
+      $window.merkleBtree.MerkleBTree.getByHash('QmaVtoV2W8iBo8gYvptFMhZGWtr42QGzzyF4PtCKnk9SNz/identities_by_distance', storage)
+    .then (index) ->
+      $scope.identitiesByDistance = index
+      $window.merkleBtree.MerkleBTree.getByHash('Qmc3YpQQHvZZw6bDsFcu6nfQmkdiXLMjwhvcMAfjE2AQZ9/identities_by_searchkey', storage)
     .then (res) ->
-      $scope.identityIndex = res
-      $window.merkleBtree.MerkleBTree.getByHash('QmWxncDjdMMczw5wWwKh5aWPoQxdyonZWPH1JLxG15YKKV/messages_by_distance', storage)
+      $scope.identitiesBySearchKey = res
+      $window.merkleBtree.MerkleBTree.getByHash('QmUPWgqs6iE14Hiethdu9XmodAb7hqspA9se1o53eXnmev/messages_by_timestamp', storage)
     .then (res) ->
       $scope.messageIndex = res
     .finally ->
@@ -308,23 +311,30 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.search = (query, limit) ->
       return if $scope.ids.loading
       $scope.ids.loading = true
+      $scope.identitiesByHash = {}
       searchKey = (query or $scope.query.term or '').toLowerCase()
       if searchKey != $scope.previousSearchKey
         $scope.filters.offset = 0
         $scope.ids.list = []
         $scope.ids.finished = false
+        $scope.identitiesByHash = {}
       $scope.previousSearchKey = searchKey
       limit = limit or 50
       cursor = false
       if $scope.ids.list.length
         cursor = $scope.ids.list[$scope.ids.list.length - 1].searchKey
-      q = $scope.identityIndex.searchText(searchKey, limit, cursor)
-      .then (identities) ->
+      q = null
+      if searchKey.length
+        q = $scope.identitiesBySearchKey.searchText(searchKey, limit, cursor)
+      else
+        q = $scope.identitiesByDistance.searchText(searchKey, limit, cursor)
+      q.then (identities) ->
         if !$scope.ids.list or $scope.filters.offset is 0
           $scope.ids.list = []
         queries = []
         angular.forEach identities, (row) ->
-          return unless row.value and row.value.length
+          return unless row.value and row.value.length and !$scope.identitiesByHash[row.value]
+          $scope.identitiesByHash[row.value] = true
           searchKey = row.key
           p = $http.get('/ipfs/' + row.value)
           .then (row) ->
