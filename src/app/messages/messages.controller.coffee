@@ -43,6 +43,27 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.collapseFilters = $window.innerWidth < 992
 
+    $scope.msgFilter = (value, index, array) ->
+      if $scope.filters.type
+        if $scope.filters.type.match /^rating/
+          if value.signedData.type != 'rating'
+            return false
+          neutralRating = (value.signedData.maxRating + value.signedData.minRating) / 2
+          if $scope.filters.type == 'rating:positive' and value.signedData.rating < neutralRating
+            return false
+          else if $scope.filters.type == 'rating:negative' and value.signedData.rating >= neutralRating
+            return false
+          else if $scope.filters.type == 'rating:neutral' and value.signedData.rating != neutralRating
+            return false
+        else if value.signedData.type != $scope.filters.type
+          return false
+      if $scope.filters.max_distance
+        if $scope.filters.max_distance == 0 and typeof value.distance != 'number'
+          return false
+        else if $scope.filters.max_distance > 0 and value.distance > $scope.filters.max_distance
+          return false
+      return true
+
     $scope.find = (offset) ->
       return if $scope.msgs.loading
       $scope.msgs.loading = true
@@ -51,7 +72,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
       params = angular.extend({}, $scope.filters, {
         idType: $scope.idType
         idValue: $scope.idValue
-        offset: $scope.filters.offset
         limit: 50
       }, if $scope.filters.max_distance == -1 then { viewpoint_name: null, viewpoint_value: null })
       p = null
@@ -63,7 +83,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
         searchKey = ''
         if $scope.msgs.list.length
           searchKey = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
-        p = $scope.messageIndex.searchRange(searchKey, undefined, params.limit, false)
+        p = $scope.messageIndex.searchText('', params.limit, searchKey)
         .then (res) ->
           values = []
           for pair in res
@@ -95,6 +115,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
         offset: 0
         receivedOffset: 0
         sentOffset: 0
+      $scope.msgs.list = []
+      $scope.msgs.finished = false
       $scope.find 0
 
     # Find existing Message
@@ -106,6 +128,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
           $scope.setMsgRawData($scope.message)
           $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
           $scope.message.recipientGravatar = CryptoJS.MD5($scope.message.recipientEmail or $scope.message.data.recipient[0][1]).toString()
+          $scope.message.hash = hash
           $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signer_keyid }, (profile) ->
             $scope.verifiedBy = profile
 
