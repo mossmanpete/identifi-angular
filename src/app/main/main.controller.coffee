@@ -68,7 +68,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.getIdentityProfile { type: 'keyID', value: res.data.keyID }, (profile) ->
           $scope.nodeInfo.profile = profile
     .then ->
-      $window.merkleBtree.MerkleBTree.getByHash('QmWXBTuicL68jxutngJhFjAW7obuS38Yi8H3bNNHUnrB1V/identities', storage)
+      $window.merkleBtree.MerkleBTree.getByHash('QmYLbWfSwpXTXVLPXiaaRxXz2x5cMPAsN3fxMMVnUh246P/identities', storage)
     .then (res) ->
       $scope.identityIndex = res
       $window.merkleBtree.MerkleBTree.getByHash('QmQGui75zAfxkChtdNy8yKpWf6nz8YWxSBmSi3w5dKGVKj/messages_by_distance', storage)
