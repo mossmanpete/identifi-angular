@@ -84,7 +84,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
         searchKey = ''
         if $scope.msgs.list.length
           searchKey = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
-        p = $scope.messageIndex.searchText('', params.limit, searchKey)
+        p = $scope.messageIndex.searchText('', params.limit, searchKey, true)
         .then (res) ->
           values = []
           for pair in res

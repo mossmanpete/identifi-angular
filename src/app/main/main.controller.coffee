@@ -328,7 +328,7 @@ angular.module('identifiAngular').controller 'MainController', [
         q = $scope.identitiesBySearchKey.searchText(searchKey, limit, cursor)
       else
         q = $scope.identitiesByDistance.searchText(searchKey, limit, cursor)
-      q.then (identities) ->
+      q = q.then (identities) ->
         if !$scope.ids.list or $scope.filters.offset is 0
           $scope.ids.list = []
         queries = []
