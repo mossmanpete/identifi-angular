@@ -11,7 +11,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
   'Messages'
   'Identities'
   'config'
-  ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, Identities, config) -> #, Authentication
+  '$timeout'
+  ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, Identities, config, $timeout) -> #, Authentication
     $scope.idType = $stateParams.type
     $scope.idValue = $stateParams.value
     $scope.msgs =
@@ -118,6 +119,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
       $scope.msgs.list = []
       $scope.msgs.finished = false
       $scope.find 0
+      $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
     # Find existing Message
     $scope.findOne = ->
