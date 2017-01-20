@@ -60,13 +60,15 @@ angular.module('identifiAngular').controller 'MainController', [
     path = $location.absUrl()
     host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
     storage = new $window.merkleBtree.IPFSGatewayStorage()
-    $http.get(host + '/api').then (res) ->
+    $http.get(host + '/api', { timeout: 1000 }).then (res) ->
       $scope.nodeInfo = res.data
       if res.data.keyID
         $scope.filters.viewpoint_name = 'keyID'
         $scope.filters.viewpoint_value = res.data.keyID
         $scope.getIdentityProfile { type: 'keyID', value: res.data.keyID }, (profile) ->
           $scope.nodeInfo.profile = profile
+    .catch (e) ->
+      console.log host + '/api request failed:', e
     .then ->
       $window.merkleBtree.MerkleBTree.getByHash('QmaVtoV2W8iBo8gYvptFMhZGWtr42QGzzyF4PtCKnk9SNz/identities_by_distance', storage)
     .then (index) ->
