@@ -50,7 +50,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
           if value.signedData.type != 'rating'
             return false
           neutralRating = (value.signedData.maxRating + value.signedData.minRating) / 2
-          if $scope.filters.type == 'rating:positive' and value.signedData.rating < neutralRating
+          if $scope.filters.type == 'rating:positive' and value.signedData.rating <= neutralRating
             return false
           else if $scope.filters.type == 'rating:negative' and value.signedData.rating >= neutralRating
             return false
