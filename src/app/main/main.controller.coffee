@@ -60,7 +60,7 @@ angular.module('identifiAngular').controller 'MainController', [
     path = $location.absUrl()
     host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
     storage = new $window.merkleBtree.IPFSGatewayStorage()
-    $http.get(host + '/api', { timeout: 1000 }).then (res) ->
+    $http.get(host + '/api', { timeout: 2000 }).then (res) ->
       $scope.nodeInfo = res.data
       if res.data.keyID
         $scope.filters.viewpoint_name = 'keyID'
@@ -70,10 +70,10 @@ angular.module('identifiAngular').controller 'MainController', [
     .catch (e) ->
       console.log host + '/api request failed:', e
     .then ->
-      $window.merkleBtree.MerkleBTree.getByHash('QmaVtoV2W8iBo8gYvptFMhZGWtr42QGzzyF4PtCKnk9SNz/identities_by_distance', storage)
+      $window.merkleBtree.MerkleBTree.getByHash('QmfK1JUBfeBLAs9KxBFXqscMwEY5YrR3VLEYPkMsqCbmNA/identities_by_distance', storage)
     .then (index) ->
       $scope.identitiesByDistance = index
-      $window.merkleBtree.MerkleBTree.getByHash('Qmc3YpQQHvZZw6bDsFcu6nfQmkdiXLMjwhvcMAfjE2AQZ9/identities_by_searchkey', storage)
+      $window.merkleBtree.MerkleBTree.getByHash('QmfK1JUBfeBLAs9KxBFXqscMwEY5YrR3VLEYPkMsqCbmNA/identities_by_searchkey', storage)
     .then (res) ->
       $scope.identitiesBySearchKey = res
       $window.merkleBtree.MerkleBTree.getByHash('QmUPWgqs6iE14Hiethdu9XmodAb7hqspA9se1o53eXnmev/messages_by_timestamp', storage)
@@ -314,7 +314,7 @@ angular.module('identifiAngular').controller 'MainController', [
       return if $scope.ids.loading
       $scope.ids.loading = true
       $scope.identitiesByHash = {}
-      searchKey = (query or $scope.query.term or '').toLowerCase()
+      searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
       if searchKey != $scope.previousSearchKey
         $scope.filters.offset = 0
         $scope.ids.list = []
@@ -342,7 +342,7 @@ angular.module('identifiAngular').controller 'MainController', [
           .then (row) ->
             identity = { searchKey: searchKey }
             smallestIndex = 1000
-            angular.forEach row.data, (attr) ->
+            angular.forEach row.data.attrs, (attr) ->
               dist = parseInt(attr.dist)
               if !isNaN(dist) and (identity.distance == undefined or (0 <= dist < identity.distance))
                 identity.distance = dist
@@ -377,7 +377,7 @@ angular.module('identifiAngular').controller 'MainController', [
               if !identity.gravatar
                 identity.gravatar = CryptoJS.MD5(attr.val).toString()
             if !identity.name
-              identity.name = row.data[0].val
+              identity.name = row.data.attrs[0].val
             $scope.ids.list.push(identity)
             $scope.ids.list[0].active = true
           queries.push p

@@ -80,10 +80,17 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         console.log "error", error
 
     $scope.getConnections = ->
-      $scope.connections = Identities.connections({
-        idType: $scope.idType
-        idValue: $scope.idValue
-      }, ->
+      $scope.connections = $scope.identitiesBySearchKey.searchText(
+        encodeURIComponent($scope.idValue) + ':' + encodeURIComponent($scope.idType)
+      )
+      .then (res) ->
+        if res.length
+          return $http.get('/ipfs/' + res[0].value)
+        else
+          return {}
+      .then (res) ->
+        console.log 'res', res
+        $scope.connections = res.data.attrs or []
         mostConfirmations = if $scope.connections.length > 0 then $scope.connections[0].confirmations else 1
         for key of $scope.connections
           conn = $scope.connections[key]
@@ -206,7 +213,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.getStats()
         $scope.getReceivedMsgs 0
         $scope.getSentMsgs 0
-      )
 
     $scope.getStats = ->
       Identities.stats(angular.extend({}, $scope.filters, {
