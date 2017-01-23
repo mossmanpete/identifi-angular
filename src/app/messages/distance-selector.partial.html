@@ -1,7 +1,7 @@
 <div class="alert alert-info">
   Viewing as:
   <strong ng-if="nodeInfo.profile">
-    <a ui-sref="identities.show({ type: filters.viewpoint_name, value: filters.viewpoint_value })" class="id-link">
+    <a ui-sref="identities.show({ type: 'keyID', value: nodeInfo.keyID })" class="id-link">
       <span class="distance-container mar-right5 mar-left5">
         <identicon id="nodeInfo.profile" class="" border="3" width="35" positive-score="nodeInfo.profile.pos" negative-score="nodeInfo.profile.neg"></identicon>
       </span>

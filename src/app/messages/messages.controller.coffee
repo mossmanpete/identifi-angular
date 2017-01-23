@@ -44,27 +44,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.collapseFilters = $window.innerWidth < 992
 
-    $scope.msgFilter = (value, index, array) ->
-      if $scope.filters.type
-        if $scope.filters.type.match /^rating/
-          if value.signedData.type != 'rating'
-            return false
-          neutralRating = (value.signedData.maxRating + value.signedData.minRating) / 2
-          if $scope.filters.type == 'rating:positive' and value.signedData.rating <= neutralRating
-            return false
-          else if $scope.filters.type == 'rating:negative' and value.signedData.rating >= neutralRating
-            return false
-          else if $scope.filters.type == 'rating:neutral' and value.signedData.rating != neutralRating
-            return false
-        else if value.signedData.type != $scope.filters.type
-          return false
-      if $scope.filters.max_distance
-        if $scope.filters.max_distance == 0 and typeof value.distance != 'number'
-          return false
-        else if $scope.filters.max_distance > 0 and value.distance > $scope.filters.max_distance
-          return false
-      return true
-
     $scope.find = (offset) ->
       return if $scope.msgs.loading
       $scope.msgs.loading = true

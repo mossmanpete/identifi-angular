@@ -81,29 +81,19 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       , (error) ->
         console.log "error", error
 
-    $scope.getIdentityProfile = ->
-      $scope.identitiesBySearchKey.searchText(
-        encodeURIComponent($scope.idValue) + ':' + encodeURIComponent($scope.idType)
-        , 2
-      )
-      .then (res) ->
-        if res.length
-          return $http.get('/ipfs/' + res[0].value)
-        else
-          return {}
-      .then (res) ->
-        $scope.identityProfile = res.data
-        $q.all([
-            $window.merkleBtree.MerkleBTree.getByHash(res.data.sent, $scope.ipfsStorage).then (index) ->
-              $scope.$apply -> $scope.sentIndex = index
-            ,
-            $window.merkleBtree.MerkleBTree.getByHash(res.data.received, $scope.ipfsStorage).then (index) ->
-              $scope.$apply -> $scope.receivedIndex = index
-          ])
-
     $scope.getConnections = ->
       connections = $scope.identityProfile.attrs or []
-      mostConfirmations = if connections.length > 0 then connections[0].confirmations else 1
+      if connections.length > 0
+        c = connections[0]
+        mostConfirmations = c.confirmations
+        $scope.$apply ->
+          $scope.stats =
+            received_positive: c.pos
+            received_negative: c.neg
+            received_neutral: c.neut
+          $scope.distance = c.dist
+      else
+        mostConfirmations = 1
       for key of connections
         conn = connections[key]
         switch conn.name
@@ -224,21 +214,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             id.collapse = !id.collapse
           )
 
-      $scope.getStats()
-
-    $scope.getStats = ->
-      Identities.stats(angular.extend({}, $scope.filters, {
-        idType: $scope.idType
-        idValue: $scope.idValue
-      }), (res) ->
-        angular.extend($scope.stats, res)
-        $scope.info.email = $scope.info.email or $scope.stats.email
-      )
-
     $scope.getSentMsgs = (offset) ->
       if !isNaN(offset)
         $scope.filters.sentOffset = offset
-      console.log $scope.sentIndex
       $scope.sentIndex.searchText('', 100, undefined, true).then (res) ->
         msgs = []
         res.forEach (row) ->
@@ -283,6 +261,21 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.filters.receivedOffset = $scope.filters.receivedOffset + received.length
         if received.length < $scope.filters.limit
           $scope.received.finished = true
+
+        $scope.thumbsUp = []
+        $scope.thumbsDown = []
+        sorted = received.sort (a,b) ->
+          return 1 if a.distance > b.distance
+          return -1 if a.distance < b.distance
+          return 0
+        sorted.forEach (msg) ->
+          return if $scope.thumbsUp.length >= 12 and $scope.thumbsDown.length >= 12
+          neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
+          if $scope.thumbsUp.length < 12 and msg.data.rating > neutralRating
+            $scope.thumbsUp.push msg
+          else if $scope.thumbsDown.length < 12 and  msg.rating < neutralRating
+            $scope.thumbsDown.push msg
+
       .catch (error) ->
         $scope.received.finished = true
       if offset == 0
@@ -300,8 +293,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         sentOffset: 0
       $scope.getReceivedMsgs 0
       $scope.getSentMsgs 0
-      if filters.max_distance != undefined
-        $scope.getStats()
 
     $scope.findOne = ->
       $scope.idType = $stateParams.type
@@ -311,40 +302,20 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $state.go 'identities.list', { search: $scope.idValue }
         $scope.tabs[2].active = true
       $scope.setPageTitle $scope.idValue
-      $scope.getIdentityProfile().then ->
+      $scope.getIdentityProfile({ type: $scope.idType, value: $scope.idValue }).then (profile) ->
+        $scope.identityProfile = profile
+        $q.all([
+          $window.merkleBtree.MerkleBTree.getByHash(profile.sent, $scope.ipfsStorage),
+          $window.merkleBtree.MerkleBTree.getByHash(profile.received, $scope.ipfsStorage)
+        ])
+      .then (indexes) ->
+        $scope.sentIndex = indexes[0]
+        $scope.receivedIndex = indexes[1]
         $scope.getConnections()
         $scope.getReceivedMsgs 0
         $scope.getSentMsgs 0
-      if $scope.idType == $scope.filters.viewpoint_name and $scope.idValue == $scope.filters.viewpoint_value
+      if $scope.idType == 'keyID' and $scope.idValue == $scope.nodeInfo.keyID
         $scope.distance = 0
-
-      $scope.thumbsUp = Identities.received(angular.extend({}, $scope.filters, {
-        idType: $scope.idType
-        idValue: $scope.idValue
-        order_by: 'distance'
-        max_distance: 0
-        direction: 'asc'
-        type: 'rating:positive'
-        offset: $scope.filters.receivedOffset
-        limit: 12
-      }), ->
-        $scope.processMessages $scope.thumbsUp, { recipientIsSelf: true }
-        if isNaN(parseInt($scope.distance)) and $scope.thumbsUp.length
-          $scope.distance = $scope.thumbsUp[0].distance + 1
-      )
-
-      $scope.thumbsDown = Identities.received(angular.extend({}, $scope.filters, {
-        idType: $scope.idType
-        idValue: $scope.idValue
-        order_by: 'distance'
-        max_distance: 0
-        direction: 'asc'
-        type: 'rating:negative'
-        offset: $scope.filters.receivedOffset
-        limit: 12
-      }), ->
-        $scope.processMessages $scope.thumbsDown, { recipientIsSelf: true }
-      )
 
     if $state.is 'identities.show'
       $scope.findOne()

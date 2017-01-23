@@ -57,29 +57,29 @@ angular.module('identifiAngular').controller 'MainController', [
       if (title)
         $rootScope.pageTitle += ' - ' + title
 
-    path = $location.absUrl()
-    host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
     $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage()
-    $http.get(host + '/api', { timeout: 2000 }).then (res) ->
-      $scope.nodeInfo = res.data
-      if res.data.keyID
-        $scope.filters.viewpoint_name = 'keyID'
-        $scope.filters.viewpoint_value = res.data.keyID
-        $scope.getIdentityProfile { type: 'keyID', value: res.data.keyID }, (profile) ->
-          $scope.nodeInfo.profile = profile
-    .catch (e) ->
-      console.log host + '/api request failed:', e
+    $q.all([
+      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/identities_by_distance', $scope.ipfsStorage),
+      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/identities_by_searchkey', $scope.ipfsStorage),
+      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/messages_by_timestamp', $scope.ipfsStorage),
+      $http.get('/ipfs/' + 'QmcsWAymWCxu9rujSeFNNHczvuFPqp1vH9VcaqCAR24gif/info')
+    ])
+    .then (results) ->
+      $scope.identitiesByDistance = results[0]
+      $scope.identitiesBySearchKey = results[1]
+      $scope.messageIndex = results[2]
+      $scope.nodeInfo = {}
+      $scope.nodeInfo.profile = $scope.profileFromData(results[3].data, ['keyID', results[3].data.keyID])
     .then ->
-      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/identities_by_distance', $scope.ipfsStorage)
-    .then (index) ->
-      $scope.identitiesByDistance = index
-      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/identities_by_searchkey', $scope.ipfsStorage)
+      path = $location.absUrl()
+      host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
+      $http.get(host + '/api', { timeout: 2000 })
     .then (res) ->
-      $scope.identitiesBySearchKey = res
-      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/messages_by_timestamp', $scope.ipfsStorage)
-    .then (res) ->
-      $scope.messageIndex = res
-    .finally ->
+      $scope.nodeInfo = angular.extend $scope.nodeInfo, res.data
+    .then ->
+      $scope.apiReady = true
+    .catch (e) ->
+      console.log 'initialization failed:', e
       $scope.apiReady = true
 
     $scope.newMessage =
@@ -131,6 +131,28 @@ angular.module('identifiAngular').controller 'MainController', [
       localStorageService.clearAll()
       $state.go('identities.list')
 
+    $scope.msgFilter = (value, index, array) ->
+      data = value.data or value.signedData
+      if $scope.filters.type
+        if $scope.filters.type.match /^rating/
+          if data.type != 'rating'
+            return false
+          neutralRating = (data.maxRating + data.minRating) / 2
+          if $scope.filters.type == 'rating:positive' and data.rating <= neutralRating
+            return false
+          else if $scope.filters.type == 'rating:negative' and data.rating >= neutralRating
+            return false
+          else if $scope.filters.type == 'rating:neutral' and data.rating != neutralRating
+            return false
+        else if data.type != $scope.filters.type
+          return false
+      if $scope.filters.max_distance
+        if $scope.filters.max_distance == 0 and typeof value.distance != 'number'
+          return false
+        else if $scope.filters.max_distance > 0 and value.distance > $scope.filters.max_distance
+          return false
+      return true
+
     $scope.removeFocus = (event) ->
       event.currentTarget.blur()
 
@@ -154,25 +176,40 @@ angular.module('identifiAngular').controller 'MainController', [
         jws: msg.jws
       msg.strData = JSON.stringify(showRawData, undefined, 2)
 
+    $scope.profileFromData = (data, fallbackId) ->
+      if data.attrs and data.attrs.length
+        data.dist = data.attrs[0].dist + 0
+        data.pos = data.attrs[0].pos
+        data.neg = data.attrs[0].neg
+        for k, v of data.attrs
+          switch v.name
+            when 'name'
+              data.name = v.val unless data.name
+            when 'nickname'
+              data.nickname = v.val unless data.nickname
+            when 'email'
+              data.gravatar = CryptoJS.MD5(v.val).toString()
+      data.name = data.nickname if data.nickname and not data.name
+      data.name = fallbackId.value unless data.name
+      data.gravatar = CryptoJS.MD5(fallbackId.value).toString() unless data.gravatar
+      return data
+
     $scope.getIdentityProfile = (id, callback) ->
-      profile = {}
-      Identities.query { idType: id.type, idValue: id.value }, (res) ->
-        if res[0]
-          profile.dist = res[0].dist + 0
-          profile.pos = res[0].pos
-          profile.neg = res[0].neg
-          for k, v of res
-            switch v.name
-              when 'name'
-                profile.name = v.val unless profile.name
-              when 'nickname'
-                profile.nickname = v.val unless profile.nickname
-              when 'email'
-                profile.gravatar = CryptoJS.MD5(v.val).toString()
-        profile.name = profile.nickname if profile.nickname and not profile.name
-        profile.name = id.value unless profile.name
-        profile.gravatar = CryptoJS.MD5(id.value).toString() unless profile.gravatar
-        callback(profile)
+      $scope.identitiesBySearchKey.searchText(
+        encodeURIComponent(id.value) + ':' + encodeURIComponent(id.type)
+        , 2
+      )
+      .then (res) ->
+        if res.length
+          return $http.get('/ipfs/' + res[0].value)
+        else
+          return { data: {} }
+      .then (res) ->
+        profile = $scope.profileFromData(res.data, id)
+        if callback
+          return callback(profile)
+        else
+          return profile
 
     $scope.openMessage = (event, message, size) ->
       t = event.target

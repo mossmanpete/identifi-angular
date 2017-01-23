@@ -9,9 +9,6 @@ angular.module('identifiAngular')
       receivedOffset: 0
       sentOffset: 0
       max_distance: 0
-    fallbackViewpoint:
-      viewpoint_name: 'keyID'
-      viewpoint_value: '/pbxjXjwEsojbSfdM3wGWfE24F4fX3GasmoHXY3yYPM='
     uniqueAttributeTypes: [
       'email',
       'url',
