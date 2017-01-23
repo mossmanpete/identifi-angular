@@ -59,7 +59,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     path = $location.absUrl()
     host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
-    storage = new $window.merkleBtree.IPFSGatewayStorage()
+    $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage()
     $http.get(host + '/api', { timeout: 2000 }).then (res) ->
       $scope.nodeInfo = res.data
       if res.data.keyID
@@ -70,13 +70,13 @@ angular.module('identifiAngular').controller 'MainController', [
     .catch (e) ->
       console.log host + '/api request failed:', e
     .then ->
-      $window.merkleBtree.MerkleBTree.getByHash('QmfK1JUBfeBLAs9KxBFXqscMwEY5YrR3VLEYPkMsqCbmNA/identities_by_distance', storage)
+      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/identities_by_distance', $scope.ipfsStorage)
     .then (index) ->
       $scope.identitiesByDistance = index
-      $window.merkleBtree.MerkleBTree.getByHash('QmfK1JUBfeBLAs9KxBFXqscMwEY5YrR3VLEYPkMsqCbmNA/identities_by_searchkey', storage)
+      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/identities_by_searchkey', $scope.ipfsStorage)
     .then (res) ->
       $scope.identitiesBySearchKey = res
-      $window.merkleBtree.MerkleBTree.getByHash('QmUPWgqs6iE14Hiethdu9XmodAb7hqspA9se1o53eXnmev/messages_by_timestamp', storage)
+      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/messages_by_timestamp', $scope.ipfsStorage)
     .then (res) ->
       $scope.messageIndex = res
     .finally ->

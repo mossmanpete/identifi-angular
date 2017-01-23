@@ -22,7 +22,7 @@
             <a href="" ng-class="{ active: activeTab == 1 }" ng-click="activateTab(1)"><span class="hidden-xs">Sent </span>({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative}})</a>
           </li>
           <li>
-            <a href="" ng-class="{ active: activeTab == 2 }" ng-click="activateTab(2)"><span class="hidden-xs">Identity </span>(<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved">0</span>)</a>
+            <a href="" ng-class="{ active: activeTab == 2 }" ng-click="activateTab(2)"><span class="hidden-xs">Identity </span>(<span ng-bind="connections.length"></span>)</a>
           </li>
         </ul>
       </div>
