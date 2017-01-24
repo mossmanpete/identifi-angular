@@ -200,7 +200,7 @@
                 </div>
               </div>
 
-              <div infinite-scroll="getReceivedMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!received.$resolved || received.finished || activeTab != 0">
+              <div infinite-scroll="getReceivedMsgs()" infinite-scroll-listen-for-event="msgScrollCheck" infinite-scroll-distance="2" infinite-scroll-disabled="!receivedIndex || received.loading || received.finished || activeTab != 0">
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
@@ -216,12 +216,12 @@
                 </div>
                 <message msg-data="msg" page-info="info" ng-repeat="msg in received | filter:msgFilter" ng-click="openMessage($event, msg, 'lg')"></message>
               </div>
-              <div ng-if="received.$resolved && received.length == 0" class="alert alert-info text-center">No messages to show</div>
-              <div ng-if="!received.$resolved" style="position:relative;padding:20px" us-spinner></div>
+              <div ng-if="!received.loading && received.length == 0" class="alert alert-info text-center">No messages to show</div>
+              <div ng-if="received.loading" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
             <uib-tab ng-if="isUniqueType">
               <uib-tab-heading>Sent ({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative}})</uib-tab-heading>
-              <div infinite-scroll="getSentMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="!sent.$resolved || sent.finished || activeTab != 1">
+              <div infinite-scroll="getSentMsgs()" infinite-scroll-listen-for-event="msgScrollCheck" infinite-scroll-distance="2" infinite-scroll-disabled="!sentIndex || sent.loading || sent.finished || activeTab != 1">
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
@@ -237,8 +237,8 @@
                 </div>
                 <message msg-data="msg" page-info="info" ng-repeat="msg in sent | filter:msgFilter" ng-click="openMessage($event, msg, 'lg')"></message>
               </div>
-              <div ng-if="sent.$resolved && sent.length == 0" class="alert alert-info text-center">No messages to show</div>
-              <div ng-if="!sent.$resolved" style="position:relative;padding:20px" us-spinner></div>
+              <div ng-if="!sent.loading && sent.length == 0" class="alert alert-info text-center">No messages to show</div>
+              <div ng-if="sent.loading" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
             <uib-tab ng-if="true">
                 <uib-tab-heading>Id<span class="hidden-xs">entity</span> (<span ng-show="connections.$resolved && connections.length > 0" ng-bind="connections.length - 1"></span><span ng-hide="connections.$resolved"></span>)</uib-tab-heading>

@@ -19,9 +19,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
       loading: false
       finished: false
       list: []
-    angular.extend $scope.filters,
-      type: 'rating'
-      offset: 0
+    $scope.filters.type = 'rating'
 
     $scope.iconCount = (rating) ->
       new Array(Math.max(1, Math.abs(rating)))
@@ -44,60 +42,34 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.collapseFilters = $window.innerWidth < 992
 
-    $scope.find = (offset) ->
+    $scope.find = ->
       return if $scope.msgs.loading
+      $scope.msgs = $scope.msgs || []
       $scope.msgs.loading = true
-      if !isNaN(offset)
-        $scope.filters.offset = offset
-      params = angular.extend({}, $scope.filters, {
-        idType: $scope.idType
-        idValue: $scope.idValue
-        limit: 50
-      }, if $scope.filters.max_distance == -1 then { viewpoint_name: null, viewpoint_value: null })
-      p = null
-      if params.idType and params.idValue
-        # Get from API for now
-        p = Messages.query(params).$promise
-      else
-        # Get latest messages from ipfs index
-        searchKey = ''
-        if $scope.msgs.list.length
-          searchKey = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
-        p = $scope.messageIndex.searchText('', params.limit, searchKey, true)
-        .then (res) ->
-          values = []
-          for pair in res
-            if pair.value
-              v = pair.value
-              v.searchKey = pair.key
-              values.push(v)
-          return values
-
+      # Get latest messages from ipfs index
+      searchKey = ''
+      if $scope.msgs.list.length
+        searchKey = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
+      p = $scope.messageIndex.searchText('', $scope.filters.limit, searchKey, true)
+      .then (res) ->
+        messages = []
+        for pair in res
+          if pair.value
+            v = pair.value
+            v.searchKey = pair.key
+            messages.push(v)
+        return messages
       p.then (messages) ->
         $scope.processMessages messages
-        if $scope.filters.offset == 0
-          $scope.msgs.list = messages
-        else
-          for key of messages
-            if isNaN(key)
-              continue
-            $scope.msgs.list.push messages[key]
-        $scope.filters.offset = $scope.filters.offset + (messages.length or 0)
+        Array.prototype.push.apply($scope.msgs.list, messages)
         if messages.length < $scope.filters.limit - 1 # bug
           $scope.$apply -> $scope.msgs.finished = true
         $scope.$apply -> $scope.msgs.loading = false
-      if offset == 0
-        $scope.msgs.list = []
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
-      angular.extend $scope.filters,
-        offset: 0
-        receivedOffset: 0
-        sentOffset: 0
       $scope.msgs.list = []
       $scope.msgs.finished = false
-      $scope.find 0
       $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
     # Find existing Message

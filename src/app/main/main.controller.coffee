@@ -49,7 +49,7 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.query.term = ''
     $scope.previousSearchKey = ''
     $scope.ids = { list: [] }
-
+    console.log 'init MainController'
     $scope.phoneRegex = /^\+?\d+$/
 
     $scope.setPageTitle = (title) ->
@@ -58,11 +58,12 @@ angular.module('identifiAngular').controller 'MainController', [
         $rootScope.pageTitle += ' - ' + title
 
     $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage()
+    indexPath = 'QmSCZRC2utV2qqxe72QXJ4wHSm6x5xHa4SbDwb4q754iud'
     $q.all([
-      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/identities_by_distance', $scope.ipfsStorage),
-      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/identities_by_searchkey', $scope.ipfsStorage),
-      $window.merkleBtree.MerkleBTree.getByHash('QmaYfz59DSqa8G4ygXRdkeeMBAWKyDjXFKkNoNtLJPjHTi/messages_by_timestamp', $scope.ipfsStorage),
-      $http.get('/ipfs/' + 'QmcsWAymWCxu9rujSeFNNHczvuFPqp1vH9VcaqCAR24gif/info')
+      $window.merkleBtree.MerkleBTree.getByHash(indexPath + '/identities_by_distance', $scope.ipfsStorage),
+      $window.merkleBtree.MerkleBTree.getByHash(indexPath + '/identities_by_searchkey', $scope.ipfsStorage),
+      $window.merkleBtree.MerkleBTree.getByHash(indexPath + '/messages_by_timestamp', $scope.ipfsStorage),
+      $http.get('/ipfs/' + indexPath + '/info')
     ])
     .then (results) ->
       $scope.identitiesByDistance = results[0]
@@ -163,7 +164,6 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.search()
       else
         $scope.query.term = ''
-        $scope.filters.offset = 0
         $scope.ids.list = []
         $scope.ids.finished = false
         $state.go 'identities.list'
@@ -195,10 +195,7 @@ angular.module('identifiAngular').controller 'MainController', [
       return data
 
     $scope.getIdentityProfile = (id, callback) ->
-      $scope.identitiesBySearchKey.searchText(
-        encodeURIComponent(id.value) + ':' + encodeURIComponent(id.type)
-        , 2
-      )
+      $scope.identitiesBySearchKey.searchText(encodeURIComponent(id.value) + ':' + encodeURIComponent(id.type), 2)
       .then (res) ->
         if res.length
           return $http.get('/ipfs/' + res[0].value)
@@ -221,7 +218,6 @@ angular.module('identifiAngular').controller 'MainController', [
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/messages/show.modal.html'
-        controller: 'MainController'
         size: size
         scope: $scope
       )
@@ -353,7 +349,6 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.identitiesByHash = {}
       searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
       if searchKey != $scope.previousSearchKey
-        $scope.filters.offset = 0
         $scope.ids.list = []
         $scope.ids.finished = false
         $scope.identitiesByHash = {}
@@ -368,7 +363,7 @@ angular.module('identifiAngular').controller 'MainController', [
       else
         q = $scope.identitiesByDistance.searchText(searchKey, limit, cursor)
       q = q.then (identities) ->
-        if !$scope.ids.list or $scope.filters.offset is 0
+        if !$scope.ids.list
           $scope.ids.list = []
         queries = []
         angular.forEach identities, (row) ->
@@ -420,7 +415,6 @@ angular.module('identifiAngular').controller 'MainController', [
           queries.push p
         if identities.length > 0
           $scope.ids.activeKey = 0
-        $scope.filters.offset = $scope.filters.offset + identities.length
         if identities.length < limit
           $scope.ids.finished = true
         return $q.all(queries)

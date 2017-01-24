@@ -9,17 +9,18 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   '$location'
   '$http'
   '$q'
+  '$timeout'
   # 'Authentication'
   'Identities'
   'config'
-  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, Identities, config) -> #, Authentication
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, Identities, config) -> #, Authentication
     $scope.activeTab = 0
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.info = {}
     $scope.stats = {}
     $scope.sent = []
-    $scope.connections = []
     $scope.received = []
+    $scope.connections = []
     $scope.thumbsUp = []
     $scope.thumbsDown = []
     $scope.distance = null
@@ -27,12 +28,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.newAttribute =
       type: ''
       value: $stateParams.value
-    angular.extend $scope.filters,
-      receivedOffset: 0
-      sentOffset: 0
-      offset: 0
-      type: null
-
+    $scope.filters.type = null
     $scope.collapseLevel = {}
     $scope.collapseFilters = $window.innerWidth < 992
     $scope.slider =
@@ -181,10 +177,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           else
             conn.rowClass = 'danger'
         $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
-
-      $scope.connections = connections
-      $scope.getPhotosFromGravatar()
-      $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
+      $scope.$apply ->
+        $scope.connections = connections
+        $scope.getPhotosFromGravatar()
+        $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
 
       $scope.connectionClicked = (event, id) ->
         if id.connecting_msgs
@@ -214,72 +210,62 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             id.collapse = !id.collapse
           )
 
-    $scope.getSentMsgs = (offset) ->
-      if !isNaN(offset)
-        $scope.filters.sentOffset = offset
-      $scope.sentIndex.searchText('', 100, undefined, true).then (res) ->
+    $scope.getSentMsgs = ->
+      return if $scope.sent.loading
+      $scope.sent.loading = true
+      searchKey = ''
+      if $scope.sent.length
+        searchKey = $scope.sent[$scope.sent.length - 1].searchKey
+      $scope.sentIndex.searchText('', $scope.filters.limit, searchKey, true).then (res) ->
         msgs = []
         res.forEach (row) ->
-          msgs.push row.value
+          v = row.value
+          v.searchKey = row.key
+          msgs.push v
         return msgs
       .then (sent) ->
         $scope.processMessages sent, { recipientIsSelf: false }
-        if $scope.filters.sentOffset == 0
-          $scope.sent = sent
-        else
-          for key of sent
-            if isNaN(key)
-              continue
-            $scope.sent.push sent[key]
-        $scope.sent.$resolved = sent.$resolved
-        $scope.filters.sentOffset = $scope.filters.sentOffset + sent.length
-        if sent.length < $scope.filters.limit
-          $scope.sent.finished = true
+        $scope.$apply ->
+          Array.prototype.push.apply($scope.sent, sent)
+          $scope.sent.loading = false
+          if sent.length < $scope.filters.limit - 1
+            $scope.sent.finished = true
       .catch (error) ->
         $scope.sent.finished = true
-      if offset == 0
-        $scope.sent = []
 
-    $scope.getReceivedMsgs = (offset) ->
-      if !isNaN(offset)
-        $scope.filters.receivedOffset = offset
-      $scope.receivedIndex.searchText('', 100, undefined, true).then (res) ->
+    $scope.getReceivedMsgs = ->
+      return if $scope.received.loading
+      $scope.received.loading = true
+      searchKey = ''
+      if $scope.received.length
+        searchKey = $scope.received[$scope.received.length - 1].searchKey
+      $scope.receivedIndex.searchText('', $scope.filters.limit, searchKey, true).then (res) ->
         msgs = []
         res.forEach (row) ->
-          msgs.push row.value
+          v = row.value
+          v.searchKey = row.key
+          msgs.push v
         return msgs
       .then (received) ->
         $scope.processMessages received, { recipientIsSelf: true }
-        if $scope.filters.receivedOffset == 0
-          $scope.received = received
-        else
-          for key of received
-            if isNaN(key)
-              continue
-            $scope.received.push received[key]
-        $scope.received.$resolved = received.$resolved
-        $scope.filters.receivedOffset = $scope.filters.receivedOffset + received.length
-        if received.length < $scope.filters.limit
-          $scope.received.finished = true
-
-        $scope.thumbsUp = []
-        $scope.thumbsDown = []
-        sorted = received.sort (a,b) ->
-          return 1 if a.distance > b.distance
-          return -1 if a.distance < b.distance
-          return 0
-        sorted.forEach (msg) ->
-          return if $scope.thumbsUp.length >= 12 and $scope.thumbsDown.length >= 12
-          neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
-          if $scope.thumbsUp.length < 12 and msg.data.rating > neutralRating
-            $scope.thumbsUp.push msg
-          else if $scope.thumbsDown.length < 12 and  msg.rating < neutralRating
-            $scope.thumbsDown.push msg
-
+        $scope.$apply ->
+          Array.prototype.push.apply($scope.received, received)
+          $scope.received.loading = false
+          if received.length < $scope.filters.limit - 1
+            $scope.received.finished = true
+          sorted = received.sort (a,b) ->
+            return 1 if a.distance > b.distance
+            return -1 if a.distance < b.distance
+            return 0
+          sorted.forEach (msg) ->
+            return if $scope.thumbsUp.length >= 12 and $scope.thumbsDown.length >= 12
+            neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
+            if $scope.thumbsUp.length < 12 and msg.data.rating > neutralRating
+              $scope.thumbsUp.push msg
+            else if $scope.thumbsDown.length < 12 and  msg.rating < neutralRating
+              $scope.thumbsDown.push msg
       .catch (error) ->
         $scope.received.finished = true
-      if offset == 0
-        $scope.received = []
 
     $scope.getPhotosFromGravatar = ->
       email = $scope.info.email or $scope.idValue
@@ -287,12 +273,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
-      angular.extend $scope.filters,
-        offset: 0
-        receivedOffset: 0
-        sentOffset: 0
-      $scope.getReceivedMsgs 0
-      $scope.getSentMsgs 0
+      $scope.sent = []
+      $scope.received = []
+      $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
     $scope.findOne = ->
       $scope.idType = $stateParams.type
@@ -304,6 +287,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.setPageTitle $scope.idValue
       $scope.getIdentityProfile({ type: $scope.idType, value: $scope.idValue }).then (profile) ->
         $scope.identityProfile = profile
+        $scope.getConnections()
+        if !(profile.sent and profile.received)
+          throw new Error('missing sent or received index: ' + JSON.stringify(profile))
         $q.all([
           $window.merkleBtree.MerkleBTree.getByHash(profile.sent, $scope.ipfsStorage),
           $window.merkleBtree.MerkleBTree.getByHash(profile.received, $scope.ipfsStorage)
@@ -311,9 +297,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       .then (indexes) ->
         $scope.sentIndex = indexes[0]
         $scope.receivedIndex = indexes[1]
-        $scope.getConnections()
         $scope.getReceivedMsgs 0
         $scope.getSentMsgs 0
+      .catch (err) ->
+        console.log 'error fetching profile', err
       if $scope.idType == 'keyID' and $scope.idValue == $scope.nodeInfo.keyID
         $scope.distance = 0
 
