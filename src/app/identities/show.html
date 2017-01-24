@@ -16,10 +16,10 @@
       <div class="col-md-9 col-md-offset-3">
         <ul class="list-inline tab-list">
           <li ng-if="isUniqueType">
-            <a href="" ng-class="{ active: activeTab == 0 }" ng-click="activateTab(0)"><span class="hidden-xs">Received </span>({{0+stats.received_positive+stats.received_neutral+stats.received_negative}})</a>
+            <a href="" ng-class="{ active: activeTab == 0 }" ng-click="activateTab(0)"><span class="hidden-xs">Received </span>({{0+stats.received_positive+stats.received_neutral+stats.received_negative || received.length}})</a>
           </li>
           <li ng-if="isUniqueType">
-            <a href="" ng-class="{ active: activeTab == 1 }" ng-click="activateTab(1)"><span class="hidden-xs">Sent </span>({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative}})</a>
+            <a href="" ng-class="{ active: activeTab == 1 }" ng-click="activateTab(1)"><span class="hidden-xs">Sent </span>({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative || sent.length}})</a>
           </li>
           <li>
             <a href="" ng-class="{ active: activeTab == 2 }" ng-click="activateTab(2)"><span class="hidden-xs">Identity </span>(<span ng-bind="connections.length"></span>)</a>
@@ -90,7 +90,7 @@
                     <span ng-if="!(stats.received_positive || stats.received_negative)">
                       &mdash;
                     </span>
-                  </b><br>
+                  </b><span ng-if="stats.sent_positive || stats.sent_negative"><br>
                   Sent:
                   <span ng-if="stats.sent_positive || stats.sent_negative">
                     <span ng-bind="stats.sent_positive / (stats.sent_positive+stats.sent_neutral+stats.sent_negative) * 100 | number:0">
@@ -98,7 +98,7 @@
                   </span>
                   <span ng-if="!(stats.sent_positive || stats.sent_negative )">
                     &mdash;
-                  </span>
+                  </span></span>
                 </p>
                 <!--
                 <p class="received-stats">
