@@ -57,12 +57,12 @@ angular.module('identifiAngular').controller 'MainController', [
         $rootScope.pageTitle += ' - ' + title
 
     $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage()
-    indexPath = 'QmSCZRC2utV2qqxe72QXJ4wHSm6x5xHa4SbDwb4q754iud'
+    indexPath = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
     $q.all([
       $window.merkleBtree.MerkleBTree.getByHash(indexPath + '/identities_by_distance', $scope.ipfsStorage),
       $window.merkleBtree.MerkleBTree.getByHash(indexPath + '/identities_by_searchkey', $scope.ipfsStorage),
       $window.merkleBtree.MerkleBTree.getByHash(indexPath + '/messages_by_timestamp', $scope.ipfsStorage),
-      $http.get('/ipfs/' + indexPath + '/info')
+      $http.get(indexPath + '/info')
     ])
     .then (results) ->
       $scope.identitiesByDistance = results[0]

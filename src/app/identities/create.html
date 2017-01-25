@@ -1,7 +1,7 @@
 <div ng-init="newEntry = {}" class="container mar-bot30" ng-controller="IdentitiesController">
   <div class="row">
     <div class="col-xs-12 col-sm-8 col-sm-offset-2">
-      <h3>Add entry</h3>
+      <h3>Add public entry</h3>
       <div class="panel panel-danger" ng-if="error">
         <div class="panel-heading" ng-bind="error"></div>
       </div>
@@ -38,7 +38,7 @@
         </div>
         <button class="btn btn-primary"
         ng-disabled="!(authentication.user || !nodeInfo.loginOptions.length) || !(newEntry.email || newEntry.url || newEntry.phone) || (addEntryForm.idName.$invalid || addEntryForm.idEmail.$invalid || addEntryForm.idPhone.$invalid || addEntryForm.idUrl.$invalid)">
-          Add entry</button>
+          Add public entry</button>
         <p class="help-block">More details can be added afterwards.</p>
       </form>
     </div>
