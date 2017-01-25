@@ -5,7 +5,6 @@ angular.module('identifiAngular').controller 'MainController', [
   '$location'
   '$http'
   '$state'
-  'Identities',
   'config',
   'localStorageService'
   '$uibModal'
@@ -15,7 +14,7 @@ angular.module('identifiAngular').controller 'MainController', [
   #'Authentication'
   #'Menus'
   #'Persona'
-  ($scope, $rootScope, $location, $http, $state, Identities, config,
+  ($scope, $rootScope, $location, $http, $state, config,
   localStorageService, $uibModal, $window, $q) -> # Authentication, Menus, Persona
     ###
     Persona.watch

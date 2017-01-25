@@ -11,9 +11,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   '$q'
   '$timeout'
   # 'Authentication'
-  'Identities'
   'config'
-  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, Identities, config) -> #, Authentication
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, config) -> #, Authentication
     $scope.activeTab = 0
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.info = {}
@@ -23,6 +22,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.connections = []
     $scope.thumbsUp = []
     $scope.thumbsDown = []
+    $scope.verifications = []
     $scope.distance = null
     $scope.query.term = $stateParams.search if $stateParams.search
     $scope.newAttribute =
@@ -182,33 +182,36 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.getPhotosFromGravatar()
         $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
 
-      $scope.connectionClicked = (event, id) ->
-        if id.connecting_msgs
-          id.collapse = !id.collapse
+    $scope.getConnectingMsgs = (id1, id2) ->
+      getVerifications = $q (resolve) ->
+        if !$scope.verifications.length
+          $scope.receivedIndex.searchText('', 10000, false, true).then (res) ->
+            res.forEach (row) ->
+              msg = row.value
+              unless msg.signedData
+                msg.signedData = KJUR.jws.JWS.parse(msg.jws).payloadObj
+              if (msg.signedData.type in ['verify_identity', 'unverify_identity'])
+                msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.signedData.author[0][1]).toString()
+                msg.linkToAuthor = msg.signedData.author[0]
+                $scope.verifications.push msg
+            resolve()
         else
-          id.connecting_msgs = Identities.connecting_msgs(angular.extend({
-            idType: $scope.idType
-            idValue: $scope.idValue
-            target_name: id.name
-            target_value: id.val
-          }, $scope.filters), ->
-            for key of id.connecting_msgs
-              if isNaN(key)
-                i++
-                continue
-              msg = id.connecting_msgs[key]
-              msg.data = KJUR.jws.JWS.parse(msg.jws).payloadObj
-              msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.data.author[0][1]).toString()
-              msg.linkToAuthor = msg.data.author[0]
-              i = undefined
-              i = 0
-              while i < msg.data.author.length
-                if true # ApplicationConfiguration.uniqueAttributeTypes.indexOf(msg.data.author[i][0] > -1)
-                  msg.linkToAuthor = msg.data.author[i]
-                  break
-                i++
-            id.collapse = !id.collapse
-          )
+          resolve()
+      getVerifications.then ->
+        msgs = []
+        $scope.verifications.forEach (msg) ->
+          hasId1 = hasId2 = false
+          for id in msg.signedData.recipient
+            return msgs.push msg if id[0] == id2.name and id[1] == id2.val
+        return msgs
+
+    $scope.connectionClicked = (event, id) ->
+      if id.connecting_msgs
+        id.collapse = !id.collapse
+      else
+        $scope.getConnectingMsgs([$scope.idType, $scope.idValue], id).then (msgs) ->
+          id.connecting_msgs = msgs
+          id.collapse = !id.collapse
 
     $scope.getSentMsgs = ->
       return if $scope.sent.loading
