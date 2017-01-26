@@ -37,7 +37,8 @@ function browserSyncInit(baseDir, browser) {
    */
   var apiProxy = proxyMiddleware('/api', {target: IDENTIFI_API_URL, changeOrigin: true});
   var ipfsProxy = proxyMiddleware('/ipfs', {target: IPFS_GATEWAY_URL, changeOrigin: true});
-  server.middleware = [apiProxy, ipfsProxy];
+  var ipnsProxy = proxyMiddleware('/ipns', {target: IPFS_GATEWAY_URL, changeOrigin: true});
+  server.middleware = [apiProxy, ipfsProxy, ipnsProxy];
 
   browserSync.instance = browserSync.init({
     startPath: '/',

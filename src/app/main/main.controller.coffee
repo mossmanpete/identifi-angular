@@ -48,7 +48,6 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.query.term = ''
     $scope.previousSearchKey = ''
     $scope.ids = { list: [] }
-    console.log 'init MainController'
     $scope.phoneRegex = /^\+?\d+$/
 
     $scope.setPageTitle = (title) ->
@@ -57,25 +56,36 @@ angular.module('identifiAngular').controller 'MainController', [
         $rootScope.pageTitle += ' - ' + title
 
     $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage()
-    indexPath = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
-    $q.all([
-      $window.merkleBtree.MerkleBTree.getByHash(indexPath + '/identities_by_distance', $scope.ipfsStorage),
-      $window.merkleBtree.MerkleBTree.getByHash(indexPath + '/identities_by_searchkey', $scope.ipfsStorage),
-      $window.merkleBtree.MerkleBTree.getByHash(indexPath + '/messages_by_timestamp', $scope.ipfsStorage),
-      $http.get(indexPath + '/info')
-    ])
-    .then (results) ->
-      $scope.identitiesByDistance = results[0]
-      $scope.identitiesBySearchKey = results[1]
-      $scope.messageIndex = results[2]
-      $scope.nodeInfo = {}
-      $scope.nodeInfo.profile = $scope.profileFromData(results[3].data, ['keyID', results[3].data.keyID])
-    .then ->
-      path = $location.absUrl()
-      host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
-      $http.get(host + '/api', { timeout: 2000 })
-    .then (res) ->
-      $scope.nodeInfo = angular.extend $scope.nodeInfo, res.data
+
+    $scope.getIpfsIndexes = (indexRoot, fallbackIndexRoot) ->
+      getBtreeOrFallback = (url, fallbackUrl) ->
+        $window.merkleBtree.MerkleBTree.getByHash(url, $scope.ipfsStorage).catch ->
+          console.log 'Failed to fetch index', url, ', reverting to', fallbackUrl
+          $window.merkleBtree.MerkleBTree.getByHash(fallbackUrl, $scope.ipfsStorage)
+
+      console.log 'Getting Identifi index from IPFS:', indexRoot
+      $q.all([
+        getBtreeOrFallback(indexRoot + '/identities_by_distance', fallbackIndexRoot + '/identities_by_distance'),
+        getBtreeOrFallback(indexRoot + '/identities_by_searchkey', fallbackIndexRoot + '/identities_by_searchkey'),
+        getBtreeOrFallback(indexRoot + '/messages_by_timestamp', fallbackIndexRoot + '/messages_by_timestamp'),
+        $http.get(indexRoot + '/info').catch ->
+          console.log 'Failed to fetch index', indexRoot + '/info,', 'reverting to', fallbackIndexRoot + '/info'
+          $http.get(fallbackIndexRoot + '/info')
+      ])
+      .then (results) ->
+        $scope.identitiesByDistance = results[0]
+        $scope.identitiesBySearchKey = results[1]
+        $scope.messageIndex = results[2]
+        $scope.nodeInfo = {}
+        $scope.nodeInfo.profile = $scope.profileFromData(results[3].data, ['keyID', results[3].data.keyID])
+      .then ->
+        path = $location.absUrl()
+        host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
+        $http.get(host + '/api', { timeout: 2000 })
+      .then (res) ->
+        $scope.nodeInfo = angular.extend $scope.nodeInfo, res.data
+
+    $scope.getIpfsIndexes '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs', '/ipfs/QmUWZkgRzVzYkyDXZjktdUZ2hc1NoBuRjyq2tASoGsaCEc'
     .then ->
       $scope.apiReady = true
     .catch (e) ->
@@ -113,6 +123,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.$root.$broadcast 'MessageAdded',
           message: response.data
           id: id
+        $scope.getIpfsIndexes '/ipfs/' + response.data.ipfsIndexRoot if response.data.ipfsIndexRoot
         return
       ), (errorResponse) ->
         $scope.error = errorResponse.data || JSON.stringify(errorResponse)
