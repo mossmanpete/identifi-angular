@@ -3,9 +3,9 @@
 Angular app that connects to the Identifi API. Runs at https://identi.fi.
 
 IPFS urls:
-https://ipfs.io/ipns/identi.fi/
-https://ipfs.io/ipns/QmaiM39ABfBEkb1ajyZ9ebfJXYgfyDNNbUaVZSwezwwoDQ/
-https://ipfs.io/ipfs/QmcheUeXxtHHRBsENxaJ8edcvh7skhtbRTHqWzGXKwXBmJ/
+* https://ipfs.io/ipns/identi.fi/
+* https://ipfs.io/ipns/QmaiM39ABfBEkb1ajyZ9ebfJXYgfyDNNbUaVZSwezwwoDQ/
+* https://ipfs.io/ipfs/QmcheUeXxtHHRBsENxaJ8edcvh7skhtbRTHqWzGXKwXBmJ/
 
 ## Development
 ```
