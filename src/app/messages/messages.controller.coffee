@@ -82,8 +82,10 @@ angular.module('identifiAngular').controller 'MessagesController', [
           $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
           $scope.message.recipientGravatar = CryptoJS.MD5($scope.message.recipientEmail or $scope.message.data.recipient[0][1]).toString()
           $scope.message.hash = hash
-          $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signer_keyid }, (profile) ->
-            $scope.verifiedBy = profile
+          $scope.$watch 'apiReady', (isReady) ->
+            if isReady
+              $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signer_keyid }, (profile) ->
+                $scope.verifiedBy = profile
 
         getMessageFromApi = ->
           $scope.message = Messages.get

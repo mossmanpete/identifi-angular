@@ -288,22 +288,24 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $state.go 'identities.list', { search: $scope.idValue }
         $scope.tabs[2].active = true
       $scope.setPageTitle $scope.idValue
-      $scope.getIdentityProfile({ type: $scope.idType, value: $scope.idValue }).then (profile) ->
-        $scope.identityProfile = profile
-        $scope.getConnections()
-        if !(profile.sent and profile.received)
-          throw new Error('missing sent or received index: ' + JSON.stringify(profile))
-        $q.all([
-          $window.merkleBtree.MerkleBTree.getByHash(profile.sent, $scope.ipfsStorage),
-          $window.merkleBtree.MerkleBTree.getByHash(profile.received, $scope.ipfsStorage)
-        ])
-      .then (indexes) ->
-        $scope.sentIndex = indexes[0]
-        $scope.receivedIndex = indexes[1]
-        $scope.getReceivedMsgs 0
-        $scope.getSentMsgs 0
-      .catch (err) ->
-        console.log 'error fetching profile', err
+      $scope.$watch 'apiReady', (isReady) ->
+        if isReady
+          $scope.getIdentityProfile({ type: $scope.idType, value: $scope.idValue }).then (profile) ->
+            $scope.identityProfile = profile
+            $scope.getConnections()
+            if !(profile.sent and profile.received)
+              throw new Error('missing sent or received index: ' + JSON.stringify(profile))
+            $q.all([
+              $window.merkleBtree.MerkleBTree.getByHash(profile.sent, $scope.ipfsStorage),
+              $window.merkleBtree.MerkleBTree.getByHash(profile.received, $scope.ipfsStorage)
+            ])
+          .then (indexes) ->
+            $scope.sentIndex = indexes[0]
+            $scope.receivedIndex = indexes[1]
+            $scope.getReceivedMsgs 0
+            $scope.getSentMsgs 0
+          .catch (err) ->
+            console.log 'error fetching profile', err
       if $scope.idType == 'keyID' and $scope.idValue == $scope.nodeInfo.keyID
         $scope.distance = 0
 
