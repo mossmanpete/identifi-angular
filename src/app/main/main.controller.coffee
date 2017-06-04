@@ -261,7 +261,7 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.toggleCollapsibleMenu = ->
       $scope.isCollapsed = !$scope.isCollapsed
 
-    $scope.processMessages = (messages, msgOptions) ->
+    $scope.processMessages = (messages, msgOptions, verifySignature) ->
       processMessage = (msg) ->
         parsedJws = KJUR.jws.JWS.parse(msg.jws)
         msg.data = parsedJws.payloadObj
@@ -269,6 +269,10 @@ angular.module('identifiAngular').controller 'MainController', [
         unless msg.signer_keyid
           keyHash = CryptoJS.SHA256(parsedJws.headerObj.kid)
           msg.signer_keyid = CryptoJS.enc.Base64.stringify(keyHash)
+
+        if verifySignature and not KJUR.jws.JWS.verify(msg.jws, parsedJws.headerObj.kid, ['ES256'])
+          console.error 'Invalid signature for msg', msg
+          return
 
         msg.gravatar = CryptoJS.MD5(msg.author_email || msg.data.author[0][1]).toString()
         msg.linkToAuthor = msg.data.author[0]

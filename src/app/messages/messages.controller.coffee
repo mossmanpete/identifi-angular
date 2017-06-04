@@ -76,7 +76,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.findOne = ->
       if $stateParams.id
         processResponse = ->
-          $scope.processMessages([$scope.message])
+          $scope.processMessages([$scope.message], {}, true)
           $scope.setPageTitle 'Message ' + hash
           $scope.setMsgRawData($scope.message)
           $scope.message.authorGravatar = CryptoJS.MD5($scope.message.authorEmail or $scope.message.data.author[0][1]).toString()
