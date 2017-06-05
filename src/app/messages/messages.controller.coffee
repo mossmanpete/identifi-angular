@@ -9,10 +9,9 @@ angular.module('identifiAngular').controller 'MessagesController', [
   '$http'
   # 'Authentication'
   'Messages'
-  'Identities'
   'config'
   '$timeout'
-  ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, Identities, config, $timeout) -> #, Authentication
+  ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, config, $timeout) -> #, Authentication
     $scope.idType = $stateParams.type
     $scope.idValue = $stateParams.value
     $scope.msgs =

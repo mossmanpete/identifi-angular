@@ -270,9 +270,11 @@ angular.module('identifiAngular').controller 'MainController', [
           keyHash = CryptoJS.SHA256(parsedJws.headerObj.kid)
           msg.signer_keyid = CryptoJS.enc.Base64.stringify(keyHash)
 
-        if verifySignature and not KJUR.jws.JWS.verify(msg.jws, parsedJws.headerObj.kid, ['ES256'])
-          console.error 'Invalid signature for msg', msg
-          return
+        if verifySignature
+          pubKey = KEYUTIL.getKey(parsedJws.headerObj.kid)
+          unless KJUR.jws.JWS.verify(msg.jws, pubKey, ['ES256'])
+            console.error 'Invalid signature for msg', msg # TODO: should hide the message
+            return
 
         msg.gravatar = CryptoJS.MD5(msg.author_email || msg.data.author[0][1]).toString()
         msg.linkToAuthor = msg.data.author[0]
