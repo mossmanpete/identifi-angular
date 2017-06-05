@@ -205,7 +205,7 @@ angular.module('identifiAngular').controller 'MainController', [
       return data
 
     $scope.getIdentityProfile = (id, callback) ->
-      $scope.identitiesBySearchKey.searchText(encodeURIComponent(id.value) + ':' + encodeURIComponent(id.type), 2)
+      $scope.identitiesBySearchKey.searchText(encodeURIComponent(id.value) + ':' + encodeURIComponent(id.type), 1)
       .then (res) ->
         if res.length
           return $http.get('/ipfs/' + res[0].value)
@@ -224,7 +224,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.setMsgRawData(message)
       $scope.message = message
       $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signer_keyid }, (profile) ->
-        $scope.verifiedBy = profile
+        $scope.$apply -> $scope.message.verifiedBy = profile
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/messages/show.modal.html'
@@ -270,7 +270,7 @@ angular.module('identifiAngular').controller 'MainController', [
           keyHash = CryptoJS.SHA256(parsedJws.headerObj.kid)
           msg.signer_keyid = CryptoJS.enc.Base64.stringify(keyHash)
 
-        if verifySignature
+        if verifySignature and false
           pubKey = KEYUTIL.getKey(parsedJws.headerObj.kid)
           unless KJUR.jws.JWS.verify(msg.jws, pubKey, ['ES256'])
             console.error 'Invalid signature for msg', msg # TODO: should hide the message

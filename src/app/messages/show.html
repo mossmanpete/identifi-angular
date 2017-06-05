@@ -5,13 +5,13 @@
       <div class="panel-heading">
         Message origin verified by:
         <a ng-if="false" ng-bind="message.signerName||message.signer_keyid" ui-sref="identities.show({type: 'keyID', value: message.signer_keyid })"></a>
-        <strong ng-if="verifiedBy">
+        <strong ng-if="message.verifiedBy">
           <a ui-sref="identities.show({ type: 'keyID', value: message.signer_keyid })" class="id-link">
             <span class="distance-container mar-right5">
-              <identicon id="verifiedBy" class="" border="3" width="35" positive-score="verifiedBy.pos" negative-score="verifiedBy.neg"></identicon>
-              <span ng-if="verifiedBy.dist >= 0" class="distance" ng-bind="verifiedBy.dist | ordinal"></span>
+              <identicon id="message.verifiedBy" class="" border="3" width="35" positive-score="message.verifiedBy.pos" negative-score="message.verifiedBy.neg"></identicon>
+              <span ng-if="message.verifiedBy.dist >= 0" class="distance" ng-bind="message.verifiedBy.dist | ordinal"></span>
             </span>
-            <span ng-bind="verifiedBy.name"></span> <small>{{message.signer_keyid}}</small>
+            <span ng-bind="message.verifiedBy.name"></span> <small>{{message.signer_keyid}}</small>
           </a>
         </strong>
       </div>

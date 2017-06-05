@@ -84,7 +84,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
           $scope.$watch 'apiReady', (isReady) ->
             if isReady
               $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signer_keyid }, (profile) ->
-                $scope.verifiedBy = profile
+                $scope.$apply -> $scope.message.verifiedBy = profile
 
         getMessageFromApi = ->
           $scope.message = Messages.get
