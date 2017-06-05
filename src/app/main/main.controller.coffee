@@ -28,6 +28,8 @@ angular.module('identifiAngular').controller 'MainController', [
 
     # set authentication
     $scope.authentication = {} # Authentication
+    $scope.localMessages = localStorageService.get('localMessages') or []
+    localStorageService.set('localMessages', $scope.localMessages)
     token = $location.search().token
     if token
       jws = KJUR.jws.JWS.parse(token).payloadObj

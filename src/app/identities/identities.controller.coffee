@@ -12,7 +12,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   '$timeout'
   # 'Authentication'
   'config'
-  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, config) -> #, Authentication
+  'localStorageService'
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, config, localStorageService) -> #, Authentication
     $scope.activeTab = 0
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.info = {}
@@ -57,6 +58,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.received.shift()
         $scope.processMessages [args.message]
         $scope.received.unshift args.message
+        $scope.localMessages.unshift args.message
+        localStorageService.set('localMessages', $scope.localMessages)
         messagesAdded = true
 
     $scope.addEntry = (event, entry) ->
