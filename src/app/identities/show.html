@@ -214,7 +214,7 @@
                     </ul>
                   </div>
                 </div>
-                <message msg-data="msg" page-info="info" ng-repeat="msg in received | filter:msgFilter" ng-click="openMessage($event, msg, 'lg')"></message>
+                <message msg-data="msg" page-info="info" ng-repeat="msg in received | filter:msgFilter | orderBy:'-data.timestamp'" ng-click="openMessage($event, msg, 'lg')"></message>
               </div>
               <div ng-if="!received.loading && received.length == 0" class="alert alert-info text-center">No messages to show</div>
               <div ng-if="received.loading" style="position:relative;padding:20px" us-spinner></div>
@@ -235,7 +235,7 @@
                     </ul>
                   </div>
                 </div>
-                <message msg-data="msg" page-info="info" ng-repeat="msg in sent | filter:msgFilter" ng-click="openMessage($event, msg, 'lg')"></message>
+                <message msg-data="msg" page-info="info" ng-repeat="msg in sent | filter:msgFilter | orderBy:'-data.timestamp'" ng-click="openMessage($event, msg, 'lg')"></message>
               </div>
               <div ng-if="!sent.loading && sent.length == 0" class="alert alert-info text-center">No messages to show</div>
               <div ng-if="sent.loading" style="position:relative;padding:20px" us-spinner></div>

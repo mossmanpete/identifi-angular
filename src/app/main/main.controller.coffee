@@ -28,7 +28,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     # set authentication
     $scope.authentication = {} # Authentication
-    $scope.localMessages = localStorageService.get('localMessages') or []
+    $scope.localMessages = localStorageService.get('localMessages') or {}
     localStorageService.set('localMessages', $scope.localMessages)
     token = $location.search().token
     if token

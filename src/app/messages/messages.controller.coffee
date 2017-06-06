@@ -11,14 +11,19 @@ angular.module('identifiAngular').controller 'MessagesController', [
   'Messages'
   'config'
   '$timeout'
-  ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, config, $timeout) -> #, Authentication
+  'localStorageService'
+  ($scope, $rootScope, $window, $stateParams, $location, $http, Messages, config, $timeout, localStorageService) -> #, Authentication
     $scope.idType = $stateParams.type
     $scope.idValue = $stateParams.value
-    $scope.msgs =
-      loading: false
-      finished: false
-      list: []
+
     $scope.filters.type = 'rating'
+
+    $scope.resetMsgs = ->
+      $scope.msgs =
+        loading: false
+        finished: false
+        list: Object.values(localStorageService.get('localMessages')) or []
+    $scope.resetMsgs()
 
     $scope.iconCount = (rating) ->
       new Array(Math.max(1, Math.abs(rating)))
@@ -52,11 +57,16 @@ angular.module('identifiAngular').controller 'MessagesController', [
       p = $scope.messageIndex.searchText('', $scope.filters.limit, searchKey, true)
       .then (res) ->
         messages = []
+        localMessages = localStorageService.get('localMessages')
         for pair in res
           if pair.value
             v = pair.value
             v.searchKey = pair.key
-            messages.push(v)
+            if localMessages.hasOwnProperty(v.hash)
+              delete localMessages[v.hash]
+              localStorageService.set('localMessages', localMessages)
+            else
+              messages.push(v)
         return messages
       p.then (messages) ->
         $scope.processMessages messages
@@ -67,8 +77,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
-      $scope.msgs.list = []
-      $scope.msgs.finished = false
+      $scope.resetMsgs()
       $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
     # Find existing Message

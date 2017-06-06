@@ -58,7 +58,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.received.shift()
         $scope.processMessages [args.message]
         $scope.received.unshift args.message
-        $scope.localMessages.unshift args.message
+        $scope.localMessages[args.message.hash] = args.message
         localStorageService.set('localMessages', $scope.localMessages)
         messagesAdded = true
 
@@ -283,6 +283,13 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.received = []
       $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
+    addLocalMessages = ->
+      for msg in Object.values(localStorageService.get('localMessages'))
+        if msg.data.recipient[0][0] == $scope.idType and msg.data.recipient[0][1] == $scope.idValue
+          $scope.received.unshift(msg)
+        if msg.data.author[0][0] == $scope.idType and msg.data.author[0][1] == $scope.idValue
+          $scope.sent.unshift(msg)
+
     $scope.findOne = ->
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
@@ -295,6 +302,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         if isReady
           $scope.getIdentityProfile({ type: $scope.idType, value: $scope.idValue }).then (profile) ->
             $scope.identityProfile = profile
+            addLocalMessages()
             $scope.getConnections()
             if !(profile.sent and profile.received)
               throw new Error('missing sent or received index: ' + JSON.stringify(profile))
