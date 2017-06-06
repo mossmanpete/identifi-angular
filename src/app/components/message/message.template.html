@@ -2,6 +2,7 @@
   <div class="message-panel" ng-class="{ 'panel-body': $ctrl.msgData.data.type != 'verify_identity', 'panel-heading': $ctrl.msgData.data.type == 'verify_identity' || $ctrl.msgData.data.type == 'unverify_identity' }">
     <p class="">
       <span class="mar-left5 pull-right" ng-class="$ctrl.msgData.iconStyle" ng-repeat="n in $ctrl.msgData.iconCount track by $index"></span>
+      <span class="mar-left5 pull-right fa fa-refresh" uib-tooltip="Pending" ng-if="$ctrl.msgData.local"></span>
       <strong>
         <a ui-sref="identities.show({ type: $ctrl.msgData.linkToAuthor[0], value: $ctrl.msgData.linkToAuthor[1] })" class="id-link">
           <span class="distance-container mar-right10">

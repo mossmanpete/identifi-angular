@@ -59,6 +59,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.processMessages [args.message]
         $scope.received.unshift args.message
         $scope.localMessages[args.message.hash] = args.message
+        $scope.localMessages[args.message.hash].local = true
         localStorageService.set('localMessages', $scope.localMessages)
         messagesAdded = true
 
