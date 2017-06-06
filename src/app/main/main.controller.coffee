@@ -138,6 +138,18 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.login = ->
       $scope.filters.max_distance = -1 # because the user doesn't have a trust index yet
 
+    $scope.openLoginModal = ->
+      modalInstance = $uibModal.open(
+        animation: $scope.animationsEnabled
+        templateUrl: 'app/main/login.modal.html'
+        size: 'lg'
+        scope: $scope
+      )
+      modalInstance.rendered.then ->
+        document.activeElement.blur()
+      $scope.$on '$stateChangeStart', ->
+        modalInstance.close()
+
     $scope.logout = ->
       $scope.filters.max_distance = 0
       $scope.authentication = {}
