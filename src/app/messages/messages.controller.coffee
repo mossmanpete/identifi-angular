@@ -19,10 +19,11 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.filters.type = 'rating'
 
     $scope.resetMsgs = ->
+      msgs = localStorageService.get('localMessages') or {}
       $scope.msgs =
         loading: false
         finished: false
-        list: Object.values(localStorageService.get('localMessages')) or []
+        list: Object.values(msgs)
     $scope.resetMsgs()
 
     $scope.iconCount = (rating) ->
@@ -57,7 +58,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
       p = $scope.messageIndex.searchText('', $scope.filters.limit, searchKey, true)
       .then (res) ->
         messages = []
-        localMessages = localStorageService.get('localMessages')
+        localMessages = localStorageService.get('localMessages') or {}
         for pair in res
           if pair.value
             v = pair.value

@@ -19,7 +19,7 @@
             <a ui-sref="identities.create">Add entry</a>
           </td>
         </tr>
-        <tr ng-repeat="result in ids.list" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
+        <tr ng-repeat="result in ids.list | orderBy:'distance'" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.type, value: result.linkTo.value })" class="search-result-row" ng-class="{active: result.active}">
           <td class="gravatar-col"><identicon id="result" border="3" width="46" positive-score="result.pos" negative-score="result.neg"></identicon></td>
           <td>
             <span ng-if="result.distance == 0" class="label label-default pull-right">viewpoint</span>

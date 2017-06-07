@@ -285,7 +285,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
     addLocalMessages = ->
-      for msg in Object.values(localStorageService.get('localMessages'))
+      msgs = localStorageService.get('localMessages') or {}
+      for msg in Object.values(msgs)
         if msg.data.recipient[0][0] == $scope.idType and msg.data.recipient[0][1] == $scope.idValue
           $scope.received.unshift(msg)
         if msg.data.author[0][0] == $scope.idType and msg.data.author[0][1] == $scope.idValue

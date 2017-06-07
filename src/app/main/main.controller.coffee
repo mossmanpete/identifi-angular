@@ -30,6 +30,23 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.authentication = {} # Authentication
     $scope.localMessages = localStorageService.get('localMessages') or {}
     localStorageService.set('localMessages', $scope.localMessages)
+
+    $scope.loginWithKey = (privateKeyPEM, publicKeyPEM) ->
+      $scope.privateKey = KEYUTIL.getKeyFromPlainPrivatePKCS8PEM(privateKeyPEM)
+      $scope.publicKey = KEYUTIL.getKey(publicKeyPEM)
+      localStorageService.set('privateKeyPEM', privateKeyPEM)
+      localStorageService.set('publicKeyPEM', publicKeyPEM)
+      publicKeyHex = KEYUTIL.getHexFromPEM(KEYUTIL.getPEM($scope.publicKey))
+      publicKeyHash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(publicKeyHex))
+      $scope.authentication.user =
+        idType: 'keyID'
+        idValue: publicKeyHash
+      $scope.loginModal.close() if $scope.loginModal
+
+    privateKey = localStorageService.get('privateKeyPEM')
+    publicKey = localStorageService.get('publicKeyPEM')
+    if privateKey and publicKey
+      $scope.loginWithKey(privateKey, publicKey)
     token = $location.search().token
     if token
       jws = KJUR.jws.JWS.parse(token).payloadObj
@@ -112,9 +129,21 @@ angular.module('identifiAngular').controller 'MainController', [
           maxRating: 3
           minRating: -3
       angular.extend message, params
-      options =
-        headers:
-          'Authorization': 'Bearer ' + $scope.authentication.token
+      options = {}
+      if $scope.privateKey
+        publicKeyHex = KEYUTIL.getHexFromPEM(KEYUTIL.getPEM($scope.publicKey))
+        publicKeyHash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(publicKeyHex))
+        message.author = [['keyID', publicKeyHash]]
+        message.timestamp = new Date().toISOString()
+        header = JSON.stringify({ alg: 'ES256', kid: publicKeyHex })
+        payload = JSON.stringify(message)
+        jws = KJUR.jws.JWS.sign("ES256", header, payload, $scope.privateKey)
+        hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(jws))
+        message = { jws: jws, hash: hash }
+      else
+        options =
+          headers:
+            'Authorization': 'Bearer ' + $scope.authentication.token
       r = $http.post('/api/messages', message, options)
       r.then ((response) ->
         # Clear form fields
@@ -139,32 +168,32 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.filters.max_distance = -1 # because the user doesn't have a trust index yet
 
     $scope.openLoginModal = ->
-      modalInstance = $uibModal.open(
+      $scope.loginModal = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/main/login.modal.html'
         size: 'lg'
         scope: $scope
       )
-      modalInstance.rendered.then ->
+      $scope.loginModal.rendered.then ->
         document.activeElement.blur()
       $scope.$on '$stateChangeStart', ->
-        modalInstance.close()
+        $scope.loginModal.close()
 
     $scope.generateKey = ->
-      ec = new elliptic.ec('secp256k1')
-      $scope.keypair = ec.genKeyPair()
-      $scope.privateKey = $scope.keypair.getPrivate().toString('hex')
-
-    $scope.loginWithKey = (key) ->
-      ec = new elliptic.ec('secp256k1')
-      $scope.keypair = ec.keyFromPrivate(key, 'hex')
+      keypair = KEYUTIL.generateKeypair('EC', 'secp256k1')
+      $scope.privateKey = keypair.prvKeyObj
+      $scope.publicKey = keypair.pubKeyObj
+      $scope.privateKeyPEM = KEYUTIL.getPEM($scope.privateKey, 'PKCS8PRV')
+      $scope.publicKeyPEM = KEYUTIL.getPEM($scope.publicKey)
 
     $scope.logout = ->
       $scope.filters.max_distance = 0
+      $scope.privateKeyPEM = ''
       $scope.authentication = {}
       localStorageService.clearAll()
       $state.go('identities.list')
-      $scope.keypair = null
+      $scope.privateKey = null
+      $scope.publicKey = null
 
     $scope.msgFilter = (value, index, array) ->
       data = value.data or value.signedData
