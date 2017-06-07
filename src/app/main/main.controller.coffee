@@ -150,11 +150,21 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.$on '$stateChangeStart', ->
         modalInstance.close()
 
+    $scope.generateKey = ->
+      ec = new elliptic.ec('secp256k1')
+      $scope.keypair = ec.genKeyPair()
+      $scope.privateKey = $scope.keypair.getPrivate().toString('hex')
+
+    $scope.loginWithKey = (key) ->
+      ec = new elliptic.ec('secp256k1')
+      $scope.keypair = ec.keyFromPrivate(key, 'hex')
+
     $scope.logout = ->
       $scope.filters.max_distance = 0
       $scope.authentication = {}
       localStorageService.clearAll()
       $state.go('identities.list')
+      $scope.keypair = null
 
     $scope.msgFilter = (value, index, array) ->
       data = value.data or value.signedData

@@ -1,14 +1,15 @@
 <div class="col-md-8 col-md-offset-2">
   <div class="panel panel-default mar-top15">
     <div class="panel-heading">
-      <textarea class="form-control" placeholder="Enter private key"></textarea>
+      <textarea class="form-control" placeholder="Enter private key" ng-model="privateKey"></textarea>
       <div class="checkbox">
         <label>
-          <input type="checkbox" value="">
+          <input type="checkbox" value="" checked="checked">
           Remember me
         </label>
       </div>
-      <button class="btn btn-primary">Generate new key</button>
+      <button class="btn btn-primary" ng-click="generateKey()">Generate new key</button>
+      <button class="btn btn-primary" ng-click="loginWithKey(privateKey)">Log in</button>
     </div>
   </div>
 </div>

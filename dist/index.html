@@ -41,6 +41,11 @@
             <li uib-dropdown class="dropdown" ng-hide="authentication.user || !nodeInfo.loginOptions.length">
               <a href="#" class="dropdown-toggle login-button" uib-dropdown-toggle="dropdown"><span class="glyphicon glyphicon-log-in"></span> Log in <b class="caret"></b></a>
               <ul uib-dropdown-menu class="dropdown-menu login-menu">
+                <li>
+                  <button data-ng-click="openLoginModal()" id="email-login" class="btn btn-block btn-social btn-success">
+                    <i class="fa fa-key"></i> Private key
+                  </button>
+                </li>
                 <li ng-if="nodeInfo.loginOptions.indexOf('persona') > -1">
                   <button data-ng-click="login()" id="email-login" class="btn btn-block btn-social btn-success">
                     <i class="fa fa-envelope"></i> Email
