@@ -1,6 +1,6 @@
 {
   "name": "identifi-angular",
-  "version": "0.0.119",
+  "version": "0.0.120",
   "dependencies": {
     "elliptic": "^6.4.0"
   },
