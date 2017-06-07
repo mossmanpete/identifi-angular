@@ -2,12 +2,12 @@
   <div class="panel panel-default mar-top15">
     <div class="panel-heading">
       <textarea class="form-control" placeholder="Enter private key" ng-model="privateKeyPEM"></textarea>
-      <div class="checkbox">
+      <!--<div class="checkbox">
         <label>
           <input type="checkbox" value="" checked="checked">
           Remember me
         </label>
-      </div>
+      </div>-->
       <button class="btn btn-primary" ng-click="generateKey()">Generate new key</button>
       <button class="btn btn-primary" ng-click="loginWithKey(privateKeyPEM, publicKeyPEM)">Log in</button>
     </div>
