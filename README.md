@@ -6,7 +6,7 @@ IPFS urls:
 * https://ipfs.io/ipns/identi.fi/
 * https://ipfs.io/ipns/QmaiM39ABfBEkb1ajyZ9ebfJXYgfyDNNbUaVZSwezwwoDQ/
 
-Also available as a [Chrome plugin](https://chrome.google.com/webstore/detail/identifi/oelmiikkaikgnmmjaonjlopkmpcahpgh).
+Also available as a [Chrome extension](https://chrome.google.com/webstore/detail/identifi/oelmiikkaikgnmmjaonjlopkmpcahpgh).
 
 ## Development
 ```
