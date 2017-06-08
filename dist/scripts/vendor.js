@@ -79632,10 +79632,13 @@ var IPFSStorage = function () {
 function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function browserGet(url) {
-  return new Promise(function (resolve) {
+  return new Promise(function (resolve, reject) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
-      if (xmlHttp.readyState === 4 && xmlHttp.status === 200) resolve(xmlHttp.responseText);
+      if (xmlHttp.readyState === 4) {
+        if (xmlHttp.status >= 200 && xmlHttp.status < 300) resolve(xmlHttp.responseText);
+        else reject(xmlHttp.responseText);
+      }
     };
     xmlHttp.open("GET", url, true); // true for asynchronous
     xmlHttp.send(null);

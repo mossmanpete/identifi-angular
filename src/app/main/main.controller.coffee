@@ -74,37 +74,55 @@ angular.module('identifiAngular').controller 'MainController', [
       if (title)
         $rootScope.pageTitle += ' - ' + title
 
-    $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage()
-
-    $scope.getIpfsIndexes = (indexRoot, fallbackIndexRoot) ->
-      getBtreeOrFallback = (url, fallbackUrl) ->
+    $scope.getIpfsIndexes = (indexRoot, fallbackIndexRoot, fallbackIndexRoot2) ->
+      getBtreeOrFallback = (url, fallbackUrl, fallbackUrl2) ->
         $window.merkleBtree.MerkleBTree.getByHash(url, $scope.ipfsStorage).catch ->
           console.log 'Failed to fetch index', url, ', reverting to', fallbackUrl
           $window.merkleBtree.MerkleBTree.getByHash(fallbackUrl, $scope.ipfsStorage)
+        .catch ->
+          console.log 'Failed to fetch index', fallbackUrl, ', reverting to', fallbackUrl2
+          $window.merkleBtree.MerkleBTree.getByHash(fallbackUrl2, $scope.ipfsStorage)
 
-      console.log 'Getting Identifi index from IPFS:', indexRoot
-      $q.all([
-        getBtreeOrFallback(indexRoot + '/identities_by_distance', fallbackIndexRoot + '/identities_by_distance'),
-        getBtreeOrFallback(indexRoot + '/identities_by_searchkey', fallbackIndexRoot + '/identities_by_searchkey'),
-        getBtreeOrFallback(indexRoot + '/messages_by_timestamp', fallbackIndexRoot + '/messages_by_timestamp'),
-        $http.get(indexRoot + '/info').catch ->
-          console.log 'Failed to fetch index', indexRoot + '/info,', 'reverting to', fallbackIndexRoot + '/info'
-          $http.get(fallbackIndexRoot + '/info')
-      ])
+      console.log 'Getting Identifi index from IPFS:', indexRoot.join('')
+      $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(indexRoot[0])
+      $http.get(indexRoot.join('') + '/info').catch ->
+        console.log 'Failed to fetch index', indexRoot.join('') + '/info,', 'reverting to', fallbackIndexRoot.join('') + '/info'
+        $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(fallbackIndexRoot[0])
+        $http.get(fallbackIndexRoot.join('') + '/info')
+      .catch ->
+        console.log 'Failed to fetch index', fallbackIndexRoot.join('') + '/info,', 'reverting to', fallbackIndexRoot2.join('') + '/info'
+        $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(fallbackIndexRoot[1])
+        $http.get(fallbackIndexRoot2.join('') + '/info')
+      .then (res) ->
+        $scope.nodeInfo = {}
+        $scope.nodeInfo.profile = $scope.profileFromData(res.data, ['keyID', res.data.keyID])
+        $q.all([
+          getBtreeOrFallback(indexRoot[1] + '/identities_by_distance',
+            fallbackIndexRoot[1] + '/identities_by_distance',
+            fallbackIndexRoot2[1] + '/identities_by_distance'),
+          getBtreeOrFallback(indexRoot[1] + '/identities_by_searchkey',
+            fallbackIndexRoot[1] + '/identities_by_searchkey',
+            fallbackIndexRoot2[1] + '/identities_by_searchkey'),
+          getBtreeOrFallback(indexRoot[1] + '/messages_by_timestamp',
+            fallbackIndexRoot[1] + '/messages_by_timestamp',
+            fallbackIndexRoot2[1] + '/messages_by_timestamp'),
+        ])
       .then (results) ->
         $scope.identitiesByDistance = results[0]
         $scope.identitiesBySearchKey = results[1]
         $scope.messageIndex = results[2]
-        $scope.nodeInfo = {}
-        $scope.nodeInfo.profile = $scope.profileFromData(results[3].data, ['keyID', results[3].data.keyID])
       .then ->
         path = $location.absUrl()
         host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
         $http.get(host + '/api', { timeout: 2000 })
       .then (res) ->
         $scope.nodeInfo = angular.extend $scope.nodeInfo, res.data
+      .catch (res) ->
+        $scope.nodeInfo = { loginOptions: [true] }
 
-    $scope.getIpfsIndexes '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs', '/ipfs/QmUWZkgRzVzYkyDXZjktdUZ2hc1NoBuRjyq2tASoGsaCEc'
+    $scope.getIpfsIndexes ['', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'],
+      ['https://identi.fi', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'],
+      ['https://ipfs.io', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs']
     .then ->
       $scope.apiReady = true
     .catch (e) ->
@@ -154,7 +172,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.$root.$broadcast 'MessageAdded',
           message: response.data
           id: id
-        $scope.getIpfsIndexes '/ipfs/' + response.data.ipfsIndexRoot if response.data.ipfsIndexRoot
+        $scope.getIpfsIndexes $scope.ipfsStorage.apiRoot + '/ipfs/' + response.data.ipfsIndexRoot if response.data.ipfsIndexRoot
         return
       ), (errorResponse) ->
         $scope.error = errorResponse.data || JSON.stringify(errorResponse)
@@ -261,7 +279,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.identitiesBySearchKey.searchText(encodeURIComponent(id.value) + ':' + encodeURIComponent(id.type), 1)
       .then (res) ->
         if res.length
-          return $http.get('/ipfs/' + res[0].value)
+          return $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + res[0].value)
         else
           return { data: {} }
       .then (res) ->
@@ -396,7 +414,7 @@ angular.module('identifiAngular').controller 'MainController', [
       angular.forEach messages, (msg, key) ->
         msg[k] = v for k, v of msgOptions
         if msg.ipfs_hash and not msg.jws
-          $http.get('/ipfs/' + msg.ipfs_hash).then (res) ->
+          $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + msg.ipfs_hash).then (res) ->
             msg.jws = res.data
             processMessage(msg)
         else processMessage(msg)
@@ -443,7 +461,7 @@ angular.module('identifiAngular').controller 'MainController', [
           return unless row.value and row.value.length and !$scope.identitiesByHash[row.value]
           $scope.identitiesByHash[row.value] = true
           searchKey = row.key
-          p = $http.get('/ipfs/' + row.value)
+          p = $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + row.value)
           .then (row) ->
             identity = { searchKey: searchKey }
             smallestIndex = 1000
