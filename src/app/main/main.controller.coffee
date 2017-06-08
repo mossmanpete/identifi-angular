@@ -163,6 +163,8 @@ angular.module('identifiAngular').controller 'MainController', [
           headers:
             'Authorization': 'Bearer ' + $scope.authentication.token
       r = $http.post('/api/messages', message, options)
+      .catch ->
+        $http.post('https://identi.fi/api/messages', message, options)
       r.then ((response) ->
         # Clear form fields
         $scope.newMessage.comment = ''
