@@ -4,7 +4,7 @@ Angular app that connects to the Identifi API.
 
 Available at:
 * https://identi.fi
-* http://identifi.github.io/
+* https://identifi.github.io/
 * https://ipfs.io/ipns/identi.fi/
 * https://ipfs.io/ipns/QmaiM39ABfBEkb1ajyZ9ebfJXYgfyDNNbUaVZSwezwwoDQ/
 * [Chrome extension](https://chrome.google.com/webstore/detail/identifi/oelmiikkaikgnmmjaonjlopkmpcahpgh)
