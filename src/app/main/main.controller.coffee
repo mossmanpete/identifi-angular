@@ -71,6 +71,9 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.ipfs = new Ipfs(
       init: true
+      EXPERIMENTAL: {
+        pubsub: true
+      },
       start: true
       repo: 'ipfs-testing'
       config: Bootstrap: [
@@ -83,6 +86,29 @@ angular.module('identifiAngular').controller 'MainController', [
         '/dns4/nyc-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLueR4xBeUbY9WZ9xGUUxunbKWcrNFTDAadQJmocnWm'
         '/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64'
       ])
+
+    $scope.ipfs.on 'ready', ->
+      console.log $scope.ipfs
+      $window.ipfs = $scope.ipfs
+      $scope.ipfs.pubsub.subscribe 'identifi', (msg) ->
+        msg = $scope.ipfs.types.Buffer(msg.data).toString()
+        hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(msg))
+        console.log 'identifi message received', msg, hash
+        localMessages = localStorageService.get('localMessages')
+        $scope.processMessages([msg])
+        localMessages[hash] = msg
+        localStorageService.set('localMessages', localMessages)
+      $scope.initIpfsIndexes()
+
+    $scope.initIpfsIndexes = ->
+      $scope.getIpfsIndexes ['', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'],
+        ['https://identi.fi', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'],
+        ['https://ipfs.io', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs']
+      .then ->
+        $scope.apiReady = true
+      .catch (e) ->
+        console.log 'initialization failed:', e
+        $scope.apiReady = true
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
@@ -99,11 +125,22 @@ angular.module('identifiAngular').controller 'MainController', [
           $window.merkleBtree.MerkleBTree.getByHash(fallbackUrl2, $scope.ipfsStorage)
 
       console.log 'Getting Identifi index from IPFS:', indexRoot.join('')
-      $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(indexRoot[0])
-      $http.get(indexRoot.join('') + '/info').catch ->
-        console.log 'Failed to fetch index', indexRoot.join('') + '/info,', 'reverting to', fallbackIndexRoot.join('') + '/info'
-        $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(fallbackIndexRoot[0])
-        $http.get(fallbackIndexRoot.join('') + '/info')
+      $scope.ipfsStorage = new $window.merkleBtree.IPFSStorage($scope.ipfs)
+      # First attempt to load indexes via js-ipfs
+      $q.all([
+        $window.merkleBtree.MerkleBTree.getByHash('/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs/identities_by_distance', $scope.ipfsStorage),
+        $window.merkleBtree.MerkleBTree.getByHash('/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs/identities_by_searchkey', $scope.ipfsStorage),
+        $window.merkleBtree.MerkleBTree.getByHash('/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs/messages_by_timestamp', $scope.ipfsStorage),
+      ])
+      # If fails, try loading indexes via gateways
+      .catch (e) ->
+        console.log 'Loading indexes via js-ipfs failed:', e
+        $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(indexRoot[0])
+        $http.get(indexRoot.join('') + '/info')
+      .catch ->
+          console.log 'Failed to fetch index', indexRoot.join('') + '/info,', 'reverting to', fallbackIndexRoot.join('') + '/info'
+          $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(fallbackIndexRoot[0])
+          $http.get(fallbackIndexRoot.join('') + '/info')
       .catch ->
         console.log 'Failed to fetch index', fallbackIndexRoot.join('') + '/info,', 'reverting to', fallbackIndexRoot2.join('') + '/info'
         $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(fallbackIndexRoot[1])
@@ -135,14 +172,14 @@ angular.module('identifiAngular').controller 'MainController', [
       .catch (res) ->
         $scope.nodeInfo = { loginOptions: [true] }
 
-    $scope.getIpfsIndexes ['', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'],
-      ['https://identi.fi', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'],
-      ['https://ipfs.io', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs']
-    .then ->
-      $scope.apiReady = true
-    .catch (e) ->
-      console.log 'initialization failed:', e
-      $scope.apiReady = true
+    $scope.ipfsGet = (uri) ->
+      $scope.ipfs.files.cat(uri).then (stream) ->
+        new Promise (resolve, reject) ->
+          stream.on 'data', (file) ->
+            file = $scope.ipfs.types.Buffer(file).toString()
+            resolve(file)
+          stream.on 'error', (error) ->
+            reject(error)
 
     $scope.newMessage =
       rating: 1
@@ -178,7 +215,7 @@ angular.module('identifiAngular').controller 'MainController', [
           headers:
             'Authorization': 'Bearer ' + $scope.authentication.token
       r = $scope.ipfs.files.add(new $scope.ipfs.types.Buffer(jws)).then (i) ->
-       console.log(i)
+       $scope.ipfs.pubsub.publish('identifi', new $scope.ipfs.types.Buffer(jws))
       .then ->
         $http.post('/api/messages', message, options)
       .catch ->
@@ -299,7 +336,9 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.identitiesBySearchKey.searchText(encodeURIComponent(id.value) + ':' + encodeURIComponent(id.type), 1)
       .then (res) ->
         if res.length
-          return $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + res[0].value)
+          return $scope.ipfsGet(res[0].value).then (res) ->
+            return { data: JSON.parse(res) }
+          # return $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + res[0].value)
         else
           return { data: {} }
       .then (res) ->
@@ -434,8 +473,8 @@ angular.module('identifiAngular').controller 'MainController', [
       angular.forEach messages, (msg, key) ->
         msg[k] = v for k, v of msgOptions
         if msg.ipfs_hash and not msg.jws
-          $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + msg.ipfs_hash).then (res) ->
-            msg.jws = res.data
+          $scope.ipfsGet(msg.ipfs_hash).then (res) ->
+            msg.jws = res
             processMessage(msg)
         else processMessage(msg)
 
@@ -481,11 +520,12 @@ angular.module('identifiAngular').controller 'MainController', [
           return unless row.value and row.value.length and !$scope.identitiesByHash[row.value]
           $scope.identitiesByHash[row.value] = true
           searchKey = row.key
-          p = $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + row.value)
+          # p = $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + row.value)
+          p = $scope.ipfsGet(row.value)
           .then (row) ->
             identity = { searchKey: searchKey }
             smallestIndex = 1000
-            angular.forEach row.data.attrs, (attr) ->
+            angular.forEach JSON.parse(row).attrs, (attr) ->
               dist = parseInt(attr.dist)
               if !isNaN(dist) and (identity.distance == undefined or (0 <= dist < identity.distance))
                 identity.distance = dist
