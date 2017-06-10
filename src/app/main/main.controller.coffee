@@ -261,6 +261,13 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.privateKeyPEM = KEYUTIL.getPEM($scope.privateKey, 'PKCS8PRV')
       $scope.publicKeyPEM = KEYUTIL.getPEM($scope.publicKey)
 
+    $scope.downloadKey = ->
+      hiddenElement = document.createElement('a')
+      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI($scope.privateKeyPEM)
+      hiddenElement.target = '_blank'
+      hiddenElement.download = 'identifi_private_key.txt'
+      hiddenElement.click()
+
     $scope.logout = ->
       $scope.filters.max_distance = 0
       $scope.privateKeyPEM = ''
