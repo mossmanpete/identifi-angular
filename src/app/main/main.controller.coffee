@@ -31,6 +31,8 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.localMessages = localStorageService.get('localMessages') or {}
     localStorageService.set('localMessages', $scope.localMessages)
 
+    $scope.nodeInfo = { keyID: null }
+
     $scope.loginWithKey = (privateKeyPEM, publicKeyPEM) ->
       $scope.privateKey = KEYUTIL.getKeyFromPlainPrivatePKCS8PEM(privateKeyPEM)
       $scope.publicKey = KEYUTIL.getKey(publicKeyPEM)
@@ -146,7 +148,6 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(fallbackIndexRoot[1])
         $http.get(fallbackIndexRoot2.join('') + '/info')
       .then (res) ->
-        $scope.nodeInfo = {}
         $scope.nodeInfo.profile = $scope.profileFromData(res.data, ['keyID', res.data.keyID])
         $q.all([
           getBtreeOrFallback(indexRoot[1] + '/identities_by_distance',
@@ -170,7 +171,7 @@ angular.module('identifiAngular').controller 'MainController', [
       .then (res) ->
         $scope.nodeInfo = angular.extend $scope.nodeInfo, res.data
       .catch (res) ->
-        $scope.nodeInfo = { loginOptions: [true] }
+        $scope.nodeInfo = { loginOptions: [true], keyID: null }
 
     $scope.ipfsGet = (uri) ->
       $scope.ipfs.files.cat(uri).then (stream) ->
