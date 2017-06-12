@@ -295,6 +295,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.findOne = ->
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
+      $scope.isCurrentUser = $scope.idType == $scope.authentication.user.idType and $scope.idValue == $scope.idValue
       $scope.isUniqueType = config.uniqueAttributeTypes.indexOf($scope.idType) > -1
       if !$scope.isUniqueType
         $state.go 'identities.list', { search: $scope.idValue }

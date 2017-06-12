@@ -216,7 +216,13 @@
                 </div>
                 <message msg-data="msg" page-info="info" ng-repeat="msg in received | filter:msgFilter | orderBy:'-data.timestamp'" ng-click="openMessage($event, msg, 'lg')"></message>
               </div>
-              <div ng-if="!received.loading && received.length == 0" class="alert alert-info text-center">No messages to show</div>
+              <div ng-if="!isCurrentUser && !received.loading && received.length == 0" class="alert alert-info text-center">No messages to show</div>
+              <div ng-if="isCurrentUser && !received.loading && received.length == 0" class="alert alert-warning text-center">
+                <i class="fa fa-info pull-right"></i>
+                <p>You have no trust ratings yet.</p>
+                <p>You need trust ratings to have your messages saved and displayed by others.</p>
+                <p>You can also ask someone to verify that {{idType}}:{{idValue}} belongs to your already trusted identity.</p>
+              </div>
               <div ng-if="received.loading" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
             <uib-tab ng-if="isUniqueType">
