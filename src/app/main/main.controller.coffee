@@ -35,6 +35,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.loginWithKey = (privateKeyPEM, publicKeyPEM) ->
       $scope.privateKey = KEYUTIL.getKeyFromPlainPrivatePKCS8PEM(privateKeyPEM)
+      $window.paska = $scope.privateKey
       $scope.publicKey = KEYUTIL.getKey(publicKeyPEM)
       localStorageService.set('privateKeyPEM', privateKeyPEM)
       localStorageService.set('publicKeyPEM', publicKeyPEM)

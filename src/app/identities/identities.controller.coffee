@@ -275,6 +275,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.received.finished = true
 
     $scope.getPhotosFromGravatar = ->
+      console.log $scope.idValue
       email = $scope.info.email or $scope.idValue
       $scope.gravatar = CryptoJS.MD5(email).toString()
 
@@ -295,7 +296,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.findOne = ->
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
-      $scope.isCurrentUser = $scope.idType == $scope.authentication.user.idType and $scope.idValue == $scope.idValue
+      $scope.isCurrentUser = $scope.authentication && $scope.authentication.user &&
+        $scope.idType == $scope.authentication.user.idType and $scope.idValue == $scope.idValue
       $scope.isUniqueType = config.uniqueAttributeTypes.indexOf($scope.idType) > -1
       if !$scope.isUniqueType
         $state.go 'identities.list', { search: $scope.idValue }
