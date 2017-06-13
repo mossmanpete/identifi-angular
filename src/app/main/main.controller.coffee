@@ -32,6 +32,7 @@ angular.module('identifiAngular').controller 'MainController', [
     localStorageService.set('localMessages', $scope.localMessages)
 
     $scope.nodeInfo = { keyID: null }
+    $scope.ipfsStorage = {}
 
     $scope.loginWithKey = (privateKeyPEM, publicKeyPEM) ->
       $scope.privateKey = KEYUTIL.getKeyFromPlainPrivatePKCS8PEM(privateKeyPEM)
@@ -174,14 +175,24 @@ angular.module('identifiAngular').controller 'MainController', [
       .catch (res) ->
         $scope.nodeInfo = { loginOptions: [true], keyID: null }
 
-    $scope.ipfsGet = (uri) ->
-      $scope.ipfs.files.cat(uri).then (stream) ->
-        new Promise (resolve, reject) ->
-          stream.on 'data', (file) ->
-            file = $scope.ipfs.types.Buffer(file).toString()
-            resolve(file)
-          stream.on 'error', (error) ->
-            reject(error)
+    $scope.ipfsGet = (uri, getJson) ->
+      apiRoot = $scope.ipfsStorage.apiRoot or 'https://identi.fi'
+      $http.get(apiRoot + '/ipfs/' + uri)
+      .then (res) ->
+        res.data
+      .catch ->
+        $scope.ipfs.files.cat(uri).then (stream) ->
+          new Promise (resolve, reject) ->
+            stream.on 'data', (file) ->
+              file = $scope.ipfs.types.Buffer(file).toString()
+              resolve(file)
+            stream.on 'error', (error) ->
+              reject(error)
+      .then (res) ->
+        if typeof res == 'object' or !getJson
+          return res
+        else
+          return JSON.parse(res)
 
     $scope.newMessage =
       rating: 1
@@ -345,8 +356,8 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.identitiesBySearchKey.searchText(encodeURIComponent(id.value) + ':' + encodeURIComponent(id.type), 1)
       .then (res) ->
         if res.length
-          return $scope.ipfsGet(res[0].value).then (res) ->
-            return { data: JSON.parse(res) }
+          return $scope.ipfsGet(res[0].value, true).then (res) ->
+            return { data: res }
           # return $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + res[0].value)
         else
           return { data: {} }
@@ -530,11 +541,11 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.identitiesByHash[row.value] = true
           searchKey = row.key
           # p = $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + row.value)
-          p = $scope.ipfsGet(row.value)
+          p = $scope.ipfsGet(row.value, true)
           .then (row) ->
             identity = { searchKey: searchKey }
             smallestIndex = 1000
-            angular.forEach JSON.parse(row).attrs, (attr) ->
+            angular.forEach row.attrs, (attr) ->
               dist = parseInt(attr.dist)
               if !isNaN(dist) and (identity.distance == undefined or (0 <= dist < identity.distance))
                 identity.distance = dist
