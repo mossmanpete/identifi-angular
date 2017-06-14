@@ -34,11 +34,10 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.nodeInfo = { keyID: null }
     $scope.ipfsStorage = {}
 
-    $scope.loginWithKey = (privateKeyPEM, publicKeyPEM) ->
+    $scope.loginWithKey = (privateKeyPEM) ->
       $scope.privateKey = KEYUTIL.getKeyFromPlainPrivatePKCS8PEM(privateKeyPEM)
       $scope.publicKey = new KJUR.crypto.ECDSA({'curve': 'secp256k1', 'pub': $scope.privateKey.pubKeyHex})
       localStorageService.set('privateKeyPEM', privateKeyPEM)
-      localStorageService.set('publicKeyPEM', publicKeyPEM)
       publicKeyHex = KEYUTIL.getHexFromPEM(KEYUTIL.getPEM($scope.publicKey))
       publicKeyHash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(publicKeyHex))
       $scope.authentication.user =
@@ -47,9 +46,8 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.loginModal.close() if $scope.loginModal
 
     privateKey = localStorageService.get('privateKeyPEM')
-    publicKey = localStorageService.get('publicKeyPEM')
-    if privateKey and publicKey
-      $scope.loginWithKey(privateKey, publicKey)
+    if privateKey
+      $scope.loginWithKey(privateKey)
     token = $location.search().token
     if token
       jws = KJUR.jws.JWS.parse(token).payloadObj
@@ -271,7 +269,6 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.privateKey = keypair.prvKeyObj
       $scope.publicKey = keypair.pubKeyObj
       $scope.privateKeyPEM = KEYUTIL.getPEM($scope.privateKey, 'PKCS8PRV')
-      $scope.publicKeyPEM = KEYUTIL.getPEM($scope.publicKey)
 
     $scope.downloadKey = ->
       hiddenElement = document.createElement('a')
