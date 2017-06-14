@@ -36,8 +36,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.loginWithKey = (privateKeyPEM, publicKeyPEM) ->
       $scope.privateKey = KEYUTIL.getKeyFromPlainPrivatePKCS8PEM(privateKeyPEM)
-      $window.paska = $scope.privateKey
-      $scope.publicKey = KEYUTIL.getKey(publicKeyPEM)
+      $scope.publicKey = new KJUR.crypto.ECDSA({'curve': 'secp256k1', 'pub': $scope.privateKey.pubKeyHex})
       localStorageService.set('privateKeyPEM', privateKeyPEM)
       localStorageService.set('publicKeyPEM', publicKeyPEM)
       publicKeyHex = KEYUTIL.getHexFromPEM(KEYUTIL.getPEM($scope.publicKey))
