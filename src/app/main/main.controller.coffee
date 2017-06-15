@@ -483,8 +483,8 @@ angular.module('identifiAngular').controller 'MainController', [
           $window.scrollTo 0, pos.bottom - ($window.innerHeight or document.documentElement.clientHeight) + 15
       return
 
+    $scope.searchRequest = null
     $scope.search = (query, limit) ->
-      return if $scope.ids.loading
       $scope.ids.loading = true
       $scope.identitiesByHash = {}
       searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
@@ -497,14 +497,15 @@ angular.module('identifiAngular').controller 'MainController', [
       cursor = false
       if $scope.ids.list.length
         cursor = $scope.ids.list[$scope.ids.list.length - 1].searchKey
-      q = null
       if searchKey.length
-        q = $scope.identitiesBySearchKey.searchText(searchKey, limit, cursor)
+        $scope.searchRequest = $scope.identitiesBySearchKey.searchText(searchKey, limit, cursor)
       else
-        q = $scope.identitiesByDistance.searchText(searchKey, limit, cursor)
-      q = q.then (identities) ->
-        if !$scope.ids.list
-          $scope.ids.list = []
+        $scope.searchRequest = $scope.identitiesByDistance.searchText(searchKey, limit, cursor)
+      $scope.searchRequest = $scope.searchRequest.then (identities) ->
+        searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
+        if searchKey != $scope.previousSearchKey
+          return # search key changed
+        $scope.ids.list = $scope.ids.list or []
         queries = []
         angular.forEach identities, (row) ->
           return unless row.value and row.value.length and !$scope.identitiesByHash[row.value]
@@ -550,7 +551,7 @@ angular.module('identifiAngular').controller 'MainController', [
               if !identity.gravatar
                 identity.gravatar = CryptoJS.MD5(attr.val).toString()
             if !identity.name
-              identity.name = row.data.attrs[0].val
+              identity.name = row.attrs[0].val
             $scope.ids.list.push(identity)
             $scope.ids.list[0].active = true
           queries.push p
@@ -559,7 +560,7 @@ angular.module('identifiAngular').controller 'MainController', [
         if identities.length < limit
           $scope.ids.finished = true
         return $q.all(queries)
-      return q.then ->
+      return $scope.searchRequest.then ->
         $scope.$apply -> $scope.ids.loading = false
         $scope.ids.list
 
