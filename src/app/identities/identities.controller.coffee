@@ -48,11 +48,13 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         args.id.confirmations += 1
         if $scope.connections && $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
+          $scope.getConnections()
       else if args.message.signedData.type == 'unverify_identity' and not args.id.refuted
         args.id.refuted = true
         args.id.refutations += 1
         if $scope.connections.indexOf(args.id) == -1
           $scope.connections.push args.id
+          $scope.getConnections()
       else if args.message.signedData.type == 'rating'
         if messagesAdded
           $scope.received.shift()
@@ -76,22 +78,22 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       params =
         type: 'verify_identity'
         recipient: recipient
-      $scope.create(event, params).then (success) ->
+      $scope.createMessage(event, params).then (success) ->
         $state.go 'messages.show', { id: success.data.hash }
       , (error) ->
         console.log "error", error
 
     $scope.getConnections = ->
       connections = $scope.identityProfile.attrs or []
+      connections = $scope.connections if $scope.connections.length
       if connections.length > 0
         c = connections[0]
         mostConfirmations = c.confirmations
-        $scope.$apply ->
-          $scope.stats =
-            received_positive: c.pos
-            received_negative: c.neg
-            received_neutral: c.neut
-          $scope.distance = c.dist
+        $scope.stats =
+          received_positive: c.pos
+          received_negative: c.neg
+          received_neutral: c.neut
+        $scope.distance = c.dist
       else
         mostConfirmations = 1
       for key of connections
@@ -181,10 +183,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           else
             conn.rowClass = 'danger'
         $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
-      $scope.$apply ->
-        $scope.connections = connections
-        $scope.getPhotosFromGravatar()
-        $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
+      $scope.connections = connections
+      $scope.getPhotosFromGravatar()
+      $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
 
     $scope.getConnectingMsgs = (id1, id2) ->
       getVerifications = $q (resolve) ->
@@ -287,11 +288,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     addLocalMessages = ->
       msgs = localStorageService.get('localMessages') or {}
-      for msg in Object.values(msgs)
-        if msg.data.recipient[0][0] == $scope.idType and msg.data.recipient[0][1] == $scope.idValue
-          $scope.received.unshift(msg)
-        if msg.data.author[0][0] == $scope.idType and msg.data.author[0][1] == $scope.idValue
-          $scope.sent.unshift(msg)
+      $scope.$apply ->
+        for msg in Object.values(msgs)
+          if msg.data.recipient[0][0] == $scope.idType and msg.data.recipient[0][1] == $scope.idValue
+            $scope.received.unshift(msg)
+          if msg.data.author[0][0] == $scope.idType and msg.data.author[0][1] == $scope.idValue
+            $scope.sent.unshift(msg)
 
     $scope.findOne = ->
       $scope.idType = $stateParams.type

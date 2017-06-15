@@ -177,7 +177,7 @@
 
               <div ng-show="authentication.user" class="panel panel-default panel-success">
                 <div class="panel-body" id="write-feedback">
-                  <form ng-controller="MessagesController" ng-submit="create($event, { type: 'rating', rating: newMessage.rating, comment: newMessage.comment, recipient: [[idType, idValue]] })">
+                  <form ng-controller="MessagesController" ng-submit="createMessage($event, { type: 'rating', rating: newMessage.rating, comment: newMessage.comment, recipient: [[idType, idValue]] })">
                     <div class="form-group">
                       <textarea name="comment" class="form-control" id="comment" ng-model="newMessage.comment" placeholder="Write feedback"></textarea>
                     </div>
@@ -216,8 +216,8 @@
                 </div>
                 <message msg-data="msg" page-info="info" ng-repeat="msg in received | filter:msgFilter | orderBy:'-data.timestamp'" ng-click="openMessage($event, msg, 'lg')"></message>
               </div>
-              <div ng-if="!isCurrentUser && !received.loading && received.length == 0" class="alert alert-info text-center">No messages to show</div>
-              <div ng-if="isCurrentUser && !received.loading && received.length == 0" class="alert alert-warning text-center">
+              <div ng-if="!apiReady && !isCurrentUser && !received.loading && received.length == 0" class="alert alert-info text-center">No messages to show</div>
+              <div ng-if="!apiReady && isCurrentUser && !received.loading && received.length == 0" class="alert alert-warning text-center">
                 <i class="fa fa-info pull-right"></i>
                 <p>You have not received any trust ratings yet.</p>
                 <p>You need trust ratings to have your messages saved and displayed by others.</p>
@@ -274,10 +274,10 @@
                               <input class="form-control linkedComment" type="text" placeholder="comment" disabled>
                             -->
                             <div class="pull-right">
-                              <button autocomplete="off" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="create($event, { type: 'verify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out">
+                              <button autocomplete="off" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="createMessage($event, { type: 'verify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out">
                                 <span class="positive glyphicon glyphicon-ok"></span> {{id.conf}}
                               </button>
-                              <button autocomplete="off" name="unverify" class="ladda-button btn btn-default btn-unverify" ng-click="create($event, { type: 'unverify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out">
+                              <button autocomplete="off" name="unverify" class="ladda-button btn btn-default btn-unverify" ng-click="createMessage($event, { type: 'unverify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out">
                                 <span class="negative glyphicon glyphicon-remove"></span> {{id.ref}}
                               </button>
                             </div>
@@ -313,7 +313,7 @@
                           <input id="addValue" ng-model="newVerification.value" class="form-control" name="linkedValue" type="text" placeholder="value" ng-disabled="!authentication.user">
                           <input id="addType" ng-model="newVerification.type" class="form-control" name="linkedType" type="text" placeholder="type" ng-disabled="!authentication.user">
                         <!--<td><input id="addComment" class="form-control" name="linkedComment" type="text" placeholder="comment" disabled></td> -->
-                          <button autocomplete="off" id="addButton" ng-click="create($event, { type: 'verify_identity', recipient: [[idType, idValue], [newVerification.type, newVerification.value]] }, { confirmations: 0, refutations: 0, type: newVerification.type, value: newVerification.value })" class="ladda-button btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user"><span class="ladda-label"><span class="glyphicon glyphicon-plus"></span> Add</span><span class="ladda-spinner"></span></button>
+                          <button autocomplete="off" id="addButton" ng-click="createMessage($event, { type: 'verify_identity', recipient: [[idType, idValue], [newVerification.type, newVerification.value]] }, { conf: 0, ref: 0, name: newVerification.type, val: newVerification.value })" class="ladda-button btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user"><span class="ladda-label"><span class="glyphicon glyphicon-plus"></span> Add</span><span class="ladda-spinner"></span></button>
                         </td>
                       </tr>
                   </tbody>

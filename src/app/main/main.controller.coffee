@@ -172,7 +172,7 @@ angular.module('identifiAngular').controller 'MainController', [
       type: ''
       value: ''
     # Create new Message
-    $scope.create = (event, params, id) ->
+    $scope.createMessage = (event, params, id) ->
       event.stopPropagation() if event
       # Create new Message object
       message =
