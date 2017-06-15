@@ -88,6 +88,13 @@ angular.module('identifiAngular').controller 'MainController', [
         '/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64'
       ])
 
+    # Get possible login options
+    $http.get('/api', { timeout: 2000 })
+    .then (res) ->
+      $scope.nodeInfo = angular.extend $scope.nodeInfo, res.data
+    , (err) ->
+      $scope.nodeInfo = { loginOptions: [true], keyID: null }
+
     $scope.ipfs.on 'ready', ->
       console.log $scope.ipfs
       $window.ipfs = $scope.ipfs
@@ -102,94 +109,53 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.initIpfsIndexes()
 
     $scope.initIpfsIndexes = ->
-      $scope.getIpfsIndexes ['', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'],
-        ['https://identi.fi', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'],
-        ['https://ipfs.io', '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs']
-      .then ->
+      indexRoot = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
+      console.log 'Loading index from https://identi.fi:', indexRoot
+      $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage('https://identi.fi')
+      $q.all([
+        $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/identities_by_distance', $scope.ipfsStorage),
+        $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/identities_by_searchkey', $scope.ipfsStorage),
+        $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/messages_by_timestamp', $scope.ipfsStorage),
+      ])
+      .catch (e) ->
+        console.log 'Loading index from https://identi.fi failed', e
+        console.log 'Loading index from ipfs.io'
+        $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage('https://ipfs.io')
+        $q.all([
+          $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/identities_by_distance', $scope.ipfsStorage),
+          $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/identities_by_searchkey', $scope.ipfsStorage),
+          $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/messages_by_timestamp', $scope.ipfsStorage),
+        ])
+      .then (results) ->
+        console.log 'Got index', results
+        $scope.identitiesByDistance = results[0]
+        $scope.identitiesBySearchKey = results[1]
+        $scope.messageIndex = results[2]
         $scope.apiReady = true
+
+      $http.get 'https://identi.fi' + indexRoot + '/info'
+      .catch (err) ->
+        $http.get 'https://ipfs.io' + indexRoot + '/info'
+      .then (res) ->
+        $scope.nodeInfo.profile = $scope.profileFromData(res.data, ['keyID', res.data.keyID])
       .catch (e) ->
         console.log 'initialization failed:', e
-        $scope.apiReady = true
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
       if (title)
         $rootScope.pageTitle += ' - ' + title
 
-    $scope.getIpfsIndexes = (indexRoot, fallbackIndexRoot, fallbackIndexRoot2) ->
-      getBtreeOrFallback = (url, fallbackUrl, fallbackUrl2) ->
-        $window.merkleBtree.MerkleBTree.getByHash(url, $scope.ipfsStorage).catch ->
-          console.log 'Failed to fetch index', url, ', reverting to', fallbackUrl
-          $window.merkleBtree.MerkleBTree.getByHash(fallbackUrl, $scope.ipfsStorage)
-        .catch ->
-          console.log 'Failed to fetch index', fallbackUrl, ', reverting to', fallbackUrl2
-          $window.merkleBtree.MerkleBTree.getByHash(fallbackUrl2, $scope.ipfsStorage)
-
-      console.log 'Getting Identifi index from IPFS:', indexRoot.join('')
-      $scope.ipfsStorage = new $window.merkleBtree.IPFSStorage($scope.ipfs)
-      # First attempt to load indexes via js-ipfs
-      $q.all([
-        $window.merkleBtree.MerkleBTree.getByHash('/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs/identities_by_distance', $scope.ipfsStorage),
-        $window.merkleBtree.MerkleBTree.getByHash('/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs/identities_by_searchkey', $scope.ipfsStorage),
-        $window.merkleBtree.MerkleBTree.getByHash('/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs/messages_by_timestamp', $scope.ipfsStorage),
-      ])
-      # If fails, try loading indexes via gateways
-      .catch (e) ->
-        console.log 'Loading indexes via js-ipfs failed:', e
-        $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(indexRoot[0])
-        $http.get(indexRoot.join('') + '/info')
-      .catch ->
-          console.log 'Failed to fetch index', indexRoot.join('') + '/info,', 'reverting to', fallbackIndexRoot.join('') + '/info'
-          $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(fallbackIndexRoot[0])
-          $http.get(fallbackIndexRoot.join('') + '/info')
-      .catch ->
-        console.log 'Failed to fetch index', fallbackIndexRoot.join('') + '/info,', 'reverting to', fallbackIndexRoot2.join('') + '/info'
-        $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage(fallbackIndexRoot[1])
-        $http.get(fallbackIndexRoot2.join('') + '/info')
-      .then (res) ->
-        $scope.nodeInfo.profile = $scope.profileFromData(res.data, ['keyID', res.data.keyID])
-        $q.all([
-          getBtreeOrFallback(indexRoot[1] + '/identities_by_distance',
-            fallbackIndexRoot[1] + '/identities_by_distance',
-            fallbackIndexRoot2[1] + '/identities_by_distance'),
-          getBtreeOrFallback(indexRoot[1] + '/identities_by_searchkey',
-            fallbackIndexRoot[1] + '/identities_by_searchkey',
-            fallbackIndexRoot2[1] + '/identities_by_searchkey'),
-          getBtreeOrFallback(indexRoot[1] + '/messages_by_timestamp',
-            fallbackIndexRoot[1] + '/messages_by_timestamp',
-            fallbackIndexRoot2[1] + '/messages_by_timestamp'),
-        ])
-      .then (results) ->
-        $scope.identitiesByDistance = results[0]
-        $scope.identitiesBySearchKey = results[1]
-        $scope.messageIndex = results[2]
-      .then ->
-        path = $location.absUrl()
-        host = if path.match /\/ip[nf]s\// then 'https://identi.fi' else ''
-        $http.get(host + '/api', { timeout: 2000 })
-      .then (res) ->
-        $scope.nodeInfo = angular.extend $scope.nodeInfo, res.data
-      .catch (res) ->
-        $scope.nodeInfo = { loginOptions: [true], keyID: null }
-
     $scope.ipfsGet = (uri, getJson) ->
-      apiRoot = $scope.ipfsStorage.apiRoot or 'https://identi.fi'
-      $http.get(apiRoot + '/ipfs/' + uri)
-      .then (res) ->
-        res.data
-      .catch ->
-        $scope.ipfs.files.cat(uri).then (stream) ->
-          new Promise (resolve, reject) ->
-            stream.on 'data', (file) ->
-              file = $scope.ipfs.types.Buffer(file).toString()
-              resolve(file)
-            stream.on 'error', (error) ->
-              reject(error)
-      .then (res) ->
-        if typeof res == 'object' or !getJson
-          return res
-        else
-          return JSON.parse(res)
+      console.log 'Getting from js-ipfs', uri
+      $scope.ipfs.files.cat(uri).then (stream) ->
+        new Promise (resolve, reject) ->
+          stream.on 'data', (file) ->
+            file = $scope.ipfs.types.Buffer(file).toString()
+            file = JSON.parse(file) if getJson
+            resolve(file)
+          stream.on 'error', (error) ->
+            reject(error)
 
     $scope.newMessage =
       rating: 1
