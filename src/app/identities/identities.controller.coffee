@@ -127,10 +127,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             conn.quickContact = true
           when 'coverPhoto'
             if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-              $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(' + conn.val + ')' }
+              $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(' + ($scope.ipfsStorage.apiRoot or '') + conn.val + ')' }
           when 'profilePhoto'
             if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-              $scope.profilePhoto = $scope.profilePhoto or conn.val
+              $scope.profilePhoto = $scope.profilePhoto or ($scope.ipfsStorage.apiRoot or '') + conn.val
           when 'url'
             conn.link = conn.val
             if conn.val.indexOf('facebook.com/') > -1
@@ -167,7 +167,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               conn.iconStyle = 'glyphicon glyphicon-link'
               conn.btnStyle = 'btn-default'
         if conn.val and conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-          conn.link = conn.val
+          conn.link = ($scope.ipfsStorage.apiRoot or '') + conn.val
           conn.linkName = conn.val
           conn.iconStyle = 'glyphicon glyphicon-link'
           conn.btnStyle = 'btn-default'
