@@ -147,15 +147,23 @@ angular.module('identifiAngular').controller 'MainController', [
         $rootScope.pageTitle += ' - ' + title
 
     $scope.ipfsGet = (uri, getJson) ->
-      console.log 'Getting from js-ipfs', uri
-      $scope.ipfs.files.cat(uri).then (stream) ->
-        new Promise (resolve, reject) ->
-          stream.on 'data', (file) ->
-            file = $scope.ipfs.types.Buffer(file).toString()
-            file = JSON.parse(file) if getJson
-            resolve(file)
-          stream.on 'error', (error) ->
-            reject(error)
+      jsIpfsGet = ->
+        console.log 'Getting from js-ipfs', uri
+        $scope.ipfs.files.cat(uri).then (stream) ->
+          new Promise (resolve, reject) ->
+            stream.on 'data', (file) ->
+              file = $scope.ipfs.types.Buffer(file).toString()
+              file = JSON.parse(file) if getJson
+              resolve(file)
+            stream.on 'error', (error) ->
+              reject(error)
+
+      if $scope.ipfsStorage.apiRoot
+        return $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + uri)
+        .then (res) -> res.data
+        .catch -> jsIpfsGet()
+      else
+        return jsIpfsGet()
 
     $scope.newMessage =
       rating: 1
