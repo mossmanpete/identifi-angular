@@ -99,8 +99,8 @@ angular.module('identifiAngular').controller 'MainController', [
       console.log $scope.ipfs
       $window.ipfs = $scope.ipfs
       $scope.ipfs.pubsub.subscribe 'identifi', (msg) ->
-        msg = $scope.ipfs.types.Buffer(msg.data).toString()
-        hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(msg))
+        msg = { jws: $scope.ipfs.types.Buffer(msg.data).toString() }
+        hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(msg.jws))
         console.log 'identifi message received', msg, hash
         localMessages = localStorageService.get('localMessages')
         $scope.processMessages([msg])
@@ -194,17 +194,18 @@ angular.module('identifiAngular').controller 'MainController', [
         jws = KJUR.jws.JWS.sign("ES256", header, payload, $scope.privateKey)
         hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(jws))
         message = { jws: jws, hash: hash }
+        $scope.ipfs.files.add(new $scope.ipfs.types.Buffer(jws)).then (i) ->
+          $scope.ipfs.pubsub.publish('identifi', new $scope.ipfs.types.Buffer(jws))
       else
         options =
           headers:
             'Authorization': 'Bearer ' + $scope.authentication.token
-      r = $scope.ipfs.files.add(new $scope.ipfs.types.Buffer(jws)).then (i) ->
-       $scope.ipfs.pubsub.publish('identifi', new $scope.ipfs.types.Buffer(jws))
-      .then ->
-        $http.post('/api/messages', message, options)
+
+      $http.post('/api/messages', message, options)
       .catch ->
         $http.post('https://identi.fi/api/messages', message, options)
-      r.then ((response) ->
+      .then ((response) ->
+        console.log response
         # Clear form fields
         $scope.newMessage.comment = ''
         $scope.newMessage.rating = 1
@@ -218,7 +219,6 @@ angular.module('identifiAngular').controller 'MainController', [
       ), (errorResponse) ->
         $scope.error = errorResponse.data || JSON.stringify(errorResponse)
         return
-      return r
 
     $scope.addAttribute = ->
       $location.path '#/identities/create/' + $scope.query.term
