@@ -20,7 +20,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.stats = {}
     $scope.sent = []
     $scope.received = []
-    $scope.connections = []
+    $scope.connections = {}
     $scope.thumbsUp = []
     $scope.thumbsDown = []
     $scope.verifications = []
@@ -42,28 +42,18 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
+      $scope.localMessages[args.message.hash] = args.message
+      $scope.localMessages[args.message.hash].local = true
+      localStorageService.set('localMessages', $scope.localMessages)
+      messagesAdded = true
       return unless $state.is 'identities.show'
-      if args.message.signedData.type == 'verify_identity' and not args.id.confirmed
-        args.id.confirmed = true
-        args.id.confirmations += 1
-        if $scope.connections && $scope.connections.indexOf(args.id) == -1
-          $scope.connections.push args.id
-          $scope.getConnections()
-      else if args.message.signedData.type == 'unverify_identity' and not args.id.refuted
-        args.id.refuted = true
-        args.id.refutations += 1
-        if $scope.connections.indexOf(args.id) == -1
-          $scope.connections.push args.id
-          $scope.getConnections()
+      if args.message.signedData.type in ['verify_identity', 'unverify_identity'] and not args.id.confirmed
+        $scope.getConnections()
       else if args.message.signedData.type == 'rating'
         if messagesAdded
           $scope.received.shift()
         $scope.processMessages [args.message]
         $scope.received.unshift args.message
-        $scope.localMessages[args.message.hash] = args.message
-        $scope.localMessages[args.message.hash].local = true
-        localStorageService.set('localMessages', $scope.localMessages)
-        messagesAdded = true
 
     $scope.addEntry = (event, entry) ->
       recipient = []
@@ -84,11 +74,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         console.log "error", error
 
     $scope.getConnections = ->
+      $scope.connections = {}
       connections = $scope.identityProfile.attrs or []
-      connections = $scope.connections if $scope.connections.length
       if connections.length > 0
         c = connections[0]
-        mostConfirmations = c.confirmations
+        mostConfirmations = c.conf
         $scope.stats =
           received_positive: c.pos
           received_negative: c.neg
@@ -96,8 +86,32 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.distance = c.dist
       else
         mostConfirmations = 1
-      for key of connections
-        conn = connections[key]
+      for k, v of connections
+        $scope.connections[$scope.getIdKey(v)] = Object.assign({}, v)
+      for msg in Object.values($scope.localMessages)
+        msg.data = msg.data or msg.signedData
+        if msg.data.type in ['verify_identity', 'unverify_identity']
+          has = false
+          for r in msg.data.recipient
+            if r[0] == $scope.idType and r[1] == $scope.idValue
+              has = true
+              break
+          continue unless has
+          for r in msg.data.recipient
+            unless r[0] == $scope.idType and r[1] == $scope.idValue
+              idKey = $scope.getIdKey(r)
+              if $scope.connections.hasOwnProperty(idKey)
+                $scope.connections[idKey].conf += 1 if msg.data.type == 'verify_identity'
+                $scope.connections[idKey].ref += 1 if msg.data.type == 'unverify_identity'
+              else
+                $scope.connections[idKey] =
+                  name: msg.data.recipient[1][0]
+                  val: msg.data.recipient[1][1]
+                  conf: if msg.data.type == 'verify_identity' then 1 else 0
+                  ref: if msg.data.type == 'unverify_identity' then 1 else 0
+              break
+      for key, conn of $scope.connections
+        conn.isCurrent = conn.name == $scope.idType and conn.val == $scope.idValue
         switch conn.name
           when 'email'
             conn.iconStyle = 'glyphicon glyphicon-envelope'
@@ -127,6 +141,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             conn.btnStyle = 'btn-success'
             conn.link = 'tel:' + conn.val
             conn.quickContact = true
+          when 'keyID'
+            conn.iconStyle = 'fa fa-key'
           when 'coverPhoto'
             if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
               $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(' + ($scope.ipfsStorage.apiRoot or '') + conn.val + ')' }
@@ -173,32 +189,35 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           conn.linkName = conn.val
           conn.iconStyle = 'glyphicon glyphicon-link'
           conn.btnStyle = 'btn-default'
-        if conn.confirmations + conn.refutations > 0
-          percentage = conn.confirmations * 100 / (conn.confirmations + conn.refutations)
+        if conn.conf + conn.ref > 0
+          percentage = conn.conf * 100 / (conn.conf + conn.ref)
           if percentage >= 80
-            alpha = conn.confirmations / mostConfirmations * 0.7 + 0.3
+            alpha = conn.conf / mostConfirmations * 0.7 + 0.3
             # conn.rowStyle = 'background-color: rgba(223,240,216,' + alpha + ')'
           else if percentage >= 60
             conn.rowClass = 'warning'
           else
             conn.rowClass = 'danger'
         $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
-      $scope.connections = connections
       $scope.getPhotosFromGravatar()
+      $scope.connectionsLength = Object.keys($scope.connections).length
       $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
 
     $scope.getConnectingMsgs = (id1, id2) ->
       getVerifications = $q (resolve) ->
         if !$scope.verifications.length
-          $scope.receivedIndex.searchText('', 10000, false, true).then (res) ->
-            res.forEach (row) ->
-              msg = row.value
-              unless msg.signedData
-                msg.signedData = KJUR.jws.JWS.parse(msg.jws).payloadObj
-              if (msg.signedData.type in ['verify_identity', 'unverify_identity'])
-                msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.signedData.author[0][1]).toString()
-                msg.linkToAuthor = msg.signedData.author[0]
-                $scope.verifications.push msg
+          if $scope.receivedIndex
+            $scope.receivedIndex.searchText('', 10000, false, true).then (res) ->
+              res.forEach (row) ->
+                msg = row.value
+                unless msg.signedData
+                  msg.signedData = KJUR.jws.JWS.parse(msg.jws).payloadObj
+                if (msg.signedData.type in ['verify_identity', 'unverify_identity'])
+                  msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.signedData.author[0][1]).toString()
+                  msg.linkToAuthor = msg.signedData.author[0]
+                  $scope.verifications.push msg
+              resolve()
+          else
             resolve()
         else
           resolve()
@@ -280,26 +299,30 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       email = $scope.info.email or $scope.idValue
       $scope.gravatar = CryptoJS.MD5(email).toString()
 
+    addLocalMessages = ->
+      msgs = localStorageService.get('localMessages') or {}
+      connectionsToAdd = {}
+      for msg in Object.values(msgs)
+        msg.data = msg.data or msg.signedData
+        if msg.data.recipient[0][0] == $scope.idType and msg.data.recipient[0][1] == $scope.idValue
+          $scope.received.unshift(msg)
+        if msg.data.author[0][0] == $scope.idType and msg.data.author[0][1] == $scope.idValue
+          $scope.sent.unshift(msg)
+
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
       $scope.sent = []
       $scope.received = []
+      addLocalMessages()
       $timeout -> $rootScope.$broadcast 'msgScrollCheck'
-
-    addLocalMessages = ->
-      msgs = localStorageService.get('localMessages') or {}
-      $scope.$apply ->
-        for msg in Object.values(msgs)
-          if msg.data.recipient[0][0] == $scope.idType and msg.data.recipient[0][1] == $scope.idValue
-            $scope.received.unshift(msg)
-          if msg.data.author[0][0] == $scope.idType and msg.data.author[0][1] == $scope.idValue
-            $scope.sent.unshift(msg)
 
     $scope.findOne = ->
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
-      $scope.isCurrentUser = $scope.authentication && $scope.authentication.user &&
-        $scope.idType == $scope.authentication.user.idType and $scope.idValue == $scope.idValue
+      $scope.isCurrentUser = $scope.authentication and
+        $scope.authentication.user and
+        $scope.idType == $scope.authentication.user.idType and
+        $scope.idValue == $scope.authentication.user.idValue
       $scope.isUniqueType = config.uniqueAttributeTypes.indexOf($scope.idType) > -1
       if !$scope.isUniqueType
         $state.go 'identities.list', { search: $scope.idValue }
@@ -309,7 +332,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         if isReady
           $scope.getIdentityProfile({ type: $scope.idType, value: $scope.idValue }).then (profile) ->
             $scope.identityProfile = profile
-            addLocalMessages()
+            $scope.$apply -> addLocalMessages()
             $scope.getConnections()
             if !(profile.sent and profile.received)
               throw new Error('missing sent or received index: ' + JSON.stringify(profile))

@@ -34,6 +34,12 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.nodeInfo = { keyID: null }
     $scope.ipfsStorage = {}
 
+    $scope.getIdKey = (id) ->
+      if Array.isArray(id)
+        return encodeURIComponent(id[0]) + ':' + encodeURIComponent(id[1])
+      else
+        return encodeURIComponent(id.name) + ':' + encodeURIComponent(id.val)
+
     $scope.loginWithKey = (privateKeyPEM) ->
       $scope.privateKey = KEYUTIL.getKeyFromPlainPrivatePKCS8PEM(privateKeyPEM)
       $scope.publicKey = new KJUR.crypto.ECDSA({'curve': 'secp256k1', 'pub': $scope.privateKey.pubKeyHex})
