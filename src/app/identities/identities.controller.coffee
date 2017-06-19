@@ -334,17 +334,16 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             $scope.identityProfile = profile
             $scope.$apply -> addLocalMessages()
             $scope.getConnections()
-            if !(profile.sent and profile.received)
-              throw new Error('missing sent or received index: ' + JSON.stringify(profile))
-            $q.all([
-              $window.merkleBtree.MerkleBTree.getByHash(profile.sent, $scope.ipfsStorage),
+            if profile.sent
+              $window.merkleBtree.MerkleBTree.getByHash(profile.sent, $scope.ipfsStorage)
+              .then (sentIndex) ->
+                $scope.sentIndex = sentIndex
+                $scope.getSentMsgs(0)
+            if profile.received
               $window.merkleBtree.MerkleBTree.getByHash(profile.received, $scope.ipfsStorage)
-            ])
-          .then (indexes) ->
-            $scope.sentIndex = indexes[0]
-            $scope.receivedIndex = indexes[1]
-            $scope.getReceivedMsgs 0
-            $scope.getSentMsgs 0
+              .then (receivedIndex) ->
+                $scope.receivedIndex = receivedIndex
+                $scope.getReceivedMsgs(0)
           .catch (err) ->
             console.log 'error fetching profile', err
       if $scope.idType == 'keyID' and $scope.idValue == $scope.nodeInfo.keyID
