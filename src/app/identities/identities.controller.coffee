@@ -68,8 +68,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       params =
         type: 'verify_identity'
         recipient: recipient
-      $scope.createMessage(event, params).then (success) ->
-        $state.go 'messages.show', { id: success.data.hash }
+      $scope.createMessage(event, params).then (response) ->
+        $state.go 'messages.show', { id: response.ipfs_hash }
       , (error) ->
         console.log "error", error
 

@@ -223,10 +223,10 @@ angular.module('identifiAngular').controller 'MainController', [
           message: response.data
           id: id
         $scope.getIpfsIndexes $scope.ipfsStorage.apiRoot + '/ipfs/' + response.data.ipfsIndexRoot if response.data.ipfsIndexRoot
-        return
+        response.data
       ), (errorResponse) ->
         $scope.error = errorResponse.data || JSON.stringify(errorResponse)
-        return
+        console.error(errorResponse)
 
     $scope.addAttribute = ->
       $location.path '#/identities/create/' + $scope.query.term
