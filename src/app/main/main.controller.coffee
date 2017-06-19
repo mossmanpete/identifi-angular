@@ -112,7 +112,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.processMessages([msg])
         localMessages[hash] = msg
         localStorageService.set('localMessages', localMessages)
-      $scope.initIpfsIndexes()
+      #$scope.initIpfsIndexes()
 
     $scope.initIpfsIndexes = ->
       indexRoot = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
@@ -146,6 +146,8 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.nodeInfo.profile = $scope.profileFromData(res.data, ['keyID', res.data.keyID])
       .catch (e) ->
         console.log 'initialization failed:', e
+
+    $scope.initIpfsIndexes()
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
