@@ -88,7 +88,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         mostConfirmations = 1
       for k, v of connections
         $scope.connections[$scope.getIdKey(v)] = Object.assign({}, v)
-      for msg in Object.values($scope.localMessages)
+      for hash, msg of $scope.localMessages
         msg.data = msg.data or msg.signedData
         if msg.data.type in ['verify_identity', 'unverify_identity']
           has = false
@@ -302,7 +302,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     addLocalMessages = ->
       msgs = localStorageService.get('localMessages') or {}
       connectionsToAdd = {}
-      for msg in Object.values(msgs)
+      for hash, msg of msgs
         msg.data = msg.data or msg.signedData
         if msg.data.recipient[0][0] == $scope.idType and msg.data.recipient[0][1] == $scope.idValue
           $scope.received.unshift(msg)

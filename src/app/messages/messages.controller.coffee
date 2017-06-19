@@ -23,7 +23,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
       $scope.msgs =
         loading: false
         finished: false
-        list: Object.values(msgs)
+        list: (value for own prop, value of msgs)
     $scope.resetMsgs()
 
     $scope.iconCount = (rating) ->
