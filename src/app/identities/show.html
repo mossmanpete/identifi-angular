@@ -139,7 +139,7 @@
                     ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                     title=""
                     uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
-                    <identicon id="msg" class="square no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
+                    <identicon id="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
                     <span class="distance" ng-bind="msg.distance | ordinal"></span>
                   </a>
                 </div>
@@ -152,7 +152,7 @@
                   ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                   title=""
                   uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
-                    <identicon id="msg" class="square no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
+                    <identicon id="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
                     <span class="distance" ng-bind="msg.distance | ordinal"></span>
                   </a>
                 </div>
