@@ -82,7 +82,7 @@ angular.module('identifiAngular').controller 'MainController', [
         pubsub: true
       },
       start: true
-      repo: 'ipfs-testing'
+      repo: 'ipfs6-identifi'
       config: Bootstrap: [
         '/dns4/ams-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd'
         '/dns4/sfo-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLju6m7xTh3DuokvT3886QRYqxAzb1kShaanJgW36yx'
