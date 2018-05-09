@@ -115,30 +115,13 @@ angular.module('identifiAngular').controller 'MainController', [
       #$scope.initIpfsIndexes()
 
     $scope.initIpfsIndexes = ->
-      indexRoot = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
-      console.log 'Loading index from https://identi.fi:', indexRoot
-      $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage('https://identi.fi')
-      $q.all([
-        $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/identities_by_distance', $scope.ipfsStorage),
-        $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/identities_by_searchkey', $scope.ipfsStorage),
-        $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/messages_by_timestamp', $scope.ipfsStorage),
-      ])
-      .catch (e) ->
-        console.log 'Loading index from https://identi.fi failed', e
-        console.log 'Loading index from ipfs.io'
-        $scope.ipfsStorage = new $window.merkleBtree.IPFSGatewayStorage('https://ipfs.io')
-        $q.all([
-          $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/identities_by_distance', $scope.ipfsStorage),
-          $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/identities_by_searchkey', $scope.ipfsStorage),
-          $window.merkleBtree.MerkleBTree.getByHash(indexRoot + '/messages_by_timestamp', $scope.ipfsStorage),
-        ])
+      $window.identifiLib.Index.load()
       .then (results) ->
-        console.log 'Got index', results
-        $scope.identitiesByDistance = results[0]
-        $scope.identitiesBySearchKey = results[1]
-        $scope.messageIndex = results[2]
+        $scope.identifiIndex = results
+        console.log 'Got index', $scope.identifiIndex
         $scope.apiReady = true
 
+      indexRoot = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
       $http.get 'https://identi.fi' + indexRoot + '/info'
       .catch (err) ->
         $http.get 'https://ipfs.io' + indexRoot + '/info'
@@ -331,8 +314,9 @@ angular.module('identifiAngular').controller 'MainController', [
       return data
 
     $scope.getIdentityProfile = (id, callback) ->
-      $scope.identitiesBySearchKey.searchText(encodeURIComponent(id.value) + ':' + encodeURIComponent(id.type), 1)
+      $scope.identifiIndex.get(id[0], id[1])
       .then (res) ->
+        console.log res
         if res.length
           return $scope.ipfsGet(res[0].value, true).then (res) ->
             return { data: res }
@@ -506,70 +490,24 @@ angular.module('identifiAngular').controller 'MainController', [
       if $scope.ids.list.length
         cursor = $scope.ids.list[$scope.ids.list.length - 1].searchKey
       if searchKey.length
-        $scope.searchRequest = $scope.identitiesBySearchKey.searchText(searchKey, limit, cursor)
+        $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
+      # TODO: distance index in identifiLib?
       else
-        $scope.searchRequest = $scope.identitiesByDistance.searchText(searchKey, limit, cursor)
+        $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
       $scope.searchRequest = $scope.searchRequest.then (identities) ->
+#        console.log identities
         searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
         if searchKey != $scope.previousSearchKey
           return # search key changed
         $scope.ids.list = $scope.ids.list or []
-        queries = []
-        angular.forEach identities, (row) ->
-          return unless row.value and row.value.length and !$scope.identitiesByHash[row.value]
-          $scope.identitiesByHash[row.value] = true
-          searchKey = row.key
-          # p = $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + row.value)
-          p = $scope.ipfsGet(row.value, true)
-          .then (row) ->
-            identity = { searchKey: searchKey }
-            smallestIndex = 1000
-            angular.forEach row.attrs, (attr) ->
-              dist = parseInt(attr.dist)
-              if !isNaN(dist) and (identity.distance == undefined or (0 <= dist < identity.distance))
-                identity.distance = dist
-              if identity.pos == undefined and parseInt(attr.pos) > 0
-                identity.pos = attr.pos
-              if identity.neg == undefined and parseInt(attr.neg) > 0
-                identity.neg = attr.neg
-              switch attr.name
-                when 'email'
-                  identity.email = attr.val
-                  identity.gravatar = CryptoJS.MD5(attr.val).toString()
-                when 'name'
-                  identity.name = attr.val
-                when 'nickname'
-                  identity.nickname = attr.val
-                  identity.name = attr.val if !identity.name
-                when 'bitcoin', 'bitcoin_address'
-                  identity.bitcoin = attr.val
-                when 'url'
-                  if attr.val.indexOf('twitter.com/') > -1
-                    identity.twitter = attr.val.split('twitter.com/')[1]
-                  if attr.val.indexOf('facebook.com/') > -1
-                    identity.facebook = attr.val.split('facebook.com/')[1]
-                  if attr.val.indexOf('plus.google.com/') > -1
-                    identity.googlePlus = attr.val.split('plus.google.com/')[1]
-              index = config.uniqueAttributeTypes.indexOf(attr.name)
-              if !identity.linkTo
-                identity.linkTo = { type: attr.name, value: attr.val }
-              if index > -1 and index < smallestIndex
-                identity.linkTo = { type: attr.name, value: attr.val }
-                smallestIndex = index
-              if !identity.gravatar
-                identity.gravatar = CryptoJS.MD5(attr.val).toString()
-            if !identity.name
-              identity.name = row.attrs[0].val
-            $scope.ids.list.push(identity)
-            $scope.ids.list[0].active = true
-          queries.push p
+        $scope.ids.list = $scope.ids.list.concat(identities)
         if identities.length > 0
           $scope.ids.activeKey = 0
-        if identities.length < limit
+        if true or identities.length < limit
           $scope.ids.finished = true
-        return $q.all(queries)
       return $scope.searchRequest.then ->
         $scope.$apply -> $scope.ids.loading = false
+        console.log $scope.ids.list
         $scope.ids.list
 
     $scope.searchKeydown = (event) ->
@@ -591,7 +529,7 @@ angular.module('identifiAngular').controller 'MainController', [
         when 13
           event.preventDefault()
           id = $scope.ids.list[$scope.ids.activeKey]
-          $state.go 'identities.show', { type: id.linkTo.type, value: id.linkTo.value }
+          $state.go 'identities.show', { type: id.linkTo.name, value: id.linkTo.val }
         when -1
           clearTimeout $scope.timer
           $scope.query.term = ''
@@ -609,6 +547,6 @@ angular.module('identifiAngular').controller 'MainController', [
           break
 
     $scope.dropdownSearchSelect = (item) ->
-      $state.go('identities.show', { type: item.linkTo.type, value: item.linkTo.value })
+      $state.go('identities.show', { type: item.linkTo.name, value: item.linkTo.val })
       $scope.query.term = ''
 ]
