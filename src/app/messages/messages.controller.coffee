@@ -55,7 +55,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
       searchKey = ''
       if $scope.msgs.list.length
         searchKey = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
-      p = $scope.messageIndex.searchText('', $scope.filters.limit, searchKey, true)
+      p = $scope.identifiIndex.messagesByTimestamp.searchText('', $scope.filters.limit, searchKey, true)
       .then (res) ->
         messages = []
         localMessages = localStorageService.get('localMessages') or {}

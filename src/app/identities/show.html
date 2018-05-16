@@ -61,16 +61,16 @@
             <div class="row">
               <div class="col-xs-12">
                 <h4>
-                  <span class="visible-xs visible-sm" ng-if="!(info.name||info.nickname)">
+                  <span class="visible-xs visible-sm" ng-if="!(identityProfile.mostVerifiedAttributes.name||identityProfile.mostVerifiedAttributes.nickname)">
                     <span ng-bind="idValue"></span>
                     <small class="text-muted">
                       <span ng-hide="idType === 'url'" ng-bind="idType" id="id-type"></span>
                       <a ng-href="{{idValue}}" ng-show="idType === 'url'" ng-bind="idType" id="id-type"></a>
                     </small>
                   </span>
-                  <span ng-bind="info.name||info.nickname"></span>
-                  <span ng-hide="!info.nickname || !info.name || info.nickname === info.name">
-                    (<span class="text-muted" ng-bind="info.nickname"></span>)
+                  <span ng-bind="identityProfile.mostVerifiedAttributes.name.attribute.val||identityProfile.mostVerifiedAttributes.nickname.attribute.val"></span>
+                  <span ng-hide="!identityProfile.mostVerifiedAttributes.nickname || !identityProfile.mostVerifiedAttributes.name || identityProfile.mostVerifiedAttributes.nickname.attribute.val === identityProfile.mostVerifiedAttributes.name.attribute.val">
+                    (<span class="text-muted" ng-bind="identityProfile.mostVerifiedAttributes.nickname.attribute.val"></span>)
                   </span>
                   <span ng-if="distance == 0" class="label label-default pull-right">viewpoint</span>
                   <span ng-if="distance > 0" ng-bind="distance | ordinal" class="label label-default pull-right"></span>
@@ -133,12 +133,11 @@
                   <h5>Thumbs up</h5>
                   <a ng-repeat="msg in thumbsUp"
                     ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 4 }"
-                    class="distance-container mar-right5 mar-bot5"
+                    class="mar-right5 mar-bot5"
                     ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                     title=""
                     uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
                     <identicon identity="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
-                    <span class="distance" ng-bind="msg.distance | ordinal"></span>
                   </a>
                 </div>
 
@@ -146,12 +145,11 @@
                   <h5>Thumbs down</h5>
                   <a ng-repeat="msg in thumbsDown"
                   ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 4 }"
-                  class="distance-container mar-right5 mar-bot5"
+                  class="mar-right5 mar-bot5"
                   ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                   title=""
                   uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
                     <identicon identity="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
-                    <span class="distance" ng-bind="msg.distance | ordinal"></span>
                   </a>
                 </div>
               </div>
