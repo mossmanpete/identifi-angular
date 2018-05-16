@@ -313,30 +313,13 @@ angular.module('identifiAngular').controller 'MainController', [
       data.gravatar = CryptoJS.MD5(fallbackId.value).toString() unless data.gravatar
       return data
 
-    $scope.getIdentityProfile = (id, callback) ->
-      $scope.identifiIndex.get(id[0], id[1])
-      .then (res) ->
-        console.log res
-        if res.length
-          return $scope.ipfsGet(res[0].value, true).then (res) ->
-            return { data: res }
-          # return $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + res[0].value)
-        else
-          return { data: {} }
-      .then (res) ->
-        profile = $scope.profileFromData(res.data, id)
-        if callback
-          return callback(profile)
-        else
-          return profile
-
     $scope.openMessage = (event, message, size) ->
       t = event.target
       return if angular.element(t).closest('a').length
       $scope.setMsgRawData(message)
       $scope.message = message
       return unless $scope.hasValidSignature(message)
-      $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signer_keyid }, (profile) ->
+      $scope.identifiIndex.get($scope.message.signer_keyid, 'keyID').then (profile) ->
         $scope.$apply -> $scope.message.verifiedBy = profile
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled

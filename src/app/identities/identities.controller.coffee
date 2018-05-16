@@ -75,7 +75,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.getConnections = ->
       $scope.connections = {}
-      connections = $scope.identityProfile.attrs or []
+      connections = $scope.identityProfile.data.attrs or []
       if connections.length > 0
         c = connections[0]
         mostConfirmations = c.conf
@@ -200,6 +200,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             conn.rowClass = 'danger'
         $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
       $scope.getPhotosFromGravatar()
+      console.log $scope.info
       $scope.connectionsLength = Object.keys($scope.connections).length
       $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
 
@@ -295,7 +296,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.received.finished = true
 
     $scope.getPhotosFromGravatar = ->
-      console.log $scope.idValue
       email = $scope.info.email or $scope.idValue
       $scope.gravatar = CryptoJS.MD5(email).toString()
 
@@ -330,7 +330,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.setPageTitle $scope.idValue
       $scope.$watch 'apiReady', (isReady) ->
         if isReady
-          $scope.getIdentityProfile({ type: $scope.idType, value: $scope.idValue }).then (profile) ->
+          $scope.identifiIndex.get($scope.idValue, $scope.idType).then (profile) ->
+            console.log 'hello', profile
             $scope.identityProfile = profile
             $scope.$apply -> addLocalMessages()
             $scope.getConnections()
