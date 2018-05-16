@@ -119,7 +119,7 @@ angular.module('identifiAngular').controller 'MainController', [
       .then (results) ->
         $scope.identifiIndex = results
         console.log 'Got index', $scope.identifiIndex
-        $scope.apiReady = true
+        $scope.$apply -> $scope.apiReady = true
 
       indexRoot = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
       $http.get 'https://identi.fi' + indexRoot + '/info'

@@ -2,15 +2,15 @@
 angular.module 'identifiAngular'
   .directive 'identicon', ->
     scope:
-      id: '='
+      identity: '='
       border: '=?'
       positiveScore: '=?'
       negativeScore: '=?'
       width: '=?'
     link: (scope, element, attr) ->
       update = ->
-        if scope.id && scope.id.identicon
-          identicon = scope.id.identicon(scope.width)
+        if scope.identity && scope.identity.identicon
+          identicon = scope.identity.identicon(scope.width)
           element.empty()
           element.append(identicon)
-      scope.$watchGroup ['id'], update
+      scope.$watchGroup ['identity'], update

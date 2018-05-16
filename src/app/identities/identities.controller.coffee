@@ -329,21 +329,18 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.tabs[2].active = true
       $scope.setPageTitle $scope.idValue
       $scope.$watch 'apiReady', (isReady) ->
+        console.log 'apiReady', isReady
         if isReady
           $scope.identifiIndex.get($scope.idValue, $scope.idType).then (profile) ->
-            console.log 'hello', profile
             $scope.identityProfile = profile
-            $scope.$apply -> addLocalMessages()
-            $scope.getConnections()
-            if profile.sent
-              $window.merkleBtree.MerkleBTree.getByHash(profile.sent, $scope.ipfsStorage)
-              .then (sentIndex) ->
-                $scope.sentIndex = sentIndex
-                $scope.getSentMsgs(0)
-            if profile.received
-              $window.merkleBtree.MerkleBTree.getByHash(profile.received, $scope.ipfsStorage)
-              .then (receivedIndex) ->
-                $scope.receivedIndex = receivedIndex
+            $scope.$apply ->
+              addLocalMessages()
+              $scope.getConnections()
+            profile.getSentMsgsIndex($scope.identifiIndex.storage).then (ix) ->
+              $scope.sentIndex = ix
+              $scope.getSentMsgs(0)
+            profile.getReceivedMsgsIndex($scope.identifiIndex.storage).then (ix) ->
+                $scope.receivedIndex = ix
                 $scope.getReceivedMsgs(0)
           .catch (err) ->
             console.log 'error fetching profile', err

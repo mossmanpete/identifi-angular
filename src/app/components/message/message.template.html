@@ -6,7 +6,7 @@
       <strong>
         <a ui-sref="identities.show({ type: $ctrl.msgData.linkToAuthor[0], value: $ctrl.msgData.linkToAuthor[1] })" class="id-link">
           <span class="distance-container mar-right10">
-            <identicon id="$ctrl.msgData" class="" border="3" width="35" positive-score="$ctrl.msgData.author_pos" negative-score="$ctrl.msgData.author_neg"></identicon>
+            <identicon identity="$ctrl.msgData" class="" border="3" width="35" positive-score="$ctrl.msgData.author_pos" negative-score="$ctrl.msgData.author_neg"></identicon>
             <span ng-if="$ctrl.msgData.distance >= 0" class="distance" ng-bind="$ctrl.msgData.distance | ordinal"></span>
           </span>
           <span ng-bind="($ctrl.msgData.authorIsSelf && ($ctrl.pageInfo.name || $ctrl.pageInfo.nickname))||$ctrl.msgData.author_name||$ctrl.msgData.linkToAuthor[1]"></span>

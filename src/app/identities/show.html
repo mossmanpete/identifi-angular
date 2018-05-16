@@ -47,10 +47,8 @@
             <div class="row">
               <div class="col-xs-12">
                 <p class="align-center">
-                  <identicon id="identityProfile"
+                  <identicon identity="identityProfile"
                     border="4"
-                    positive-score="stats.received_positive"
-                    negative-score="stats.received_negative"
                     width="230">
                   </identicon>
                   <!-- <a ng-href="" class="circle {{profileImageCircleClass}}">
@@ -139,7 +137,7 @@
                     ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                     title=""
                     uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
-                    <identicon id="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
+                    <identicon identity="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
                     <span class="distance" ng-bind="msg.distance | ordinal"></span>
                   </a>
                 </div>
@@ -152,7 +150,7 @@
                   ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                   title=""
                   uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
-                    <identicon id="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
+                    <identicon identity="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
                     <span class="distance" ng-bind="msg.distance | ordinal"></span>
                   </a>
                 </div>
@@ -299,7 +297,7 @@
                                 </span>
                                 <strong>
                                   <a ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" class="id-link">
-                                    <identicon id="msg" class="mar-right5" border="3" width="30" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
+                                    <identicon identity="msg" class="mar-right5" border="3" width="30" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
                                     <span ng-bind="msg.author_name||msg.data.author[0][1]"></span>
                                   </a>
                                 </strong>
