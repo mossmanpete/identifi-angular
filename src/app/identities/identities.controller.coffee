@@ -241,17 +241,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.getSentMsgs = ->
       return if $scope.sent.loading
       $scope.sent.loading = true
-      searchKey = ''
+      cursor = ''
       if $scope.sent.length
-        searchKey = $scope.sent[$scope.sent.length - 1].searchKey
-      $scope.sentIndex.searchText('', $scope.filters.limit, searchKey, true).then (res) ->
-        msgs = []
-        res.forEach (row) ->
-          v = row.value
-          v.searchKey = row.key
-          msgs.push v
-        return msgs
+        cursor = $scope.sent[$scope.sent.length - 1].cursor
+      $scope.identifiIndex.getSentMsgs($scope.identityProfile, $scope.filters.limit, cursor)
       .then (sent) ->
+        console.log 'sent', sent
         $scope.processMessages sent, { recipientIsSelf: false }
         $scope.$apply ->
           Array.prototype.push.apply($scope.sent, sent)
@@ -264,17 +259,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.getReceivedMsgs = ->
       return if $scope.received.loading
       $scope.received.loading = true
-      searchKey = ''
+      cursor = ''
       if $scope.received.length
-        searchKey = $scope.received[$scope.received.length - 1].searchKey
-      $scope.receivedIndex.searchText('', $scope.filters.limit, searchKey, true).then (res) ->
-        msgs = []
-        res.forEach (row) ->
-          v = row.value
-          v.searchKey = row.key
-          msgs.push v
-        return msgs
+        cursor = $scope.received[$scope.received.length - 1].cursor
+      $scope.identifiIndex.getReceivedMsgs($scope.identityProfile, $scope.filters.limit, cursor)
       .then (received) ->
+        console.log 'received', received
         $scope.processMessages received, { recipientIsSelf: true }
         $scope.$apply ->
           Array.prototype.push.apply($scope.received, received)
@@ -329,19 +319,14 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.tabs[2].active = true
       $scope.setPageTitle $scope.idValue
       $scope.$watch 'apiReady', (isReady) ->
-        console.log 'apiReady', isReady
         if isReady
           $scope.identifiIndex.get($scope.idValue, $scope.idType).then (profile) ->
             $scope.identityProfile = profile
             $scope.$apply ->
               addLocalMessages()
               $scope.getConnections()
-            profile.getSentMsgsIndex($scope.identifiIndex.storage).then (ix) ->
-              $scope.sentIndex = ix
-              $scope.getSentMsgs(0)
-            profile.getReceivedMsgsIndex($scope.identifiIndex.storage).then (ix) ->
-                $scope.receivedIndex = ix
-                $scope.getReceivedMsgs(0)
+            $scope.getSentMsgs(0)
+            $scope.getReceivedMsgs(0)
           .catch (err) ->
             console.log 'error fetching profile', err
       if $scope.idType == 'keyID' and $scope.idValue == $scope.nodeInfo.keyID
