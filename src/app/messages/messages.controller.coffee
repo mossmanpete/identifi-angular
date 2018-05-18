@@ -67,7 +67,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
               delete localMessages[v.hash]
               localStorageService.set('localMessages', localMessages)
             else
-              messages.push(v)
+              m = $window.identifiLib.Message.fromJws(v.jws) # TODO: implement in identifi-lib
+              messages.push(m)
         return messages
       p.then (messages) ->
         $scope.processMessages messages

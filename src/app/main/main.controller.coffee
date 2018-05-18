@@ -373,10 +373,9 @@ angular.module('identifiAngular').controller 'MainController', [
           keyHash = CryptoJS.SHA256(parsedJws.headerObj.kid)
           msg.signer_keyid = CryptoJS.enc.Base64.stringify(keyHash)
 
-        msg.author = msg.getAuthor()
+        msg.author = msg.getAuthor() if msg.getAuthor
         return if verifySignature and not $scope.hasValidSignature(msg, parsedJws) # TODO: should display warning or hide msg or sth
 
-        msg.gravatar = CryptoJS.MD5(msg.author_email || msg.data.author[0][1]).toString()
         msg.linkToAuthor = msg.data.author[0]
         i = undefined
         i = 0

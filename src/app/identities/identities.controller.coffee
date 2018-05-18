@@ -241,9 +241,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.getSentMsgs = ->
       return if $scope.sent.loading
       $scope.sent.loading = true
-      cursor = ''
-      if $scope.sent.length
-        cursor = $scope.sent[$scope.sent.length - 1].cursor
+      cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       $scope.identifiIndex.getSentMsgs($scope.identityProfile, $scope.filters.limit, cursor)
       .then (sent) ->
         console.log 'sent', sent
@@ -259,9 +257,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.getReceivedMsgs = ->
       return if $scope.received.loading
       $scope.received.loading = true
-      cursor = ''
-      if $scope.received.length
-        cursor = $scope.received[$scope.received.length - 1].cursor
+      cursor = if $scope.received.length then $scope.received[$scope.received.length - 1].cursor else ''
       $scope.identifiIndex.getReceivedMsgs($scope.identityProfile, $scope.filters.limit, cursor)
       .then (received) ->
         console.log 'received', received
