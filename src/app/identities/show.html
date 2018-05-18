@@ -138,7 +138,7 @@
                     ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                     title=""
                     uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
-                    <identicon identity="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
+                    <identicon identity="msg.getAuthor()" class="no-glow" border="3" width="60"></identicon>
                   </a>
                 </div>
 
@@ -150,7 +150,7 @@
                   ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                   title=""
                   uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
-                    <identicon identity="msg" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
+                    <identicon identity="msg.getAuthor()" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
                   </a>
                 </div>
               </div>

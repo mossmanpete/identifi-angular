@@ -5,17 +5,13 @@ angular.module 'identifiAngular'
       identity: '='
       showDistance: '=?'
       border: '=?'
-      positiveScore: '=?'
-      negativeScore: '=?'
       width: '=?'
     link: (scope, element, attr) ->
-      if typeof scope.showDistance == 'undefined'
-        scope.showDistance = true
-      else
-        scope.showDistance = !!parseInt(scope.showDistance)
+      scope.showDistance = if typeof scope.showDistance == 'undefined' then true else !!parseInt(scope.showDistance)
+      scope.border = if isNaN(scope.border) then 3 else scope.border
       update = ->
         if scope.identity && scope.identity.identicon
-          identicon = scope.identity.identicon(scope.width, undefined, scope.showDistance)
+          identicon = scope.identity.identicon(scope.width, scope.border, scope.showDistance)
           element.empty()
           element.append(identicon)
       scope.$watchGroup ['identity'], update
