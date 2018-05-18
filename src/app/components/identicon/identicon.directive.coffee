@@ -3,15 +3,12 @@ angular.module 'identifiAngular'
   .directive 'identicon', ->
     scope:
       identity: '='
-      showDistance: '=?'
-      border: '=?'
-      width: '=?'
-    link: (scope, element, attr) ->
-      scope.showDistance = if typeof scope.showDistance == 'undefined' then true else !!parseInt(scope.showDistance)
-      scope.border = if isNaN(scope.border) then 3 else scope.border
+    link: (scope, element, attrs) ->
+      attrs.showDistance = if typeof attrs.showDistance == 'undefined' then true else !!parseInt(attrs.showDistance)
+      attrs.border = if isNaN(attrs.border) then 3 else attrs.border
       update = ->
         if scope.identity && scope.identity.identicon
-          identicon = scope.identity.identicon(scope.width, scope.border, scope.showDistance)
+          identicon = scope.identity.identicon(attrs.width, attrs.border, attrs.showDistance)
           element.empty()
           element.append(identicon)
       scope.$watchGroup ['identity'], update
