@@ -406,13 +406,13 @@ angular.module('identifiAngular').controller 'MainController', [
         msg.bgColor = ''
         msg.iconCount = new Array(1)
         switch signedData.type
-          when 'verify_identity'
+          when 'verify_identity', 'verification'
             msg.iconStyle = 'glyphicon glyphicon-ok positive'
             msg.hasSuccess = 'has-success'
           when 'connection'
             msg.iconStyle = 'glyphicon glyphicon-ok positive'
             msg.hasSuccess = 'has-success'
-          when 'unverify_identity'
+          when 'unverify_identity', 'unverification'
             msg.iconStyle = 'glyphicon glyphicon-remove negative'
             msg.hasSuccess = 'has-error'
             msg.bgColor = 'background-color: #FFF0DE;border-color:#FFE2C6;'

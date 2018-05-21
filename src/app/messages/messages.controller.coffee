@@ -49,31 +49,23 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.find = ->
       return if $scope.msgs.loading
-      $scope.msgs = $scope.msgs || []
       $scope.msgs.loading = true
       # Get latest messages from ipfs index
       searchKey = ''
       if $scope.msgs.list.length
         searchKey = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
-      p = $scope.identifiIndex.messagesByTimestamp.searchText('', $scope.filters.limit, searchKey, true)
+      $scope.identifiIndex.messagesByTimestamp.searchText('', $scope.filters.limit, searchKey, true) # TODO: implement in identifi-lib
       .then (res) ->
         messages = []
-        localMessages = localStorageService.get('localMessages') or {}
         for pair in res
-          if pair.value
-            v = pair.value
-            v.searchKey = pair.key
-            if localMessages.hasOwnProperty(v.hash)
-              delete localMessages[v.hash]
-              localStorageService.set('localMessages', localMessages)
-            else
-              m = $window.identifiLib.Message.fromJws(v.jws) # TODO: implement in identifi-lib
-              messages.push(m)
-        return messages
-      p.then (messages) ->
+          m = $window.identifiLib.Message.fromJws(pair.value.jws)
+          m.searchKey = pair.key
+          m.isVerification = m.signedData.type in ['verification', 'verify_identity']
+          m.isUnverification = m.signedData.type in ['unverification', 'unverify_identity']
+          messages.push(m)
         $scope.processMessages messages
         Array.prototype.push.apply($scope.msgs.list, messages)
-        if messages.length < $scope.filters.limit - 1 # bug
+        if res.length < $scope.filters.limit - 1 # bug
           $scope.$apply -> $scope.msgs.finished = true
         $scope.$apply -> $scope.msgs.loading = false
 

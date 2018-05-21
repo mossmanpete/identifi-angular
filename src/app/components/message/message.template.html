@@ -1,5 +1,5 @@
-<div class="panel msg" ng-class="{'panel-info':$ctrl.msgData.data.type == 'verify_identity'}" style="{{$ctrl.msgData.bgColor}}" ng-if="$ctrl.msgData.data">
-  <div class="message-panel" ng-class="{ 'panel-body': $ctrl.msgData.data.type != 'verify_identity', 'panel-heading': $ctrl.msgData.data.type == 'verify_identity' || $ctrl.msgData.data.type == 'unverify_identity' }">
+<div class="panel msg" ng-class="{'panel-info':$ctrl.msgData.isVerification}" style="{{$ctrl.msgData.bgColor}}" ng-if="$ctrl.msgData.data">
+  <div class="message-panel" ng-class="{ 'panel-body': !$ctrl.msgData.isVerification, 'panel-heading': $ctrl.msgData.isVerification || $ctrl.msgData.isUnverification }">
     <p class="">
       <span class="mar-left5 pull-right" ng-class="$ctrl.msgData.iconStyle" ng-repeat="n in $ctrl.msgData.iconCount track by $index"></span>
       <span class="mar-left5 pull-right fa fa-refresh" uib-tooltip="Pending" ng-if="$ctrl.msgData.local"></span>
@@ -14,13 +14,13 @@
        - <a ui-sref="messages.show({ id: ($ctrl.msgData.ipfs_hash || $ctrl.msgData.hash) })" ng-bind="$ctrl.msgData.data.timestamp|date:'medium'" class="text-muted small" style="display:inline-block;"></a>
     </p>
 
-    <p ng-if="$ctrl.msgData.data.type == 'verify_identity' || $ctrl.msgData.data.type == 'unverify_identity'">
+    <p ng-if="$ctrl.msgData.isVerification || $ctrl.msgData.isUnverification">
       <small ng-repeat="recipient in $ctrl.msgData.data.recipient">
         {{recipient[0]}}:
         <span ng-if="recipient[0] == 'email' || recipient[0] == 'url'" ng-bind-html="recipient[1] | linky"></span>
         <span ng-if="!(recipient[0] == 'email' || recipient[0] == 'url')" ng-bind="recipient[1]"></span>
-        <i class="fa fa-link" ng-if="!$last && $ctrl.msgData.data.type == 'verify_identity'"></i>
-        <i class="fa fa-chain-broken" ng-if="!$last && $ctrl.msgData.data.type == 'unverify_identity'"></i>
+        <i class="fa fa-link" ng-if="!$last && $ctrl.msgData.isVerification"></i>
+        <i class="fa fa-chain-broken" ng-if="!$last && $ctrl.msgData.isUnverification"></i>
       </small>
     </p>
 
