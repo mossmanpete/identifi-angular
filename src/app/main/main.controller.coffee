@@ -409,6 +409,7 @@ angular.module('identifiAngular').controller 'MainController', [
           when 'verify_identity', 'verification'
             msg.iconStyle = 'glyphicon glyphicon-ok positive'
             msg.hasSuccess = 'has-success'
+            msg.isVerification = true
           when 'connection'
             msg.iconStyle = 'glyphicon glyphicon-ok positive'
             msg.hasSuccess = 'has-success'
@@ -416,6 +417,7 @@ angular.module('identifiAngular').controller 'MainController', [
             msg.iconStyle = 'glyphicon glyphicon-remove negative'
             msg.hasSuccess = 'has-error'
             msg.bgColor = 'background-color: #FFF0DE;border-color:#FFE2C6;'
+            msg.isUnverification = true
           when 'rating'
             rating = signedData.rating
             neutralRating = (signedData.minRating + signedData.maxRating) / 2

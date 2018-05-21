@@ -197,7 +197,7 @@
                 </div>
               </div>
 
-              <div infinite-scroll="getReceivedMsgs()" infinite-scroll-listen-for-event="msgScrollCheck" infinite-scroll-distance="2" infinite-scroll-disabled="!apiReady || !receivedIndex || received.loading || received.finished || activeTab != 0">
+              <div infinite-scroll="getReceivedMsgs()" infinite-scroll-listen-for-event="msgScrollCheck" infinite-scroll-distance="2" infinite-scroll-disabled="!apiReady || !identityProfile || received.loading || received.finished || activeTab != 0">
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
@@ -224,7 +224,7 @@
             </uib-tab>
             <uib-tab ng-if="isUniqueType">
               <uib-tab-heading>Sent ({{0+stats.sent_positive+stats.sent_neutral+stats.sent_negative}})</uib-tab-heading>
-              <div infinite-scroll="getSentMsgs()" infinite-scroll-listen-for-event="msgScrollCheck" infinite-scroll-distance="2" infinite-scroll-disabled="!apiReady || !sentIndex || sent.loading || sent.finished || activeTab != 1">
+              <div infinite-scroll="getSentMsgs()" infinite-scroll-listen-for-event="msgScrollCheck" infinite-scroll-distance="2" infinite-scroll-disabled="!apiReady || !identityProfile || sent.loading || sent.finished || activeTab != 1">
                 <div class="panel">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">

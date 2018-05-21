@@ -67,7 +67,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
           m.isVerification = m.signedData.type in ['verification', 'verify_identity']
           m.isUnverification = m.signedData.type in ['unverification', 'unverify_identity']
           messages.push(m)
-          console.log pair.value if m.signedData.author && m.signedData.author[0][1] == 'B1N1eMWAc8EpwN0lARFSw3PRUtxGJgujUz5RvhHUGQs='
         $scope.processMessages messages
         Array.prototype.push.apply($scope.msgs.list, messages)
         if res.length < $scope.filters.limit - 1 # bug

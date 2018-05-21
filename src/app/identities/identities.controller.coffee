@@ -213,7 +213,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
                 msg = row.value
                 unless msg.signedData
                   msg.signedData = KJUR.jws.JWS.parse(msg.jws).payloadObj
-                if (msg.signedData.type in ['verify_identity', 'unverify_identity'])
+                if (msg.signedData.type in ['verify_identity', 'verification', 'unverify_identity', 'unverification'])
                   msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.signedData.author[0][1]).toString()
                   msg.linkToAuthor = msg.signedData.author[0]
                   $scope.verifications.push msg
@@ -239,7 +239,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           id.collapse = !id.collapse
 
     $scope.getSentMsgs = ->
-      return if $scope.sent.loading
+      return if $scope.sent.loading or not $scope.identityProfile
       $scope.sent.loading = true
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       $scope.identifiIndex.getSentMsgs($scope.identityProfile, $scope.filters.limit, cursor)
@@ -251,11 +251,14 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.sent.loading = false
           if sent.length < $scope.filters.limit - 1
             $scope.sent.finished = true
+            console.log 'sent finished'
       .catch (error) ->
+        console.log 'error loading sent messages', error
         $scope.sent.finished = true
 
     $scope.getReceivedMsgs = ->
-      return if $scope.received.loading
+      console.log '$scope.received', $scope.received
+      return if $scope.received.loading or not $scope.identityProfile
       $scope.received.loading = true
       cursor = if $scope.received.length then $scope.received[$scope.received.length - 1].cursor else ''
       $scope.identifiIndex.getReceivedMsgs($scope.identityProfile, $scope.filters.limit, cursor)
@@ -267,6 +270,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.received.loading = false
           if received.length < $scope.filters.limit - 1
             $scope.received.finished = true
+            console.log 'received finished'
           sorted = received.sort (a,b) ->
             return 1 if a.distance > b.distance
             return -1 if a.distance < b.distance
@@ -279,6 +283,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             else if $scope.thumbsDown.length < 12 and  msg.rating < neutralRating
               $scope.thumbsDown.push msg
       .catch (error) ->
+        console.log 'error loading received messages', error
         $scope.received.finished = true
 
     $scope.getPhotosFromGravatar = ->
