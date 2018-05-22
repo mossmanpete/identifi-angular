@@ -1367,40 +1367,6 @@ a {
   box-shadow: none !important;
 }
 
-.identicon {
-  vertical-align: middle;
-  margin: auto;
-  border-radius: 50%;
-  text-align: center;
-  display: inline-block;
-  position: relative;
-  margin: auto;
-  max-width: 100%;
-
-  .pie {
-    border-radius: 50%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    box-shadow: 0px 0px 0px 0px #82FF84;
-    padding-bottom: 100%;
-    max-width: 100%;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
-    transition: all 0.2s ease-in-out;
-  }
-
-  img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    max-width: 100%;
-    border-radius: 50%;
-    border-color: transparent;
-    border-style: solid;
-  }
-}
-
 .btn-confirm, .btn-unverify {
   padding: 12px 10px;
 }

@@ -7,7 +7,7 @@
         <a ng-if="false" ng-bind="message.signerName||message.signer_keyid" ui-sref="identities.show({type: 'keyID', value: message.signer_keyid })"></a>
         <strong ng-if="message.verifiedBy">
           <a ui-sref="identities.show({ type: 'keyID', value: message.signer_keyid })" class="id-link">
-            <identicon identity="message.verifiedBy" border="3" width="35"></identicon>
+            <identicon identity="message.verifiedBy" class="mar-right5" border="3" width="35"></identicon>
             <span ng-bind="message.verifiedBy.mostVerifiedAttributes.name.attribute.val"></span> <small>{{message.signer_keyid}}</small>
           </a>
         </strong>

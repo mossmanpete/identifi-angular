@@ -137,9 +137,7 @@
                     class="mar-right5 mar-bot5"
                     ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                     title=""
-                    uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
-                    <identicon identity="msg.author" class="no-glow" border="3" width="60"></identicon>
-                  </a>
+                    uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}"><identicon identity="msg.author" class="no-glow" border="3" width="60"></identicon></a>
                 </div>
 
                 <div ng-if="isUniqueType && thumbsDown.length > 0" class="stats-box mar-bot10">

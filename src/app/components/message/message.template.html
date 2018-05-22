@@ -5,7 +5,7 @@
       <span class="mar-left5 pull-right fa fa-refresh" uib-tooltip="Pending" ng-if="$ctrl.msgData.local"></span>
       <strong>
         <a ui-sref="identities.show({ type: $ctrl.msgData.linkToAuthor[0], value: $ctrl.msgData.linkToAuthor[1] })" class="id-link">
-          <identicon identity="$ctrl.msgData.author" class="" border="3" width="35" positive-score="$ctrl.msgData.author_pos" negative-score="$ctrl.msgData.author_neg"></identicon>
+          <identicon identity="$ctrl.msgData.author" class="mar-right5" border="3" width="35" positive-score="$ctrl.msgData.author_pos" negative-score="$ctrl.msgData.author_neg"></identicon>
           <span ng-bind="($ctrl.msgData.authorIsSelf && ($ctrl.pageInfo.name || $ctrl.pageInfo.nickname))||$ctrl.msgData.author_name||$ctrl.msgData.linkToAuthor[1]"></span>
         </a>
       </strong>

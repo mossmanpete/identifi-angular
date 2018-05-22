@@ -10,12 +10,13 @@ angular.module('identifiAngular').controller 'MainController', [
   '$uibModal'
   '$window'
   '$q'
+  'focus'
 
   #'Authentication'
   #'Menus'
   #'Persona'
   ($scope, $rootScope, $location, $http, $state, config,
-  localStorageService, $uibModal, $window, $q) -> # Authentication, Menus, Persona
+  localStorageService, $uibModal, $window, $q, focus) -> # Authentication, Menus, Persona
     ###
     Persona.watch
       loggedInUser: Authentication.user.email
@@ -277,6 +278,7 @@ angular.module('identifiAngular').controller 'MainController', [
       event.currentTarget.blur()
 
     $scope.logoClicked = ->
+      focus('searchFocus')
       if $state.is 'identities.list'
         if $scope.query.term != ''
           $scope.query.term = ''
@@ -457,11 +459,10 @@ angular.module('identifiAngular').controller 'MainController', [
         cursor = $scope.ids.list[$scope.ids.list.length - 1].searchKey
       if searchKey.length
         $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
-      # TODO: distance index in identifiLib?
+        # TODO: use distance index in identifiLib?
       else
         $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
       $scope.searchRequest = $scope.searchRequest.then (identities) ->
-#        console.log identities
         searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
         if searchKey != $scope.previousSearchKey
           return # search key changed
@@ -469,6 +470,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.list = $scope.ids.list.concat(identities)
         if identities.length > 0
           $scope.ids.activeKey = 0
+          $scope.ids.list[0].active = true
         if true or identities.length < limit
           $scope.ids.finished = true
       return $scope.searchRequest.then ->
