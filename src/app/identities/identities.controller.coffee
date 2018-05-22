@@ -244,33 +244,28 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       $scope.identifiIndex.getSentMsgs($scope.identityProfile, $scope.filters.limit, cursor)
       .then (sent) ->
-        console.log 'sent', sent
         $scope.processMessages sent, { recipientIsSelf: false }
         $scope.$apply ->
           Array.prototype.push.apply($scope.sent, sent)
           $scope.sent.loading = false
           if sent.length < $scope.filters.limit - 1
             $scope.sent.finished = true
-            console.log 'sent finished'
       .catch (error) ->
         console.log 'error loading sent messages', error
         $scope.sent.finished = true
 
     $scope.getReceivedMsgs = ->
-      console.log '$scope.received', $scope.received
       return if $scope.received.loading or not $scope.identityProfile
       $scope.received.loading = true
       cursor = if $scope.received.length then $scope.received[$scope.received.length - 1].cursor else ''
       $scope.identifiIndex.getReceivedMsgs($scope.identityProfile, $scope.filters.limit, cursor)
       .then (received) ->
-        console.log 'received', received
         $scope.processMessages received, { recipientIsSelf: true }
         $scope.$apply ->
           Array.prototype.push.apply($scope.received, received)
           $scope.received.loading = false
           if received.length < $scope.filters.limit - 1
             $scope.received.finished = true
-            console.log 'received finished'
           sorted = received.sort (a,b) ->
             return 1 if a.distance > b.distance
             return -1 if a.distance < b.distance

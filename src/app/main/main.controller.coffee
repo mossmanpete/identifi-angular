@@ -318,8 +318,11 @@ angular.module('identifiAngular').controller 'MainController', [
       return if angular.element(t).closest('a').length
       $scope.setMsgRawData(message)
       $scope.message = message
-      return unless $scope.hasValidSignature(message)
+      # TODO: check sig
       $scope.identifiIndex.get($scope.message.signer_keyid, 'keyID').then (profile) ->
+        unless profile
+          profile = new $window.identifiLib.Identity({attrs:[['keyID', $scope.message.signer_keyid]]})
+        console.log 'verified by', profile
         $scope.$apply -> $scope.message.verifiedBy = profile
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
@@ -357,14 +360,6 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.toggleCollapsibleMenu = ->
       $scope.isCollapsed = !$scope.isCollapsed
 
-    $scope.hasValidSignature = (msg, parsedJws) ->
-      parsedJws = parsedJws or KJUR.jws.JWS.parse(msg.jws)
-      pem = KJUR.asn1.ASN1Util.getPEMStringFromHex(parsedJws.headerObj.kid, "PUBLIC KEY")
-      pubKey = KEYUTIL.getKey(pem)
-      isValid = KJUR.jws.JWS.verify(msg.jws, pubKey, ['ES256'])
-      if isValid then console.log 'valid signature' else console.error 'invalid signature'
-      return isValid
-
     $scope.processMessages = (messages, msgOptions, verifySignature) ->
       processMessage = (msg) ->
         parsedJws = KJUR.jws.JWS.parse(msg.jws)
@@ -374,7 +369,7 @@ angular.module('identifiAngular').controller 'MainController', [
           msg.signer_keyid = CryptoJS.enc.Base64.stringify(keyHash)
 
         msg.author = msg.getAuthor() if msg.getAuthor
-        return if verifySignature and not $scope.hasValidSignature(msg, parsedJws) # TODO: should display warning or hide msg or sth
+        # TODO: make sure message signature is checked
 
         msg.linkToAuthor = msg.data.author[0]
         i = undefined
