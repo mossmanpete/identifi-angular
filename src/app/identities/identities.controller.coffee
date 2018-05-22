@@ -17,14 +17,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.activeTab = 0
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.info = {}
-    $scope.stats = {}
     $scope.sent = []
     $scope.received = []
     $scope.connections = {}
     $scope.thumbsUp = []
     $scope.thumbsDown = []
     $scope.verifications = []
-    $scope.distance = null
     $scope.query.term = $stateParams.search if $stateParams.search
     $scope.newAttribute =
       type: ''
@@ -79,15 +77,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       if connections.length > 0
         c = connections[0]
         mostConfirmations = c.conf
-        $scope.stats =
-          received_positive: c.pos
-          received_negative: c.neg
-          received_neutral: c.neut
-        $scope.distance = c.dist
       else
         mostConfirmations = 1
-      for k, v of connections
-        $scope.connections[$scope.getIdKey(v)] = Object.assign({}, v)
+      for id in connections
+        $scope.connections[$scope.getIdKey(id)] = Object.assign({}, id)
       for hash, msg of $scope.localMessages
         msg.data = msg.data or msg.signedData
         if msg.data.type in ['verify_identity', 'unverify_identity']
@@ -239,7 +232,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           id.collapse = !id.collapse
 
     $scope.getSentMsgs = ->
-      return if $scope.sent.loading or not $scope.identityProfile
+      return if $scope.sent.loading or not $scope.identityProfile or not $scope.identityProfile.data.sent
       $scope.sent.loading = true
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       $scope.identifiIndex.getSentMsgs($scope.identityProfile, $scope.filters.limit, cursor)
@@ -255,7 +248,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.sent.finished = true
 
     $scope.getReceivedMsgs = ->
-      return if $scope.received.loading or not $scope.identityProfile
+      return if $scope.received.loading or not $scope.identityProfile or not $scope.identityProfile.data.received
       $scope.received.loading = true
       cursor = if $scope.received.length then $scope.received[$scope.received.length - 1].cursor else ''
       $scope.identifiIndex.getReceivedMsgs($scope.identityProfile, $scope.filters.limit, cursor)
@@ -267,8 +260,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           if received.length < $scope.filters.limit - 1
             $scope.received.finished = true
           sorted = received.sort (a,b) ->
-            return 1 if a.distance > b.distance
-            return -1 if a.distance < b.distance
+            console.log a
+            return 1 if a.authorTrustDistance > b.authorTrustDistance
+            return -1 if a.authorTrustDistance < b.authorTrustDistance
             return 0
           sorted.forEach (msg) ->
             return if $scope.thumbsUp.length >= 12 and $scope.thumbsDown.length >= 12
@@ -317,12 +311,17 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.$watch 'apiReady', (isReady) ->
         if isReady
           $scope.identifiIndex.get($scope.idValue, $scope.idType).then (profile) ->
-            $scope.identityProfile = profile
+            if profile
+              $scope.identityProfile = profile
+              $scope.getSentMsgs(0)
+              $scope.getReceivedMsgs(0)
+            else
+              $scope.$apply ->
+                $scope.identityProfile = new $window.identifiLib.Identity({attrs:[[$scope.idType, $scope.idValue]]})
             $scope.$apply ->
               addLocalMessages()
               $scope.getConnections()
-            $scope.getSentMsgs(0)
-            $scope.getReceivedMsgs(0)
+            console.log $scope.identityProfile
           .catch (err) ->
             console.log 'error fetching profile', err
       if $scope.idType == 'keyID' and $scope.idValue == $scope.nodeInfo.keyID
