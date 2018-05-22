@@ -456,8 +456,7 @@ angular.module('identifiAngular').controller 'MainController', [
       limit = limit or 50
       cursor = false
       if $scope.ids.list.length
-        cursor = $scope.ids.list[$scope.ids.list.length - 1].searchKey
-        console.log $scope.ids.list[$scope.ids.list.length - 1]
+        cursor = $scope.ids.list[$scope.ids.list.length - 1].cursor
       if searchKey.length
         $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
         # TODO: use distance index in identifiLib?
