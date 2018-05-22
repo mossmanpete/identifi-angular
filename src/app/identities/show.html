@@ -74,7 +74,7 @@
                     (<span class="text-muted" ng-bind="identity.mostVerifiedAttributes.nickname.attribute.val"></span>)
                   </span>
                   <span ng-if="identity.trustDistance == 0" class="label label-default pull-right">viewpoint</span>
-                  <span ng-if="identity.trustDistance > 0" ng-bind="identity.trustDistance | ordinal" class="label label-default pull-right"></span>
+                  <span ng-if="identity.trustDistance < 1000" ng-bind="identity.trustDistance | ordinal" class="label label-default pull-right"></span>
                 </h4>
               </div>
             </div>
