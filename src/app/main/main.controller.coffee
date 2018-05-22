@@ -297,21 +297,8 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.profileFromData = (data, fallbackId) ->
       if data.attrs and data.attrs.length
-        data.dist = data.attrs[0].dist + 0
-        data.pos = data.attrs[0].pos
-        data.neg = data.attrs[0].neg
-        for k, v of data.attrs
-          switch v.name
-            when 'name'
-              data.name = v.val unless data.name
-            when 'nickname'
-              data.nickname = v.val unless data.nickname
-            when 'email'
-              data.gravatar = CryptoJS.MD5(v.val).toString()
-      data.name = data.nickname if data.nickname and not data.name
-      data.name = fallbackId.value unless data.name
-      data.gravatar = CryptoJS.MD5(fallbackId.value).toString() unless data.gravatar
-      return data
+        return new $window.identifiLib.Identity({attrs:data.attrs})
+      return new $window.identifiLib.Identity({attrs:[fallbackId]})
 
     $scope.openMessage = (event, message, size) ->
       t = event.target

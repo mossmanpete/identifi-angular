@@ -3,9 +3,9 @@
   <strong ng-if="nodeInfo.profile">
     <a ui-sref="identities.show({ type: 'keyID', value: nodeInfo.keyID })" class="id-link">
       <span class="distance-container mar-right5 mar-left5">
-        <identicon identity="nodeInfo.profile" class="" border="3" width="35" positive-score="nodeInfo.profile.pos" negative-score="nodeInfo.profile.neg"></identicon>
+        <identicon identity="nodeInfo.profile" class="" border="3" width="35"></identicon>
       </span>
-      <span ng-bind="nodeInfo.profile.name"></span>
+      <span ng-bind="nodeInfo.profile.mostVerifiedAttributes.name.attribute.val"></span>
     </a>
   </strong>
   <br class="hidden-sm">
