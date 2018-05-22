@@ -267,9 +267,9 @@ angular.module('identifiAngular').controller 'MainController', [
         else if data.type != $scope.filters.type
           return false
       if $scope.filters.max_distance
-        if $scope.filters.max_distance == 0 and typeof value.distance != 'number'
+        if $scope.filters.max_distance == 0 and typeof value.authorTrustDistance != 'number'
           return false
-        else if $scope.filters.max_distance > 0 and value.distance > $scope.filters.max_distance
+        else if $scope.filters.max_distance > 0 and value.authorTrustDistance > $scope.filters.max_distance
           return false
       return true
 
@@ -309,7 +309,6 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.identifiIndex.get($scope.message.signer_keyid, 'keyID').then (profile) ->
         unless profile
           profile = new $window.identifiLib.Identity({attrs:[['keyID', $scope.message.signer_keyid]]})
-        console.log 'verified by', profile
         $scope.$apply -> $scope.message.verifiedBy = profile
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
@@ -474,7 +473,6 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.ids.finished = true
       return $scope.searchRequest.then ->
         $scope.$apply -> $scope.ids.loading = false
-        console.log $scope.ids.list
         $scope.ids.list
 
     $scope.searchKeydown = (event) ->

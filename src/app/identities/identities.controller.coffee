@@ -192,8 +192,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           else
             conn.rowClass = 'danger'
         $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
-      $scope.getPhotosFromGravatar()
-      console.log $scope.info
       $scope.connectionsLength = Object.keys($scope.connections).length
       $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
 
@@ -274,10 +272,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         console.log 'error loading received messages', error
         $scope.received.finished = true
 
-    $scope.getPhotosFromGravatar = ->
-      email = $scope.info.email or $scope.idValue
-      $scope.gravatar = CryptoJS.MD5(email).toString()
-
     addLocalMessages = ->
       msgs = localStorageService.get('localMessages') or {}
       connectionsToAdd = {}
@@ -316,11 +310,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               $scope.getReceivedMsgs(0)
             else
               $scope.$apply ->
-                $scope.identity = new $window.identifiLib.Identity({attrs:[[$scope.idType, $scope.idValue]]})
+                $scope.identity = new $window.identifiLib.Identity({attrs:[{name:$scope.idType, val:$scope.idValue}]})
             $scope.$apply ->
               addLocalMessages()
               $scope.getConnections()
-            console.log $scope.identity
           .catch (err) ->
             console.log 'error fetching profile', err
       if $scope.idType == 'keyID' and $scope.idValue == $scope.nodeInfo.keyID
