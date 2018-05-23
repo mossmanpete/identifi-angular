@@ -90884,7 +90884,7 @@ var Index = function () {
                 break;
               }
 
-              if (!r[i].value) {
+              if (!(r[i].value && !identitiesByHash.hasOwnProperty(r[i].value))) {
                 _context9.next = 22;
                 break;
               }
@@ -90945,7 +90945,7 @@ var Index = function () {
   return Index;
 }();
 
-var version$2 = "0.0.46";
+var version$2 = "0.0.47";
 
 /*eslint no-useless-escape: "off", camelcase: "off" */
 
