@@ -453,7 +453,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.finished = false
         $scope.identitiesByHash = {}
       $scope.previousSearchKey = searchKey
-      limit = limit or 50
+      limit = limit or 20
       cursor = false
       if $scope.ids.list.length
         cursor = $scope.ids.list[$scope.ids.list.length - 1].cursor
