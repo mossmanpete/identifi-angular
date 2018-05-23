@@ -443,6 +443,19 @@ angular.module('identifiAngular').controller 'MainController', [
           $window.scrollTo 0, pos.bottom - ($window.innerHeight or document.documentElement.clientHeight) + 15
       return
 
+    $scope.setIdentityNames = (i, htmlSafe) ->
+      if i.mostVerifiedAttributes.name
+        i.primaryName = i.mostVerifiedAttributes.name.attribute.val
+      else if i.mostVerifiedAttributes.nickname
+        i.primaryName = i.mostVerifiedAttributes.nickname.attribute.val
+      else
+        i.primaryName = i.data.attrs[0].val
+      if i.primaryName
+        if i.mostVerifiedAttributes.nickname and i.mostVerifiedAttributes.nickname.attribute.val != i.primaryName
+          i.nickname = i.mostVerifiedAttributes.nickname.attribute.val
+          i.nickname = i.nickname.replace('<', '&lt;') if htmlSafe
+      i.primaryName = i.primaryName.replace('<', '&lt;') if htmlSafe
+
     $scope.searchRequest = null
     $scope.search = (query, limit) ->
       $scope.ids.loading = true
@@ -468,18 +481,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.searchRequest = $scope.searchRequest.then (res) ->
         return if res.searchKey != $scope.searchKey
         identities = res.identities
-        identities.forEach (i) ->
-          if i.mostVerifiedAttributes.name
-            i.primaryName = i.mostVerifiedAttributes.name.attribute.val
-          else if i.mostVerifiedAttributes.nickname
-            i.primaryName = i.mostVerifiedAttributes.nickname.attribute.val
-          else
-            i.primaryName = i.data.attrs[0].val
-          if i.primaryName
-            if i.mostVerifiedAttributes.nickname and i.mostVerifiedAttributes.nickname.attribute.val != i.primaryName
-              i.nickname = i.mostVerifiedAttributes.nickname.attribute.val
-              i.nickname = i.nickname.replace('<', '&lt;')
-          i.primaryName = i.primaryName.replace('<', '&lt;')
+        identities.forEach (i) -> $scope.setIdentityNames(i, true)
         searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
         if searchKey != $scope.previousSearchKey
           return # search key changed

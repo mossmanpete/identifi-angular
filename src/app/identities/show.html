@@ -69,9 +69,9 @@
                       <a ng-href="{{idValue}}" ng-show="idType === 'url'" ng-bind="idType" id="id-type"></a>
                     </small>
                   </span>
-                  <span ng-bind="identity.mostVerifiedAttributes.name.attribute.val||identity.mostVerifiedAttributes.nickname.attribute.val"></span>
-                  <span ng-hide="!identity.mostVerifiedAttributes.nickname || !identity.mostVerifiedAttributes.name || identity.mostVerifiedAttributes.nickname.attribute.val === identity.mostVerifiedAttributes.name.attribute.val">
-                    (<span class="text-muted" ng-bind="identity.mostVerifiedAttributes.nickname.attribute.val"></span>)
+                  <span ng-bind="identity.primaryName"></span>
+                  <span ng-hide="!identity.nickname || identity.nickname == identity.primaryName">
+                    (<span class="text-muted" ng-bind="identity.nickname"></span>)
                   </span>
                   <span ng-if="identity.trustDistance == 0" class="label label-default pull-right">viewpoint</span>
                   <span ng-if="identity.trustDistance > 0 && identity.trustDistance < 1000" ng-bind="identity.trustDistance | ordinal" class="label label-default pull-right"></span>

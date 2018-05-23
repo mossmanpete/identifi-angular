@@ -307,6 +307,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.identifiIndex.get($scope.idValue, $scope.idType).then (profile) ->
             if profile
               $scope.identity = profile
+              $scope.setIdentityNames($scope.identity)
               $scope.info.identity = $scope.identity
               $scope.getSentMsgs(0)
               $scope.getReceivedMsgs(0)
