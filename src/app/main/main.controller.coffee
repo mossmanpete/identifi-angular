@@ -463,7 +463,18 @@ angular.module('identifiAngular').controller 'MainController', [
       else
         $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
       $scope.searchRequest = $scope.searchRequest.then (identities) ->
-        console.log identities
+        identities.forEach (i) ->
+          if i.mostVerifiedAttributes.name
+            i.primaryName = i.mostVerifiedAttributes.name.attribute.val
+          else if i.mostVerifiedAttributes.nickname
+            i.primaryName = i.mostVerifiedAttributes.nickname.attribute.val
+          else
+            i.primaryName = i.data.attrs[0].val
+          if i.primaryName
+            if i.mostVerifiedAttributes.nickname and i.mostVerifiedAttributes.nickname.attribute.val != i.primaryName
+              i.nickname = i.mostVerifiedAttributes.nickname.attribute.val
+              i.nickname = i.nickname.replace('<', '&lt;')
+          i.primaryName = i.primaryName.replace('<', '&lt;')
         searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
         if searchKey != $scope.previousSearchKey
           return # search key changed
@@ -479,7 +490,6 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.ids.list[0].active = true
       return $scope.searchRequest.then ->
         $scope.$apply -> $scope.ids.loading = false
-        console.log $scope.ids.loading, $scope.ids.finished
         $scope.ids.list
 
     $scope.searchKeydown = (event) ->
