@@ -448,6 +448,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.ids.loading = true
       $scope.identitiesByHash = {}
       searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
+      $scope.searchKey = searchKey
       if searchKey != $scope.previousSearchKey
         $scope.ids.list = []
         $scope.ids.finished = false
@@ -459,10 +460,14 @@ angular.module('identifiAngular').controller 'MainController', [
         cursor = $scope.ids.list[$scope.ids.list.length - 1].cursor
       if searchKey.length
         $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
+        .then (identities) -> {identities, searchKey}
         # TODO: use distance index in identifiLib?
       else
         $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
-      $scope.searchRequest = $scope.searchRequest.then (identities) ->
+        .then (identities) -> {identities, searchKey}
+      $scope.searchRequest = $scope.searchRequest.then (res) ->
+        return if res.searchKey != $scope.searchKey
+        identities = res.identities
         identities.forEach (i) ->
           if i.mostVerifiedAttributes.name
             i.primaryName = i.mostVerifiedAttributes.name.attribute.val
@@ -488,9 +493,9 @@ angular.module('identifiAngular').controller 'MainController', [
         if identities.length > 0 && $scope.ids.list.length == identities.length
           $scope.ids.activeKey = 0
           $scope.ids.list[0].active = true
-      return $scope.searchRequest.then ->
         $scope.$apply -> $scope.ids.loading = false
         $scope.ids.list
+      return $scope.searchRequest
 
     $scope.searchKeydown = (event) ->
       switch (if event then event.which else -1)
