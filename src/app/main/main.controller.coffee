@@ -467,12 +467,15 @@ angular.module('identifiAngular').controller 'MainController', [
         if searchKey != $scope.previousSearchKey
           return # search key changed
         $scope.ids.list = $scope.ids.list or []
-        $scope.ids.list = $scope.ids.list.concat(identities)
-        if identities.length > 0
-          $scope.ids.activeKey = 0
-          $scope.ids.list[0].active = true
         if identities.length < limit
           $scope.ids.finished = true
+        if identities.length && $scope.ids.list.length &&
+        $scope.getIdKey(identities[0].linkTo) == $scope.getIdKey($scope.ids.list[$scope.ids.list.length - 1].linkTo)
+          identities.shift() # Prevent duplicate
+        $scope.ids.list = $scope.ids.list.concat(identities)
+        if identities.length > 0 && $scope.ids.list.length == identities.length
+          $scope.ids.activeKey = 0
+          $scope.ids.list[0].active = true
       return $scope.searchRequest.then ->
         $scope.$apply -> $scope.ids.loading = false
         console.log $scope.ids.loading, $scope.ids.finished
