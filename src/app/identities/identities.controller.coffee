@@ -16,7 +16,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, config, localStorageService) -> #, Authentication
     $scope.activeTab = 0
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
-    $scope.info = {}
     $scope.sent = []
     $scope.received = []
     $scope.connections = {}
@@ -113,7 +112,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             conn.btnStyle = 'btn-success'
             conn.link = 'mailto:' + conn.val
             conn.quickContact = true
-            $scope.info.email = $scope.info.email or conn.val
           when 'bitcoin_address', 'bitcoin'
             conn.iconStyle = 'fa fa-bitcoin'
             conn.btnStyle = 'btn-primary'
@@ -126,10 +124,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           when 'account'
             conn.iconStyle = 'fa fa-at'
           when 'nickname'
-            $scope.info.nickname = $scope.info.nickname or conn.val
             conn.iconStyle = 'glyphicon glyphicon-font'
           when 'name'
-            $scope.info.name = $scope.info.name or conn.val
             conn.iconStyle = 'glyphicon glyphicon-font'
           when 'tel', 'phone'
             conn.iconStyle = 'glyphicon glyphicon-earphone'
@@ -195,7 +191,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             conn.rowClass = 'danger'
         $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
       $scope.connectionsLength = Object.keys($scope.connections).length
-      $scope.setPageTitle ($scope.info.name || $scope.info.nickname || $scope.idValue)
+
 
     $scope.getConnectingMsgs = (id1, id2) ->
       getVerifications = $q (resolve) ->
@@ -308,7 +304,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             if profile
               $scope.identity = profile
               $scope.setIdentityNames($scope.identity)
-              $scope.info.identity = $scope.identity
+              $scope.setPageTitle($scope.identity.primaryName)
               $scope.getSentMsgs(0)
               $scope.getReceivedMsgs(0)
             else
