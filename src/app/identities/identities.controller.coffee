@@ -237,7 +237,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       $scope.identifiIndex.getSentMsgs($scope.identity, $scope.filters.limit, cursor)
       .then (sent) ->
-        $scope.processMessages sent, { recipientIsSelf: false }
+        $scope.processMessages sent, { authorIsSelf: true }
         $scope.$apply ->
           Array.prototype.push.apply($scope.sent, sent)
           $scope.sent.loading = false
@@ -262,11 +262,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           received.forEach (msg) ->
             neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
             if Object.keys(thumbsUpObj).length < 12 and msg.data.rating > neutralRating
-              thumbsUpObj[msg.hash] = msg
+              thumbsUpObj[msg.linkToAuthor] = msg
               $scope.thumbsUp = Object.values(thumbsUpObj)
               $scope.hasThumbsUp = true
             else if Object.keys(thumbsDownObj).length < 12 and msg.data.rating < neutralRating
-              thumbsDownObj[msg.hash] = msg
+              thumbsDownObj[msg.linkToAuthor] = msg
               $scope.thumbsDown = Object.values(thumbsDownObj)
               $scope.hasThumbsDown = true
       .catch (error) ->
@@ -307,6 +307,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.identifiIndex.get($scope.idValue, $scope.idType).then (profile) ->
             if profile
               $scope.identity = profile
+              $scope.info.identity = $scope.identity
               $scope.getSentMsgs(0)
               $scope.getReceivedMsgs(0)
             else
