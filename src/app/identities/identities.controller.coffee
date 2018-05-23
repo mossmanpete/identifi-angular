@@ -20,6 +20,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.sent = []
     $scope.received = []
     $scope.connections = {}
+    thumbsUpObj = {}
+    thumbsDownObj = {}
     $scope.thumbsUp = []
     $scope.thumbsDown = []
     $scope.verifications = []
@@ -257,17 +259,16 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.received.loading = false
           if received.length < $scope.filters.limit - 1
             $scope.received.finished = true
-          sorted = received.sort (a,b) ->
-            return 1 if a.authorTrustDistance > b.authorTrustDistance
-            return -1 if a.authorTrustDistance < b.authorTrustDistance
-            return 0
-          sorted.forEach (msg) ->
-            return if $scope.thumbsUp.length >= 12 and $scope.thumbsDown.length >= 12
+          received.forEach (msg) ->
             neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
-            if $scope.thumbsUp.length < 12 and msg.data.rating > neutralRating
-              $scope.thumbsUp.push msg
-            else if $scope.thumbsDown.length < 12 and  msg.rating < neutralRating
-              $scope.thumbsDown.push msg
+            if Object.keys(thumbsUpObj).length < 12 and msg.data.rating > neutralRating
+              thumbsUpObj[msg.hash] = msg
+              $scope.thumbsUp = Object.values(thumbsUpObj)
+              $scope.hasThumbsUp = true
+            else if Object.keys(thumbsDownObj).length < 12 and msg.data.rating < neutralRating
+              thumbsDownObj[msg.hash] = msg
+              $scope.thumbsDown = Object.values(thumbsDownObj)
+              $scope.hasThumbsDown = true
       .catch (error) ->
         console.log 'error loading received messages', error
         $scope.received.finished = true

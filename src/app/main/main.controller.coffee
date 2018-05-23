@@ -463,6 +463,7 @@ angular.module('identifiAngular').controller 'MainController', [
       else
         $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
       $scope.searchRequest = $scope.searchRequest.then (identities) ->
+        console.log identities
         searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
         if searchKey != $scope.previousSearchKey
           return # search key changed

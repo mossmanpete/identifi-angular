@@ -121,7 +121,7 @@
                 <div ng-if="isUniqueType" class="mar-top10 quick-contact">
                   <ul class="list-unstyled">
                     <li ng-repeat="id in connections" ng-if="id.quickContact"><a ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span><span ng-bind="id.linkName || id.val"></span></a></li>
-                    <li>
+                    <li ng-if="stats.first_seen">
                       <span class="fa fa-calendar"></span>First seen:
                        <span ng-if="stats.first_seen" ng-bind="stats.first_seen|date:'mediumDate'"></span>
                        <span ng-if="!stats.first_seen">&mdash;</span>
@@ -130,9 +130,9 @@
                 </div>
               </div>
               <div class="col-xs-12 col-sm-6 col-md-12 mar-top10">
-                <div ng-if="isUniqueType && thumbsUp.length > 0" class="stats-box mar-bot10">
+                <div ng-if="isUniqueType && hasThumbsUp" class="stats-box mar-bot10">
                   <h5>Thumbs up</h5>
-                  <a ng-repeat="msg in thumbsUp"
+                  <a ng-repeat="msg in thumbsUp | orderBy:'authorTrustDistance'"
                     ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 4 }"
                     class="mar-right5 mar-bot5"
                     ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
@@ -140,16 +140,14 @@
                     uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}"><identicon identity="msg.author" class="no-glow" border="3" width="60"></identicon></a>
                 </div>
 
-                <div ng-if="isUniqueType && thumbsDown.length > 0" class="stats-box mar-bot10">
+                <div ng-if="isUniqueType && hasThumbsDown" class="stats-box mar-bot10">
                   <h5>Thumbs down</h5>
-                  <a ng-repeat="msg in thumbsDown"
+                  <a ng-repeat="msg in thumbsDown | orderBy:'authorTrustDistance'"
                   ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 4 }"
                   class="mar-right5 mar-bot5"
                   ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
                   title=""
-                  uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}">
-                    <identicon identity="msg.author" class="no-glow" border="3" width="60" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
-                  </a>
+                  uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}"><identicon identity="msg.author" class="no-glow" border="3" width="60"></identicon></a>
                 </div>
               </div>
             </div>
