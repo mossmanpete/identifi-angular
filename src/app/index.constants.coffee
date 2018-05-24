@@ -1,5 +1,4 @@
 angular.module('identifiAngular')
-  .constant 'moment', moment
   .constant 'config',
     defaultFilters:
       type: null

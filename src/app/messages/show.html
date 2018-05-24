@@ -4,11 +4,11 @@
     <div class="panel panel-info">
       <div class="panel-heading">
         Message origin verified by:
-        <a ng-if="false" ng-bind="message.signerName||message.signer_keyid" ui-sref="identities.show({type: 'keyID', value: message.signer_keyid })"></a>
+        <a ng-if="false" ng-bind="message.signerName||message.signerKeyHash" ui-sref="identities.show({type: 'keyID', value: message.signerKeyHash })"></a>
         <strong ng-if="message.verifiedBy">
-          <a ui-sref="identities.show({ type: 'keyID', value: message.signer_keyid })" class="id-link">
+          <a ui-sref="identities.show({ type: 'keyID', value: message.signerKeyHash })" class="id-link">
             <identicon identity="message.verifiedBy" class="mar-right5" border="3" width="35"></identicon>
-            <span ng-bind="message.verifiedBy.mostVerifiedAttributes.name.attribute.val"></span> <small>{{message.signer_keyid}}</small>
+            <span ng-bind="message.verifiedBy.mostVerifiedAttributes.name.attribute.val"></span> <small>{{message.signerKeyHash}}</small>
           </a>
         </strong>
       </div>

@@ -43,10 +43,10 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.loginWithKey = (privateKeyPEM) ->
       $scope.privateKey = KEYUTIL.getKeyFromPlainPrivatePKCS8PEM(privateKeyPEM)
-      $scope.publicKey = new KJUR.crypto.ECDSA({'curve': 'secp256k1', 'pub': $scope.privateKey.pubKeyHex})
+      # $scope.publicKey = new KJUR.crypto.ECDSA({'curve': 'secp256k1', 'pub': $scope.privateKey.pubKeyHex})
       localStorageService.set('privateKeyPEM', privateKeyPEM)
-      publicKeyHex = KEYUTIL.getHexFromPEM(KEYUTIL.getPEM($scope.publicKey))
-      publicKeyHash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(publicKeyHex))
+      $scope.privateKey.pubKeyASN1 = KEYUTIL.getHexFromPEM(KEYUTIL.getPEM($scope.publicKey))
+      # publicKeyHash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256($scope.privateKey.pubKeyASN1))
       $scope.authentication.user =
         idType: 'keyID'
         idValue: publicKeyHash
@@ -55,21 +55,6 @@ angular.module('identifiAngular').controller 'MainController', [
     privateKey = localStorageService.get('privateKeyPEM')
     if privateKey
       $scope.loginWithKey(privateKey)
-    token = $location.search().token
-    if token
-      jws = KJUR.jws.JWS.parse(token).payloadObj
-      $scope.authentication.token = token
-      $scope.authentication.user = jws.user
-      localStorageService.set('token', token)
-      previousState = localStorageService.get('state') || 'identities.list'
-      previousStateParams = localStorageService.get('stateParams') || {}
-      $state.go(previousState, previousStateParams)
-    else
-      token = localStorageService.get('token')
-      if token
-        jws = KJUR.jws.JWS.parse(token).payloadObj
-        $scope.authentication.token = token
-        $scope.authentication.user = jws.user
 
     $scope.query = {}
     $scope.query.term = ''
@@ -106,8 +91,7 @@ angular.module('identifiAngular').controller 'MainController', [
       console.log $scope.ipfs
       $window.ipfs = $scope.ipfs
       $scope.ipfs.pubsub.subscribe 'identifi', (msg) ->
-        msg = { jws: $scope.ipfs.types.Buffer(msg.data).toString() }
-        hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(msg.jws))
+        msg = $window.identifiLib.Message.fromJws($scope.ipfs.types.Buffer(msg.data).toString())
         console.log 'identifi message received', msg, hash
         localMessages = localStorageService.get('localMessages')
         $scope.processMessages([msg])
@@ -167,50 +151,32 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.createMessage = (event, params, id) ->
       event.stopPropagation() if event
       # Create new Message object
-      message =
-        context: 'identifi'
-
+      message = null
       if params.type == 'rating'
-        angular.extend message,
-          maxRating: 3
-          minRating: -3
-      angular.extend message, params
-      options = {}
-      if $scope.privateKey
-        publicKeyHex = KEYUTIL.getHexFromPEM(KEYUTIL.getPEM($scope.publicKey))
-        publicKeyHash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(publicKeyHex))
-        message.author = [['keyID', publicKeyHash]]
-        message.timestamp = new Date().toISOString()
-        header = JSON.stringify({ alg: 'ES256', kid: publicKeyHex })
-        payload = JSON.stringify(message)
-        jws = KJUR.jws.JWS.sign("ES256", header, payload, $scope.privateKey)
-        hash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(jws))
-        message = { jws: jws, hash: hash }
-        $scope.ipfs.files.add(new $scope.ipfs.types.Buffer(jws)).then (i) ->
-          $scope.ipfs.pubsub.publish('identifi', new $scope.ipfs.types.Buffer(jws))
+        params.maxRating |= 3
+        params.minRating |= -3
+        message = new $window.identifiLib.Message.createRating(params)
+        console.log message
       else
-        options =
-          headers:
-            'Authorization': 'Bearer ' + $scope.authentication.token
+        message = new $window.identifiLib.Message.createVerification(params)
+      options = {}
+      console.log 1, $scope.privateKey
+      message.sign($scope.privateKey)
+      console.log 2
 
-      $http.post('/api/messages', message, options)
-      .catch ->
-        $http.post('https://identi.fi/api/messages', message, options)
-      .then ((response) ->
+      $scope.identifiIndex.publishMessage(message)
+      .then (response) ->
         console.log response
         # Clear form fields
         $scope.newMessage.comment = ''
         $scope.newMessage.rating = 1
         $scope.newVerification.type = ''
         $scope.newVerification.value = ''
-        $scope.$root.$broadcast 'MessageAdded',
-          message: response.data
-          id: id
-        $scope.getIpfsIndexes $scope.ipfsStorage.apiRoot + '/ipfs/' + response.data.ipfsIndexRoot if response.data.ipfsIndexRoot
+        $scope.$root.$broadcast 'MessageAdded', {message, id}
         response.data
-      ), (errorResponse) ->
-        $scope.error = errorResponse.data || JSON.stringify(errorResponse)
-        console.error(errorResponse)
+      .catch (e) ->
+        console.error(e)
+        $scope.error = e
 
     $scope.addAttribute = ->
       $location.path '#/identities/create/' + $scope.query.term
@@ -231,9 +197,8 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.loginModal.close()
 
     $scope.generateKey = ->
-      keypair = KEYUTIL.generateKeypair('EC', 'secp256k1')
-      $scope.privateKey = keypair.prvKeyObj
-      $scope.publicKey = keypair.pubKeyObj
+      $scope.privateKey = $window.identifiLib.util.getDefaultKey()
+      console.log $scope.privateKey
       $scope.privateKeyPEM = KEYUTIL.getPEM($scope.privateKey, 'PKCS8PRV')
 
     $scope.downloadKey = ->
@@ -308,9 +273,13 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.setMsgRawData(message)
       $scope.message = message
       # TODO: check sig
-      $scope.identifiIndex.get($scope.message.signer_keyid, 'keyID').then (profile) ->
+      console.log $scope.message
+      $scope.message.signerKeyHash = $scope.message.getSignerKeyID()
+      $scope.identifiIndex.get($scope.message.signerKeyHash, 'keyID').then (profile) ->
+        console.log 1, profile
         unless profile
-          profile = new $window.identifiLib.Identity({attrs:[['keyID', $scope.message.signer_keyid]]})
+          profile = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.message.signerKeyHash}]})
+          console.log 2, profile
         $scope.$apply -> $scope.message.verifiedBy = profile
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
@@ -350,13 +319,9 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.processMessages = (messages, msgOptions, verifySignature) ->
       processMessage = (msg) ->
-        parsedJws = KJUR.jws.JWS.parse(msg.jws)
-        msg.data = parsedJws.payloadObj
-        unless msg.signer_keyid
-          keyHash = CryptoJS.SHA256(parsedJws.headerObj.kid)
-          msg.signer_keyid = CryptoJS.enc.Base64.stringify(keyHash)
-
+        msg.data = msg.signedData
         msg.author = msg.getAuthor() if msg.getAuthor
+        msg.author.trustDistance = msg.authorTrustDistance
         # TODO: make sure message signature is checked
 
         msg.linkToAuthor = msg.data.author[0]

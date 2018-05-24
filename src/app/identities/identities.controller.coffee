@@ -199,11 +199,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           if $scope.receivedIndex
             $scope.receivedIndex.searchText('', 10000, false, true).then (res) ->
               res.forEach (row) ->
-                msg = row.value
-                unless msg.signedData
-                  msg.signedData = KJUR.jws.JWS.parse(msg.jws).payloadObj
+                msg = $window.identifiLib.Message.fromJws(row.value.jws)
                 if (msg.signedData.type in ['verify_identity', 'verification', 'unverify_identity', 'unverification'])
-                  msg.gravatar = CryptoJS.MD5(msg.authorEmail or msg.signedData.author[0][1]).toString()
                   msg.linkToAuthor = msg.signedData.author[0]
                   $scope.verifications.push msg
               resolve()
@@ -230,6 +227,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.getSentMsgs = ->
       return if $scope.sent.loading or not $scope.identity or not $scope.identity.data.sent
       $scope.sent.loading = true
+      if $scope.sent.length == 0
+        $scope.identity.sentPositive = 0
+        $scope.identity.sentNeutral = 0
+        $scope.identity.sentNegative = 0
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       $scope.identifiIndex.getSentMsgs($scope.identity, $scope.filters.limit, cursor)
       .then (sent) ->
@@ -239,6 +240,16 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.sent.loading = false
           if sent.length < $scope.filters.limit - 1
             $scope.sent.finished = true
+        sent.forEach (msg) ->
+          if msg.data.type == 'rating'
+            neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
+            if msg.data.rating > neutralRating
+              $scope.identity.sentPositive++
+            else if msg.data.rating < neutralRating
+              $scope.identity.sentNegative++
+            else
+              console.log msg
+              $scope.identity.sentNeutral++
       .catch (error) ->
         console.log 'error loading sent messages', error
         $scope.sent.finished = true
