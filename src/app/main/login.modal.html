@@ -1,7 +1,7 @@
 <div class="col-md-10 col-md-offset-1">
   <div class="panel panel-default mar-top15">
     <div class="panel-heading">
-      <textarea rows="6" class="form-control" placeholder="Enter private key" ng-model="privateKeyPEM"></textarea>
+      <textarea rows="6" class="form-control" placeholder="Enter private key" ng-model="privateKeySerialized"></textarea>
       <!--<div class="checkbox">
         <label>
           <input type="checkbox" value="" checked="checked">
@@ -9,8 +9,8 @@
         </label>
       </div>-->
       <button class="btn btn-primary" ng-click="generateKey()">Generate new key</button>
-      <button class="btn btn-default pull-right" ng-disabled="!privateKeyPEM" ng-click="downloadKey()"><i class="fa fa-download"></i> Download key</button>
-      <button class="btn btn-primary" ng-click="loginWithKey(privateKeyPEM, publicKeyPEM)">Log in</button>
+      <button class="btn btn-default pull-right" ng-disabled="!privateKeySerialized" ng-click="downloadKey()"><i class="fa fa-download"></i> Download key</button>
+      <button class="btn btn-primary" ng-click="loginWithKey(privateKeySerialized, publicKeyPEM)">Log in</button>
     </div>
   </div>
 </div>

@@ -41,18 +41,14 @@ angular.module('identifiAngular').controller 'MainController', [
       else
         return encodeURIComponent(id.name) + ':' + encodeURIComponent(id.val)
 
-    $scope.loginWithKey = (privateKeyPEM) ->
-      $scope.privateKey = KEYUTIL.getKeyFromPlainPrivatePKCS8PEM(privateKeyPEM)
-      # $scope.publicKey = new KJUR.crypto.ECDSA({'curve': 'secp256k1', 'pub': $scope.privateKey.pubKeyHex})
-      localStorageService.set('privateKeyPEM', privateKeyPEM)
-      $scope.privateKey.pubKeyASN1 = KEYUTIL.getHexFromPEM(KEYUTIL.getPEM($scope.publicKey))
-      # publicKeyHash = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256($scope.privateKey.pubKeyASN1))
+    $scope.loginWithKey = (privateKeySerialized) ->
+      $scope.privateKey = $window.identifiLib.util.getDefaultKey() # TODO: fix
       $scope.authentication.user =
         idType: 'keyID'
-        idValue: publicKeyHash
+        idValue: $window.identifiLib.util.getHash($scope.privateKey.pubKeyASN1)
       $scope.loginModal.close() if $scope.loginModal
 
-    privateKey = localStorageService.get('privateKeyPEM')
+    privateKey = localStorageService.get('privateKeySerialized')
     if privateKey
       $scope.loginWithKey(privateKey)
 
@@ -160,9 +156,7 @@ angular.module('identifiAngular').controller 'MainController', [
       else
         message = new $window.identifiLib.Message.createVerification(params)
       options = {}
-      console.log 1, $scope.privateKey
       message.sign($scope.privateKey)
-      console.log 2
 
       $scope.identifiIndex.publishMessage(message)
       .then (response) ->
@@ -199,18 +193,18 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.generateKey = ->
       $scope.privateKey = $window.identifiLib.util.getDefaultKey()
       console.log $scope.privateKey
-      $scope.privateKeyPEM = KEYUTIL.getPEM($scope.privateKey, 'PKCS8PRV')
+      $scope.privateKeySerialized = $scope.privateKey.prvKeyHex
 
     $scope.downloadKey = ->
       hiddenElement = document.createElement('a')
-      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI($scope.privateKeyPEM)
+      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI($scope.privateKeySerialized)
       hiddenElement.target = '_blank'
       hiddenElement.download = 'identifi_private_key.txt'
       hiddenElement.click()
 
     $scope.logout = ->
       $scope.filters.max_distance = 0
-      $scope.privateKeyPEM = ''
+      $scope.privateKeySerialized = ''
       $scope.authentication = {}
       localStorageService.clearAll()
       $state.go('identities.list')
@@ -273,13 +267,10 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.setMsgRawData(message)
       $scope.message = message
       # TODO: check sig
-      console.log $scope.message
       $scope.message.signerKeyHash = $scope.message.getSignerKeyID()
       $scope.identifiIndex.get($scope.message.signerKeyHash, 'keyID').then (profile) ->
-        console.log 1, profile
         unless profile
           profile = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.message.signerKeyHash}]})
-          console.log 2, profile
         $scope.$apply -> $scope.message.verifiedBy = profile
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
@@ -293,23 +284,6 @@ angular.module('identifiAngular').controller 'MainController', [
         modalInstance.close()
 
     $scope.filters = $scope.filters or config.defaultFilters
-
-    ###
-    $scope.authentication = Authentication
-    if Authentication.user
-      if Authentication.user.provider == 'persona'
-        Authentication.user.idType = 'email'
-      else
-        Authentication.user.idType = 'url'
-      switch Authentication.user.provider
-        when 'persona'
-          Authentication.user.idValue = Authentication.user.email
-        when 'twitter'
-          Authentication.user.idValue = 'https://twitter.com/' + Authentication.user.username
-        else
-          Authentication.user.idValue = Authentication.user.providerData.link
-          break
-    ###
 
     $scope.isCollapsed = false
     # $scope.menu = Menus.getMenu('topbar')
