@@ -42,13 +42,14 @@ angular.module('identifiAngular').controller 'MainController', [
         return encodeURIComponent(id.name) + ':' + encodeURIComponent(id.val)
 
     $scope.loginWithKey = (privateKeySerialized) ->
-      $scope.privateKey = $window.identifiLib.util.getDefaultKey() # TODO: fix
+      $scope.privateKey = $window.identifiLib.util.jwkToPrvKey(JSON.parse(privateKeySerialized))
+      localStorageService.set('identifiKey', privateKeySerialized)
       $scope.authentication.user =
         idType: 'keyID'
-        idValue: $window.identifiLib.util.getHash($scope.privateKey.pubKeyASN1)
+        idValue: $scope.privateKey.keyID
       $scope.loginModal.close() if $scope.loginModal
 
-    privateKey = localStorageService.get('privateKeySerialized')
+    privateKey = localStorageService.get('identifiKey')
     if privateKey
       $scope.loginWithKey(privateKey)
 
@@ -151,12 +152,11 @@ angular.module('identifiAngular').controller 'MainController', [
       if params.type == 'rating'
         params.maxRating |= 3
         params.minRating |= -3
-        message = new $window.identifiLib.Message.createRating(params)
+        message = new $window.identifiLib.Message.createRating(params, $scope.privateKey)
         console.log message
       else
-        message = new $window.identifiLib.Message.createVerification(params)
+        message = new $window.identifiLib.Message.createVerification(params, $scope.privateKey)
       options = {}
-      message.sign($scope.privateKey)
 
       $scope.identifiIndex.publishMessage(message)
       .then (response) ->
@@ -191,9 +191,9 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.loginModal.close()
 
     $scope.generateKey = ->
-      $scope.privateKey = $window.identifiLib.util.getDefaultKey()
+      $scope.privateKey = $window.identifiLib.util.generateKey()
       console.log $scope.privateKey
-      $scope.privateKeySerialized = $scope.privateKey.prvKeyHex
+      $scope.privateKeySerialized = JSON.stringify($window.identifiLib.util.prvKeyToJwk($scope.privateKey))
 
     $scope.downloadKey = ->
       hiddenElement = document.createElement('a')

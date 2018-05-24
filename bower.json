@@ -21,7 +21,7 @@
     "ngInfiniteScroll": "^1.3.4",
     "angular-local-storage": "^0.5.2",
     "angularjs-slider": "^5.8.7",
-    "identifi-lib": "^0.0.50"
+    "identifi-lib": "^0.0.52"
   },
   "devDependencies": {
     "angular-mocks": "~1.5.9"
