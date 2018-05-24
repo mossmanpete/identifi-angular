@@ -214,7 +214,8 @@
                 <i class="fa fa-info pull-right"></i>
                 <p>You have not received any trust ratings yet.</p>
                 <p>You need trust ratings to have your messages saved and displayed by others.</p>
-                <p>You can also ask someone to verify that {{idType}}:{{idValue}} belongs to your already trusted identity.</p>
+                <p>You can also ask someone to verify that this account belongs to your already trusted identity.</p>
+                <p><button ng-click="copyIdLink()" class="btn btn-default">Copy link</button></p>
               </div>
               <div ng-if="received.loading" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>

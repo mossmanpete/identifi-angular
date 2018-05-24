@@ -10,10 +10,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   '$http'
   '$q'
   '$timeout'
+  'clipboard'
   # 'Authentication'
   'config'
   'localStorageService'
-  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, config, localStorageService) -> #, Authentication
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, clipboard, config, localStorageService) -> #, Authentication
     $scope.activeTab = 0
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.sent = []
@@ -53,6 +54,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.received.shift()
         $scope.processMessages [args.message]
         $scope.received.unshift args.message
+
+    $scope.copyIdLink = ->
+      clipboard.copyText 'https://identi.fi/#/identities/' + encodeURIComponent($scope.idType) + '/' + encodeURIComponent($scope.idValue)
 
     $scope.addEntry = (event, entry) ->
       recipient = []
