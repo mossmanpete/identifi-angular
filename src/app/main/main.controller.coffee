@@ -33,7 +33,6 @@ angular.module('identifiAngular').controller 'MainController', [
     localStorageService.set('localMessages', $scope.localMessages)
 
     $scope.nodeInfo = { keyID: null }
-    $scope.ipfsStorage = {}
 
     $scope.getIdKey = (id) ->
       if Array.isArray(id)
@@ -132,8 +131,8 @@ angular.module('identifiAngular').controller 'MainController', [
             stream.on 'error', (error) ->
               reject(error)
 
-      if $scope.ipfsStorage.apiRoot
-        return $http.get($scope.ipfsStorage.apiRoot + '/ipfs/' + uri)
+      if true # TODO: hmm
+        return $http.get('https://identi.fi/ipfs/' + uri)
         .then (res) -> res.data
         .catch -> jsIpfsGet()
       else
@@ -361,12 +360,7 @@ angular.module('identifiAngular').controller 'MainController', [
               msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
 
       angular.forEach messages, (msg, key) ->
-        msg[k] = v for k, v of msgOptions
-        if msg.ipfs_hash and not msg.jws
-          $scope.ipfsGet(msg.ipfs_hash).then (res) ->
-            msg.jws = res
-            processMessage(msg)
-        else processMessage(msg)
+        processMessage(msg)
 
     # Collapsing the menu after navigation
     $scope.$on '$stateChangeSuccess', ->

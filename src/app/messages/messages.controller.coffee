@@ -59,6 +59,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
         messages = []
         for pair in res
           m = $window.identifiLib.Message.fromJws(pair.value.jws)
+          m.ipfs_hash = pair.value.ipfs_hash
           m.authorPos = pair.value.author_pos
           m.authorNeg = pair.value.author_neg
           m.authorTrustDistance = pair.value.distance
@@ -81,35 +82,25 @@ angular.module('identifiAngular').controller 'MessagesController', [
     # Find existing Message
     $scope.findOne = ->
       if $stateParams.id
+        hash = $stateParams.id
         processResponse = ->
           $scope.processMessages([$scope.message], {}, true)
           $scope.setPageTitle 'Message ' + hash
           $scope.setMsgRawData($scope.message)
-          $scope.message.hash = hash
-          $scope.getIdentityProfile { type: 'keyID', value: $scope.message.signerKeyHash }, (profile) ->
+          $scope.message.signerKeyHash = $scope.message.getSignerKeyID()
+          $scope.identifiIndex.get($scope.message.signerKeyHash, 'keyID').then (profile) ->
+            unless profile
+              profile = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.message.signerKeyHash}]})
             $scope.$apply -> $scope.message.verifiedBy = profile
 
-        getMessageFromApi = ->
-          $scope.message = Messages.get
-            id: hash
-            viewpoint_name: $scope.filters.viewpoint_name
-            viewpoint_value: $scope.filters.viewpoint_value
-            max_distance: $scope.filters.max_distance
-          , processResponse
-
-        hash = $stateParams.id
-        query = null
         $scope.$watch 'apiReady', (isReady) ->
           if isReady
             if hash.match /^Qm[1-9A-Za-z]{40,50}$/ # looks like an ipfs address
               $scope.ipfsGet(hash).then (res) ->
-                $scope.message = { 'jws': res } # same format as the object returned by Messages.get
+                $scope.message = $window.identifiLib.Message.fromJws(res)
                 processResponse()
-              .catch (err) -> # fallback go local if ipfs not available
-                console.log 'failed to get msg from ipfs', err
-                getMessageFromApi()
-            else
-              getMessageFromApi()
+              .catch (e) ->
+                console.log e
 
     return
 ]
