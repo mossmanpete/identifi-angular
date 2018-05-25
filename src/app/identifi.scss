@@ -444,6 +444,9 @@ section.section {
 
 .navbar-nav li {
   float: left;
+  a.nav-identicon {
+    padding: 12px;
+  }
 }
 
 .login-menu li {

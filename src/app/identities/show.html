@@ -186,7 +186,7 @@
                         <span class="visible-xs pull-left write-msg-icons">
                           <span ng-repeat="i in iconCount(newMessage.rating) track by $index" class="write-msg-icon glyphicon glyphicon-thumbs-up mar-left5" ng-class="[iconStyle(newMessage.rating), iconClass(newMessage.rating)]"></span>
                         </span>
-                        <button type="submit" class="pull-right ladda-button btn btn-primary" data-style="zoom-out"><span class="ladda-label"><span class="fa fa-edit"></span> Publish</span><span class="ladda-spinner"></span></button>
+                        <button type="submit" class="pull-right ladda-button btn btn-primary" data-style="zoom-out"><span class="ladda-label"><span class="fa fa-edit m"></span> Publish</span><span class="ladda-spinner"></span></button>
                       </div>
                     </div>
                   </form>
@@ -215,7 +215,7 @@
                 <p>You have not received any trust ratings yet.</p>
                 <p>You need trust ratings to have your messages saved and displayed by others.</p>
                 <p>You can also ask someone to verify that this account belongs to your already trusted identity.</p>
-                <p><button ng-click="copyIdLink()" class="btn btn-default">Copy link</button></p>
+                <p><button ng-click="copyIdLink()" class="btn btn-primary">Copy link to this page</button></p>
               </div>
               <div ng-if="received.loading" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>

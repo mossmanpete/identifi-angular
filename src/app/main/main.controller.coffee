@@ -47,6 +47,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.authentication.user =
         idType: 'keyID'
         idValue: $scope.privateKey.keyID
+      $scope.authentication.identity = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.privateKey.keyID}]})
       $scope.loginModal.close() if $scope.loginModal
 
     privateKey = localStorageService.get('identifiKey')

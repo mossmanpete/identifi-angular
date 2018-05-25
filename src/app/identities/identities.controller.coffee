@@ -56,7 +56,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.received.unshift args.message
 
     $scope.copyIdLink = ->
-      clipboard.copyText 'https://identi.fi/#/identities/' + encodeURIComponent($scope.idType) + '/' + encodeURIComponent($scope.idValue)
+      clipboard.copyText 'https://identi.fi/#/identities/' + $scope.idType + '/' + $scope.idValue
 
     $scope.addEntry = (event, entry) ->
       recipient = []
