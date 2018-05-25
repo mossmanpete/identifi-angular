@@ -1,7 +1,8 @@
 angular.module 'identifiAngular',
   ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages',
   'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'angular-parallax',
-  'infinite-scroll', 'LocalStorageModule', 'rzModule', 'angular-clipboard']
+  'infinite-scroll', 'LocalStorageModule', 'rzModule', 'angular-clipboard',
+  'monospaced.qrcode']
 
 angular.module('identifiAngular').filter 'escape', [ ->
   (input) ->

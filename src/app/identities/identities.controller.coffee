@@ -56,7 +56,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.received.unshift args.message
 
     $scope.copyIdLink = ->
-      clipboard.copyText 'https://identi.fi/#/identities/' + $scope.idType + '/' + $scope.idValue
+      clipboard.copyText $scope.idUrl
 
     $scope.addEntry = (event, entry) ->
       recipient = []
@@ -304,6 +304,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.findOne = ->
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
+      $scope.idUrl = 'https://identi.fi/#/identities/' + $scope.idType + '/' + $scope.idValue
       $scope.isCurrentUser = $scope.authentication and
         $scope.authentication.user and
         $scope.idType == $scope.authentication.user.idType and

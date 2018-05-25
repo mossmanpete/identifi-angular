@@ -215,7 +215,9 @@
                 <p>You have not received any trust ratings yet.</p>
                 <p>You need trust ratings to have your messages saved and displayed by others.</p>
                 <p>You can also ask someone to verify that this account belongs to your already trusted identity.</p>
-                <p><button ng-click="copyIdLink()" class="btn btn-primary">Copy link to this page</button></p>
+                <p><button ng-click="copyIdLink()" class="btn btn-primary mar-top10">Copy link to this page</button></p>
+                <p>Or show them your QR code:</p>
+                <div class="mar-top20"><qrcode data="{{idUrl}}" size="240"></qrcode></div>
               </div>
               <div ng-if="received.loading" style="position:relative;padding:20px" us-spinner></div>
             </uib-tab>
