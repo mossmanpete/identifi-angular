@@ -75,6 +75,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
         $scope.$apply -> $scope.msgs.loading = false
 
     $scope.setFilters = (filters) ->
+      console.log 'setFilters'
       angular.extend $scope.filters, filters
       $scope.resetMsgs()
       $timeout -> $rootScope.$broadcast 'msgScrollCheck'
@@ -98,6 +99,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
             if hash.match /^Qm[1-9A-Za-z]{40,50}$/ # looks like an ipfs address
               $scope.ipfsGet(hash).then (res) ->
                 $scope.message = $window.identifiLib.Message.fromJws(res)
+                $scope.message.ipfs_hash = hash
                 processResponse()
               .catch (e) ->
                 console.log e
