@@ -33,6 +33,7 @@ angular.module('identifiAngular').controller 'MainController', [
     localStorageService.set('localMessages', $scope.localMessages)
 
     $scope.nodeInfo = { keyID: null }
+    $scope.ipfsRoot = 'https://identi.fi' # used for profile / cover photos
 
     $scope.getIdKey = (id) ->
       if Array.isArray(id)
@@ -294,8 +295,8 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.processMessages = (messages, msgOptions, verifySignature) ->
       processMessage = (msg) ->
         msg.data = msg.signedData
-        msg.author = msg.getAuthor() if msg.getAuthor
-        msg.author.trustDistance = msg.authorTrustDistance
+        msg.author = msg.getAuthor() if (msg.getAuthor and not (msgOptions and msgOptions.authorIsSelf))
+        msg.author.trustDistance = msg.authorTrustDistance if msg.author
         # TODO: make sure message signature is checked
 
         msg.linkToAuthor = msg.data.author[0]
@@ -360,6 +361,7 @@ angular.module('identifiAngular').controller 'MainController', [
               msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
 
       angular.forEach messages, (msg, key) ->
+        msg[k] = v for k, v of msgOptions
         processMessage(msg)
 
     # Collapsing the menu after navigation
