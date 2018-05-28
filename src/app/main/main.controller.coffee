@@ -78,13 +78,6 @@ angular.module('identifiAngular').controller 'MainController', [
         '/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64'
       ])
 
-    # Get possible login options
-    $http.get('/api', { timeout: 2000 })
-    .then (res) ->
-      $scope.nodeInfo = angular.extend $scope.nodeInfo, res.data
-    , (err) ->
-      $scope.nodeInfo = { loginOptions: [true], keyID: null }
-
     $scope.ipfs.on 'ready', ->
       console.log $scope.ipfs
       $window.ipfs = $scope.ipfs
@@ -104,6 +97,7 @@ angular.module('identifiAngular').controller 'MainController', [
         console.log 'Got index', $scope.identifiIndex
         $scope.$apply -> $scope.apiReady = true
 
+      # TODO: get this from identifiLib
       indexRoot = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
       $http.get 'https://identi.fi' + indexRoot + '/info'
       .catch (err) ->
