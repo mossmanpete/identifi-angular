@@ -232,9 +232,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       return if $scope.sent.loading or not $scope.identity or not $scope.identity.data.sent
       $scope.sent.loading = true
       if $scope.sent.length == 0
-        $scope.identity.sentPositive = 0
-        $scope.identity.sentNeutral = 0
-        $scope.identity.sentNegative = 0
+        $scope.identity.data.sentPositive = 0
+        $scope.identity.data.sentNeutral = 0
+        $scope.identity.data.sentNegative = 0
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       $scope.identifiIndex.getSentMsgs($scope.identity, $scope.filters.limit, cursor)
       .then (sent) ->
@@ -248,12 +248,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           if msg.data.type == 'rating'
             neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
             if msg.data.rating > neutralRating
-              $scope.identity.sentPositive++
+              $scope.identity.data.sentPositive++
             else if msg.data.rating < neutralRating
-              $scope.identity.sentNegative++
+              $scope.identity.data.sentNegative++
             else
               console.log msg
-              $scope.identity.sentNeutral++
+              $scope.identity.data.sentNeutral++
       .catch (error) ->
         console.log 'error loading sent messages', error
         $scope.sent.finished = true
