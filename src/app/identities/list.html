@@ -22,8 +22,8 @@
         <tr ng-repeat="result in ids.list" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.name, value: result.linkTo.val })" class="search-result-row" ng-class="{active: result.active}">
           <td class="gravatar-col"><identicon identity="result" border="3" width="50" positive-score="result.pos" negative-score="result.neg"></identicon></td>
           <td>
-            <span ng-if="result.trustDistance == 0" class="label label-default pull-right">viewpoint</span>
-            <span ng-if="result.trustDistance > 0" ng-bind="result.trustDistance | ordinal" class="label label-default pull-right"></span>
+            <span ng-if="result.data.trustDistance == 0" class="label label-default pull-right">viewpoint</span>
+            <span ng-if="result.data.trustDistance > 0" ng-bind="result.data.trustDistance | ordinal" class="label label-default pull-right"></span>
             <a ng-bind-html="result.primaryName|highlight:query.term" ui-sref="identities.show({ type: result.linkTo.name, value: result.linkTo.val })"></a>
             <small ng-if="!(result.mostVerifiedAttributes.name||result.mostVerifiedAttributes.nickname)" class="list-group-item-text">
               <span ng-bind-html="result.data.attrs[0].name|highlight:query.term"></span>

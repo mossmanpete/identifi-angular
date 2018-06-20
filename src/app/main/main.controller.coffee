@@ -290,7 +290,7 @@ angular.module('identifiAngular').controller 'MainController', [
       processMessage = (msg) ->
         msg.data = msg.signedData
         msg.author = msg.getAuthor() if (msg.getAuthor and not (msgOptions and msgOptions.authorIsSelf))
-        msg.author.trustDistance = msg.authorTrustDistance if msg.author
+        msg.author.data.trustDistance = msg.authorTrustDistance if msg.author
         # TODO: make sure message signature is checked
 
         msg.linkToAuthor = msg.data.author[0]

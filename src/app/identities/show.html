@@ -73,8 +73,8 @@
                   <span ng-hide="!identity.nickname || identity.nickname == identity.primaryName">
                     (<span class="text-muted" ng-bind="identity.nickname"></span>)
                   </span>
-                  <span ng-if="identity.trustDistance == 0" class="label label-default pull-right">viewpoint</span>
-                  <span ng-if="identity.trustDistance > 0 && identity.trustDistance < 1000" ng-bind="identity.trustDistance | ordinal" class="label label-default pull-right"></span>
+                  <span ng-if="identity.data.trustDistance == 0" class="label label-default pull-right">viewpoint</span>
+                  <span ng-if="identity.data.trustDistance > 0 && identity.data.trustDistance < 1000" ng-bind="identity.data.trustDistance | ordinal" class="label label-default pull-right"></span>
                 </h4>
               </div>
             </div>
