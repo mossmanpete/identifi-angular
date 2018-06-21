@@ -334,8 +334,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               $scope.getConnections()
           .catch (err) ->
             console.log 'error fetching profile', err
-      if $scope.idType == 'keyID' and $scope.idValue == $scope.nodeInfo.keyID
-        $scope.distance = 0
 
     if $state.is 'identities.show'
       $scope.findOne()

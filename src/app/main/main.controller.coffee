@@ -32,7 +32,6 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.localMessages = localStorageService.get('localMessages') or {}
     localStorageService.set('localMessages', $scope.localMessages)
 
-    $scope.nodeInfo = { keyID: null }
     $scope.ipfsRoot = 'https://identi.fi' # used for profile / cover photos
 
     $scope.getIdKey = (id) ->
@@ -95,17 +94,12 @@ angular.module('identifiAngular').controller 'MainController', [
       .then (results) ->
         $scope.identifiIndex = results
         console.log 'Got index', $scope.identifiIndex
+        $scope.identifiIndex.getViewpoint().then (vp) ->
+          $scope.viewpoint = vp
         $scope.$apply -> $scope.apiReady = true
 
       # TODO: get this from identifiLib
       indexRoot = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
-      $http.get 'https://identi.fi' + indexRoot + '/info'
-      .catch (err) ->
-        $http.get 'https://ipfs.io' + indexRoot + '/info'
-      .then (res) ->
-        $scope.nodeInfo.profile = $scope.profileFromData(res.data, ['keyID', res.data.keyID])
-      .catch (e) ->
-        console.log 'initialization failed:', e
 
     $scope.initIpfsIndexes()
 

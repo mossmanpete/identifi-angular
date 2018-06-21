@@ -5,7 +5,7 @@
       <div class="panel panel-danger" ng-if="error">
         <div class="panel-heading" ng-bind="error"></div>
       </div>
-      <div class="panel panel-info" ng-hide="authentication.user || !nodeInfo.loginOptions.length">
+      <div class="panel panel-info" ng-hide="authentication.user">
         <div class="panel-heading">Please log in to add entries.</div>
       </div>
       <form class="form" name="addEntryForm" ng-submit="addEntry($event, newEntry)">
@@ -37,7 +37,7 @@
           <p class="help-block">Social media profile or other personal url</p>
         </div>
         <button class="btn btn-primary"
-        ng-disabled="!(authentication.user || !nodeInfo.loginOptions.length) || !(newEntry.email || newEntry.url || newEntry.phone) || (addEntryForm.idName.$invalid || addEntryForm.idEmail.$invalid || addEntryForm.idPhone.$invalid || addEntryForm.idUrl.$invalid)">
+        ng-disabled="!(authentication.user || !(newEntry.email || newEntry.url || newEntry.phone) || (addEntryForm.idName.$invalid || addEntryForm.idEmail.$invalid || addEntryForm.idPhone.$invalid || addEntryForm.idUrl.$invalid)">
           Add public entry</button>
         <p class="help-block">More details can be added afterwards.</p>
       </form>

@@ -72135,7 +72135,7 @@ var Identity = function () {
 
               searchResults.innerHTML = '';
               r.sort(function (a, b) {
-                return a.data.trustDistance - b.data.trustDistance;
+                return a.trustDistance - b.trustDistance;
               });
               r.forEach(function (i) {
                 searchResults.appendChild(i.profileCard());
@@ -72406,11 +72406,11 @@ var Message = function () {
         attrs.push({ name: a[0], val: a[1] });
       });
       var id = new Identity({ attrs: attrs });
-      if (this.authorPos && this.authorNeg) {
-        id.receivedPositive = this.authorPos;
-        id.receivedNegative = this.authorNeg;
+      if (this.hasOwnProperty('authorPos') && this.hasOwnProperty('authorNeg')) {
+        id.data.receivedPositive = this.authorPos;
+        id.data.receivedNegative = this.authorNeg;
       }
-      if (this.authorTrustDistance) {
+      if (this.hasOwnProperty('authorTrustDistance')) {
         id.data.trustDistance = this.authorTrustDistance;
       }
       if (this.authorName) {
@@ -72429,11 +72429,11 @@ var Message = function () {
         attrs.push({ name: a[0], val: a[1] });
       });
       var id = new Identity({ attrs: attrs });
-      if (this.recipientPos && this.recipientNeg) {
-        id.receivedPositive = this.recipientPos;
-        id.receivedNegative = this.recipientNeg;
+      if (this.hasOwnProperty('recipientPos') && this.hasOwnProperty('recipientNeg')) {
+        id.data.receivedPositive = this.recipientPos;
+        id.data.receivedNegative = this.recipientNeg;
       }
-      if (this.recipientTrustDistance) {
+      if (this.hasOwnProperty('recipientTrustDistance')) {
         id.data.trustDistance = this.recipientTrustDistance;
       }
       if (this.recipientName) {
@@ -90050,7 +90050,7 @@ var Index = function () {
   return Index;
 }();
 
-var version$2 = "0.0.52";
+var version$2 = "0.0.55";
 
 /*eslint no-useless-escape: "off", camelcase: "off" */
 
