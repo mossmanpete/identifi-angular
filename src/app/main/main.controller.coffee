@@ -81,7 +81,6 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.loginWithKey(privateKey)
 
     $scope.ipfs.on 'ready', ->
-      console.log $scope.ipfs
       $scope.ipfsReady = true
       $window.ipfs = $scope.ipfs
       $scope.ipfs.pubsub.subscribe 'identifi', (msg) ->
@@ -91,10 +90,8 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.initIpfsIndexes() unless $scope.authentication.user
 
     $scope.initIpfsIndexes = (viewpoint) ->
-      console.log 'initIpfsIndexes', viewpoint
       setIndex = (results) ->
         $scope.identifiIndex = results
-        console.log results
         $scope.identifiIndex.save().then (uri) ->
           localStorageService.set('identifiIndexUri', uri)
         console.log 'Got index', $scope.identifiIndex
@@ -108,10 +105,8 @@ angular.module('identifiAngular').controller 'MainController', [
         p = $window.identifiLib.Index.load(existingUri, $scope.ipfs)
         .then (r) ->
           console.log 'loaded', existingUri
-          console.log r
           r
       else if viewpoint
-        console.log 111
         p = $window.identifiLib.Index.create($scope.ipfs, viewpoint)
       else
         #$window.identifiLib.Index.load()
@@ -218,6 +213,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $state.go('identities.list')
       $scope.privateKey = null
       $scope.publicKey = null
+      $scope.initIpfsIndexes()
 
     $scope.msgFilter = (value, index, array) ->
       data = value.data or value.signedData

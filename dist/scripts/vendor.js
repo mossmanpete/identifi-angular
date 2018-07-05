@@ -71955,15 +71955,21 @@ var Identity = function () {
     this.profile = {};
     this.mostVerifiedAttributes = {};
     if (data.attrs.length) {
+      // old index format
       var c = data.attrs[0];
-      this.data.receivedPositive = c.pos;
-      this.data.receivedNegative = c.neg;
-      this.data.receivedNeutral = c.neut;
+      if (c.pos !== undefined && c.neg !== undefined && c.neut !== undefined) {
+        this.data.receivedPositive = c.pos;
+        this.data.receivedNegative = c.neg;
+        this.data.receivedNeutral = c.neut;
+      }
     }
     this.data.receivedNegative |= 0;
     this.data.receivedPositive |= 0;
     this.data.receivedNeutral |= 0;
-    this.data.trustDistance = this.data.hasOwnProperty('trustDistance') ? this.data.trustDistance : 1000;
+    this.data.sentNegative |= 0;
+    this.data.sentPositive |= 0;
+    this.data.sentNeutral |= 0;
+    this.data.trustDistance = this.data.hasOwnProperty('trustDistance') ? this.data.trustDistance : 99;
     this.data.attrs.forEach(function (a) {
       if (!_this.linkTo && Attribute.isUniqueType(a.name)) {
         _this.linkTo = a;
@@ -72058,6 +72064,9 @@ var Identity = function () {
         };
       }
     });
+    if (this.linkTo.name !== 'keyID' && this.mostVerifiedAttributes.keyID) {
+      this.linkTo = this.mostVerifiedAttributes.keyID.attribute;
+    }
     _Object$keys(this.mostVerifiedAttributes).forEach(function (k) {
       if (['name', 'nickname', 'email', 'url', 'coverPhoto', 'profilePhoto'].indexOf(k) > -1) {
         _this.profile[k] = _this.mostVerifiedAttributes[k].attribute.val;
@@ -72374,7 +72383,15 @@ var Message = function () {
   };
 
   Message.prototype.isPositive = function isPositive() {
-    return this.signedData.rating > (this.signedData.maxRating + this.signedData.minRating) / 2;
+    return this.signedData.type === 'rating' && this.signedData.rating > (this.signedData.maxRating + this.signedData.minRating) / 2;
+  };
+
+  Message.prototype.isNegative = function isNegative() {
+    return this.signedData.type === 'rating' && this.signedData.rating < (this.signedData.maxRating + this.signedData.minRating) / 2;
+  };
+
+  Message.prototype.isNeutral = function isNeutral() {
+    return this.signedData.type === 'rating' && this.signedData.rating === (this.signedData.maxRating + this.signedData.minRating) / 2;
   };
 
   Message.prototype.sign = function sign(key, skipValidation) {
@@ -81419,7 +81436,7 @@ var Index = function () {
 
             case 24:
               if (_Object$keys(recipientIdentities).length) {
-                _context18.next = 34;
+                _context18.next = 33;
                 break;
               }
 
@@ -81434,16 +81451,13 @@ var Index = function () {
               _id2.sentIndex = new merkleBtree.MerkleBTree(this.storage, IPFS_INDEX_WIDTH);
               _id2.receivedIndex = new merkleBtree.MerkleBTree(this.storage, IPFS_INDEX_WIDTH);
               // TODO: take msg author trust into account
-              if (msg.isPositive()) {
-                _id2.data.trustDistance = msg.distance + 1;
-              }
-              _context18.next = 33;
+              _context18.next = 32;
               return this._saveIdentityToIpfs(_id2);
 
-            case 33:
+            case 32:
               recipientIdentities[_id2.ipfsHash] = _id2;
 
-            case 34:
+            case 33:
               msgIndexKey = Index.getMsgIndexKey(msg);
 
               msgIndexKey = msgIndexKey.substr(msgIndexKey.indexOf(':') + 1);
@@ -81461,7 +81475,7 @@ var Index = function () {
 
                       case 3:
                         if (!recipientIdentities.hasOwnProperty(id.ipfsHash)) {
-                          _context17.next = 7;
+                          _context17.next = 8;
                           break;
                         }
 
@@ -81479,23 +81493,44 @@ var Index = function () {
                             id.data.attrs.push({ name: a1[0], val: a1[1], conf: 1, ref: 0 });
                           }
                         });
-                        _context17.next = 7;
+                        if (msg.signedData.type === 'rating') {
+                          if (msg.isPositive()) {
+                            if (msg.distance + 1 < id.data.trustDistance) {
+                              id.data.trustDistance = msg.distance + 1;
+                            }
+                            id.data.receivedPositive++;
+                          } else if (msg.isNegative()) {
+                            id.data.receivedNegative++;
+                          } else {
+                            id.data.receivedNeutral++;
+                          }
+                        }
+                        _context17.next = 8;
                         return id.receivedIndex.put(msgIndexKey, msg);
 
-                      case 7:
+                      case 8:
                         if (!authorIdentities.hasOwnProperty(id.ipfsHash)) {
-                          _context17.next = 10;
+                          _context17.next = 12;
                           break;
                         }
 
-                        _context17.next = 10;
+                        if (msg.signedData.type === 'rating') {
+                          if (msg.isPositive()) {
+                            id.data.sentPositive++;
+                          } else if (msg.isNegative()) {
+                            id.data.sentNegative++;
+                          } else {
+                            id.data.sentNeutral++;
+                          }
+                        }
+                        _context17.next = 12;
                         return id.sentIndex.put(msgIndexKey, msg);
 
-                      case 10:
-                        _context17.next = 12;
+                      case 12:
+                        _context17.next = 14;
                         return _this2._addIdentityToIndexes(id);
 
-                      case 12:
+                      case 14:
                       case 'end':
                         return _context17.stop();
                     }
@@ -81504,20 +81539,20 @@ var Index = function () {
               });
               _i2 = 0;
 
-            case 39:
+            case 38:
               if (!(_i2 < ids.length)) {
-                _context18.next = 44;
+                _context18.next = 43;
                 break;
               }
 
-              return _context18.delegateYield(_loop(_i2), 't0', 41);
+              return _context18.delegateYield(_loop(_i2), 't0', 40);
 
-            case 41:
+            case 40:
               _i2++;
-              _context18.next = 39;
+              _context18.next = 38;
               break;
 
-            case 44:
+            case 43:
             case 'end':
               return _context18.stop();
           }
