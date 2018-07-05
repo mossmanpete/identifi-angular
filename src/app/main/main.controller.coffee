@@ -70,8 +70,11 @@ angular.module('identifiAngular').controller 'MainController', [
         idValue: $scope.privateKey.keyID
       $scope.authentication.identity = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.privateKey.keyID}]})
       $scope.loginModal.close() if $scope.loginModal
-      $scope.ipfs.on 'ready', ->
+      if $scope.ipfs.isOnline()
         $scope.initIpfsIndexes {name: 'keyID', val: $scope.privateKey.keyID}
+      else
+        $scope.ipfs.on 'ready', ->
+          $scope.initIpfsIndexes {name: 'keyID', val: $scope.privateKey.keyID}
 
     privateKey = localStorageService.get('identifiKey')
     if privateKey
@@ -88,6 +91,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.initIpfsIndexes() unless $scope.authentication.user
 
     $scope.initIpfsIndexes = (viewpoint) ->
+      console.log 'initIpfsIndexes', viewpoint
       setIndex = (results) ->
         $scope.identifiIndex = results
         console.log results
@@ -98,7 +102,6 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.viewpoint = vp
         $scope.$apply -> $scope.apiReady = true
 
-      console.log $scope.ipfs.files
       existingUri = localStorageService.get('identifiIndexUri')
       p = null
       if existingUri
@@ -108,6 +111,7 @@ angular.module('identifiAngular').controller 'MainController', [
           console.log r
           r
       else if viewpoint
+        console.log 111
         p = $window.identifiLib.Index.create($scope.ipfs, viewpoint)
       else
         #$window.identifiLib.Index.load()
