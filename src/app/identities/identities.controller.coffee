@@ -40,20 +40,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         hidePointerLabels: true
         hideLimitLabels: true
 
-    messagesAdded = false
     $scope.$on 'MessageAdded', (event, args) ->
-      $scope.localMessages[args.message.hash] = args.message
-      $scope.localMessages[args.message.hash].local = true
-      localStorageService.set('localMessages', $scope.localMessages)
-      messagesAdded = true
-      return unless $state.is 'identities.show'
-      if args.message.signedData.type in ['verify_identity', 'unverify_identity'] and not args.id.confirmed
-        $scope.getConnections()
-      else if args.message.signedData.type == 'rating'
-        if messagesAdded
-          $scope.received.shift()
-        $scope.processMessages [args.message]
-        $scope.received.unshift args.message
+      $state.reload()
 
     $scope.copyIdLink = ->
       clipboard.copyText $scope.idUrl
@@ -86,28 +74,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         mostConfirmations = 1
       for id in connections
         $scope.connections[$scope.getIdKey(id)] = Object.assign({}, id)
-      for hash, msg of $scope.localMessages
-        msg.data = msg.data or msg.signedData
-        if msg.data.type in ['verify_identity', 'unverify_identity']
-          has = false
-          for r in msg.data.recipient
-            if r[0] == $scope.idType and r[1] == $scope.idValue
-              has = true
-              break
-          continue unless has
-          for r in msg.data.recipient
-            unless r[0] == $scope.idType and r[1] == $scope.idValue
-              idKey = $scope.getIdKey(r)
-              if $scope.connections.hasOwnProperty(idKey)
-                $scope.connections[idKey].conf += 1 if msg.data.type == 'verify_identity'
-                $scope.connections[idKey].ref += 1 if msg.data.type == 'unverify_identity'
-              else
-                $scope.connections[idKey] =
-                  name: msg.data.recipient[1][0]
-                  val: msg.data.recipient[1][1]
-                  conf: if msg.data.type == 'verify_identity' then 1 else 0
-                  ref: if msg.data.type == 'unverify_identity' then 1 else 0
-              break
       for key, conn of $scope.connections
         conn.isCurrent = conn.name == $scope.idType and conn.val == $scope.idValue
         switch conn.name
@@ -284,21 +250,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         console.log 'error loading received messages', error
         $scope.received.finished = true
 
-    addLocalMessages = ->
-      msgs = localStorageService.get('localMessages') or {}
-      connectionsToAdd = {}
-      for hash, msg of msgs
-        msg.data = msg.data or msg.signedData
-        if msg.data.recipient[0][0] == $scope.idType and msg.data.recipient[0][1] == $scope.idValue
-          $scope.received.unshift(msg)
-        if msg.data.author[0][0] == $scope.idType and msg.data.author[0][1] == $scope.idValue
-          $scope.sent.unshift(msg)
-
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
       $scope.sent = []
       $scope.received = []
-      addLocalMessages()
       $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
     $scope.findOne = ->
@@ -330,7 +285,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               $scope.$apply ->
                 $scope.identity = new $window.identifiLib.Identity({attrs:[{name:$scope.idType, val:$scope.idValue}]})
             $scope.$apply ->
-              addLocalMessages()
               $scope.getConnections()
           .catch (err) ->
             console.log 'error fetching profile', err

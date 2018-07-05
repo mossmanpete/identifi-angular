@@ -29,8 +29,6 @@ angular.module('identifiAngular').controller 'MainController', [
 
     # set authentication
     $scope.authentication = {} # Authentication
-    $scope.localMessages = localStorageService.get('localMessages') or {}
-    localStorageService.set('localMessages', $scope.localMessages)
 
     $scope.ipfsRoot = 'https://identi.fi' # used for profile / cover photos
 
@@ -39,19 +37,6 @@ angular.module('identifiAngular').controller 'MainController', [
         return encodeURIComponent(id[0]) + ':' + encodeURIComponent(id[1])
       else
         return encodeURIComponent(id.name) + ':' + encodeURIComponent(id.val)
-
-    $scope.loginWithKey = (privateKeySerialized) ->
-      $scope.privateKey = $window.identifiLib.util.jwkToPrvKey(JSON.parse(privateKeySerialized))
-      localStorageService.set('identifiKey', privateKeySerialized)
-      $scope.authentication.user =
-        idType: 'keyID'
-        idValue: $scope.privateKey.keyID
-      $scope.authentication.identity = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.privateKey.keyID}]})
-      $scope.loginModal.close() if $scope.loginModal
-
-    privateKey = localStorageService.get('identifiKey')
-    if privateKey
-      $scope.loginWithKey(privateKey)
 
     $scope.query = {}
     $scope.query.term = ''
@@ -77,31 +62,59 @@ angular.module('identifiAngular').controller 'MainController', [
         '/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64'
       ])
 
+    $scope.loginWithKey = (privateKeySerialized) ->
+      $scope.privateKey = $window.identifiLib.util.jwkToPrvKey(JSON.parse(privateKeySerialized))
+      localStorageService.set('identifiKey', privateKeySerialized)
+      $scope.authentication.user =
+        idType: 'keyID'
+        idValue: $scope.privateKey.keyID
+      $scope.authentication.identity = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.privateKey.keyID}]})
+      $scope.loginModal.close() if $scope.loginModal
+      $scope.ipfs.on 'ready', ->
+        $scope.initIpfsIndexes {name: 'keyID', val: $scope.privateKey.keyID}
+
+    privateKey = localStorageService.get('identifiKey')
+    if privateKey
+      $scope.loginWithKey(privateKey)
+
     $scope.ipfs.on 'ready', ->
       console.log $scope.ipfs
+      $scope.ipfsReady = true
       $window.ipfs = $scope.ipfs
       $scope.ipfs.pubsub.subscribe 'identifi', (msg) ->
+        console.log 'identifi message received', msg, $scope.ipfs.types.Buffer(msg.data).toString()
         msg = $window.identifiLib.Message.fromJws($scope.ipfs.types.Buffer(msg.data).toString())
-        console.log 'identifi message received', msg, hash
-        localMessages = localStorageService.get('localMessages')
         $scope.processMessages([msg])
-        localMessages[hash] = msg
-        localStorageService.set('localMessages', localMessages)
-      #$scope.initIpfsIndexes()
+      $scope.initIpfsIndexes() unless $scope.authentication.user
 
-    $scope.initIpfsIndexes = ->
-      $window.identifiLib.Index.load()
-      .then (results) ->
+    $scope.initIpfsIndexes = (viewpoint) ->
+      setIndex = (results) ->
         $scope.identifiIndex = results
+        console.log results
+        $scope.identifiIndex.save().then (uri) ->
+          localStorageService.set('identifiIndexUri', uri)
         console.log 'Got index', $scope.identifiIndex
         $scope.identifiIndex.getViewpoint().then (vp) ->
           $scope.viewpoint = vp
         $scope.$apply -> $scope.apiReady = true
 
-      # TODO: get this from identifiLib
-      indexRoot = '/ipns/Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs'
+      console.log $scope.ipfs.files
+      existingUri = localStorageService.get('identifiIndexUri')
+      p = null
+      if existingUri
+        p = $window.identifiLib.Index.load(existingUri, $scope.ipfs)
+        .then (r) ->
+          console.log 'loaded', existingUri
+          console.log r
+          r
+      else if viewpoint
+        p = $window.identifiLib.Index.create($scope.ipfs, viewpoint)
+      else
+        #$window.identifiLib.Index.load()
+        p = $window.identifiLib.Index.load('Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs', $scope.ipfs)
+      p.then setIndex
 
-    $scope.initIpfsIndexes()
+    #$scope.initIpfsIndexes()
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
@@ -147,16 +160,18 @@ angular.module('identifiAngular').controller 'MainController', [
         message = new $window.identifiLib.Message.createVerification(params, $scope.privateKey)
       options = {}
 
-      $scope.identifiIndex.publishMessage(message)
+      $scope.identifiIndex.addMessage(message) # publishMessage
+      .then ->
+        $scope.identifiIndex.save()
       .then (response) ->
-        console.log response
+        if response.length
+          localStorageService.set('identifiIndexUri', response)
         # Clear form fields
         $scope.newMessage.comment = ''
         $scope.newMessage.rating = 1
         $scope.newVerification.type = ''
         $scope.newVerification.value = ''
         $scope.$root.$broadcast 'MessageAdded', {message, id}
-        response.data
       .catch (e) ->
         console.error(e)
         $scope.error = e

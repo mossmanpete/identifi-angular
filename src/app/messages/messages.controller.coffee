@@ -19,7 +19,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.filters.type = 'rating'
 
     $scope.resetMsgs = ->
-      msgs = localStorageService.get('localMessages') or {}
+      msgs = {}
       $scope.msgs =
         loading: false
         finished: false
