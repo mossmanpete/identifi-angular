@@ -26,9 +26,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.thumbsDown = []
     $scope.verifications = []
     $scope.query.term = $stateParams.search if $stateParams.search
-    $scope.newAttribute =
+    $scope.newVerification =
       type: ''
-      value: $stateParams.value
+      value: ''
     $scope.filters.type = null
     $scope.collapseLevel = {}
     $scope.collapseFilters = $window.innerWidth < 992
@@ -63,6 +63,15 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $state.go 'messages.show', { id: response.ipfs_hash }
       , (error) ->
         console.log "error", error
+
+    $scope.guessAttributeType = ->
+      if $scope.newVerification.value.length
+        $scope.newVerification.type = $window.identifiLib.Attribute.guessTypeOf($scope.newVerification.value)
+        unless $scope.newVerification.type
+          unless $scope.newVerification.value.match /\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\.|\>|\?|\/|\""|\;|\:/
+            $scope.newVerification.type = 'name'
+      else
+        $scope.newVerification.type = ''
 
     $scope.getConnections = ->
       $scope.connections = {}
