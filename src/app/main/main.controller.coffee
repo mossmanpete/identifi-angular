@@ -240,6 +240,10 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.removeFocus = (event) ->
       event.currentTarget.blur()
 
+    $scope.addEntryClicked = ->
+      $state.go 'identities.create'
+      focus('idNameFocus')
+
     $scope.logoClicked = ->
       focus('searchFocus')
       if $state.is 'identities.list'

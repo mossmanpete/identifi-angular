@@ -48,19 +48,23 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.addEntry = (event, entry) ->
       recipient = []
+      linkTo = null
       if entry.name
         recipient.push ['name', entry.name]
       if entry.email
         recipient.push ['email', entry.email]
+        linkTo = { type: 'email', value: entry.email }
       if entry.url
         recipient.push ['url', entry.url]
+        linkTo = { type: 'url', value: entry.url } unless linkTo
       if entry.phone
         recipient.push ['phone', entry.phone]
+        linkTo = { type: 'phone', value: entry.phone } unless linkTo
       params =
         type: 'verify_identity'
         recipient: recipient
       $scope.createMessage(event, params).then (response) ->
-        $state.go 'messages.show', { id: response.ipfs_hash }
+        $state.go 'identities.show', linkTo
       , (error) ->
         console.log "error", error
 

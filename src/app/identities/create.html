@@ -11,7 +11,7 @@
       <form class="form" name="addEntryForm" ng-submit="addEntry($event, newEntry)">
         <div class="form-group">
           <label for="idName">Name *</label>
-          <input type="text" required autofocus id="idName" name="idName" ng-model="newEntry.name" class="form-control">
+          <input type="text" required autofocus id="idName" focus-on="idNameFocus" name="idName" ng-model="newEntry.name" class="form-control">
         </div>
         <div class="form-group" ng-class="{ 'has-error': addEntryForm.idEmail.$invalid }">
           <label for="idEmail">Email</label>
@@ -37,7 +37,7 @@
           <p class="help-block">Social media profile or other personal url</p>
         </div>
         <button class="btn btn-primary"
-        ng-disabled="!(authentication.user || !(newEntry.email || newEntry.url || newEntry.phone) || (addEntryForm.idName.$invalid || addEntryForm.idEmail.$invalid || addEntryForm.idPhone.$invalid || addEntryForm.idUrl.$invalid))">
+        ng-disabled="!(authentication.user && (newEntry.email || newEntry.url || newEntry.phone) && !(addEntryForm.idName.$invalid || addEntryForm.idEmail.$invalid || addEntryForm.idPhone.$invalid || addEntryForm.idUrl.$invalid))">
           Add public entry</button>
         <p class="help-block">More details can be added afterwards.</p>
       </form>
