@@ -92,8 +92,9 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.initIpfsIndexes = (viewpoint) ->
       setIndex = (results) ->
         $scope.identifiIndex = results
-        $scope.identifiIndex.save().then (uri) ->
-          localStorageService.set('identifiIndexUri', uri)
+        if $scope.identifiIndex.storage.ipfs
+          $scope.identifiIndex.save().then (uri) ->
+            localStorageService.set('identifiIndexUri', uri)
         console.log 'Got index', $scope.identifiIndex
         $scope.identifiIndex.getViewpoint().then (vp) ->
           $scope.viewpoint = vp
@@ -109,8 +110,8 @@ angular.module('identifiAngular').controller 'MainController', [
       else if viewpoint
         p = $window.identifiLib.Index.create($scope.ipfs, viewpoint)
       else
-        #$window.identifiLib.Index.load()
-        p = $window.identifiLib.Index.load('Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs', $scope.ipfs)
+        p = $window.identifiLib.Index.load()
+        #p = $window.identifiLib.Index.load('Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs', $scope.ipfs)
       p.then setIndex
 
     #$scope.initIpfsIndexes()
