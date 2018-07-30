@@ -109,8 +109,10 @@ angular.module('identifiAngular').controller 'MainController', [
       else if viewpoint
         p = $window.identifiLib.Index.create($scope.ipfs, viewpoint)
       else
+        console.log $window.Gun
+        gun = new $window.Gun(['http://localhost:8080/gun', 'https://identifi.herokuapp.com/gun'])
         #$window.identifiLib.Index.load()
-        p = $window.identifiLib.Index.load('Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs', $scope.ipfs)
+        p = $window.identifiLib.Index.load('5OmUK6oYG+T5nl8zRN68pYMpixmbgiuKauCyTa9nJyc=', new $window.identifiLib.GUNStorage(gun))
       p.then setIndex
 
     #$scope.initIpfsIndexes()
