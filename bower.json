@@ -23,8 +23,7 @@
     "angularjs-slider": "^5.8.7",
     "identifi-lib": "^0.0.58",
     "angular-clipboard": "^1.6.2",
-    "angular-qrcode": "^7.2.0",
-    "merkle-btree": "^1.0.20"
+    "angular-qrcode": "^7.2.0"
   },
   "devDependencies": {
     "angular-mocks": "~1.5.9"

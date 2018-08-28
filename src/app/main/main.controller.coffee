@@ -63,7 +63,7 @@ angular.module('identifiAngular').controller 'MainController', [
       ])
 
     $scope.loginWithKey = (privateKeySerialized) ->
-      $scope.privateKey = $window.identifiLib.util.jwkToPrvKey(JSON.parse(privateKeySerialized))
+      $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
       localStorageService.set('identifiKey', privateKeySerialized)
       $scope.authentication.user =
         idType: 'keyID'
@@ -83,38 +83,16 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.ipfs.on 'ready', ->
       $scope.ipfsReady = true
       $window.ipfs = $scope.ipfs
-      $scope.ipfs.pubsub.subscribe 'identifi', (msg) ->
-        console.log 'identifi message received', msg, $scope.ipfs.types.Buffer(msg.data).toString()
-        msg = $window.identifiLib.Message.fromJws($scope.ipfs.types.Buffer(msg.data).toString())
-        $scope.processMessages([msg])
-      $scope.initIpfsIndexes() unless $scope.authentication.user
 
-    $scope.initIpfsIndexes = (viewpoint) ->
-      setIndex = (results) ->
-        $scope.identifiIndex = results
-        if $scope.identifiIndex.storage.ipfs
-          $scope.identifiIndex.save().then (uri) ->
-            localStorageService.set('identifiIndexUri', uri)
-        console.log 'Got index', $scope.identifiIndex
-        $scope.identifiIndex.getViewpoint().then (vp) ->
-          $scope.viewpoint = vp
-        $scope.$apply -> $scope.apiReady = true
+    setIndex = (results) ->
+      $scope.identifiIndex = results
+      console.log 'Got index', $scope.identifiIndex
+      $scope.identifiIndex.getViewpoint().then (vp) ->
+        $scope.viewpoint = vp
+      $scope.$apply -> $scope.apiReady = true
 
-      existingUri = localStorageService.get('identifiIndexUri')
-      p = null
-      if existingUri
-        p = $window.identifiLib.Index.load(existingUri, $scope.ipfs)
-        .then (r) ->
-          console.log 'loaded', existingUri
-          r
-      else if viewpoint
-        p = $window.identifiLib.Index.create($scope.ipfs, viewpoint)
-      else
-        p = $window.identifiLib.Index.load()
-        #p = $window.identifiLib.Index.load('Qmbb1DRwd75rZk5TotTXJYzDSJL6BaNT1DAQ6VbKcKLhbs', $scope.ipfs)
-      p.then setIndex
-
-    #$scope.initIpfsIndexes()
+    gun = new Gun(['http://localhost:8765/gun'])
+    $window.identifiLib.Index.create(gun).then(setIndex)
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
@@ -195,9 +173,9 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.loginModal.close()
 
     $scope.generateKey = ->
-      $scope.privateKey = $window.identifiLib.util.generateKey()
+      $scope.privateKey = $window.identifiLib.Key.generate()
       console.log $scope.privateKey
-      $scope.privateKeySerialized = JSON.stringify($window.identifiLib.util.prvKeyToJwk($scope.privateKey))
+      $scope.privateKeySerialized = $window.identifiLib.Key.toJwk($scope.privateKey)
 
     $scope.downloadKey = ->
       hiddenElement = document.createElement('a')
@@ -388,17 +366,20 @@ angular.module('identifiAngular').controller 'MainController', [
       return
 
     $scope.setIdentityNames = (i, htmlSafe) ->
-      if i.mostVerifiedAttributes.name
-        i.primaryName = i.mostVerifiedAttributes.name.attribute.val
-      else if i.mostVerifiedAttributes.nickname
-        i.primaryName = i.mostVerifiedAttributes.nickname.attribute.val
-      else
-        i.primaryName = i.data.attrs[0].val
-      if i.primaryName
-        if i.mostVerifiedAttributes.nickname and i.mostVerifiedAttributes.nickname.attribute.val != i.primaryName
-          i.nickname = i.mostVerifiedAttributes.nickname.attribute.val
-          i.nickname = i.nickname.replace('<', '&lt;') if htmlSafe
-      i.primaryName = i.primaryName.replace('<', '&lt;') if htmlSafe
+      i.gun.get('attrs').load (attrs) ->
+        console.log attrs
+        mva = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
+        if mva.name
+          i.primaryName = mva.name.attribute.val
+        else if mva.nickname
+          i.primaryName = mva.nickname.attribute.val
+        else
+          i.primaryName = attrs[Object.keys(attrs)[0]].val
+        if i.primaryName
+          if mva.nickname and mva.nickname.attribute.val != i.primaryName
+            i.nickname = mva.nickname.attribute.val
+            i.nickname = i.nickname.replace('<', '&lt;') if htmlSafe
+        i.primaryName = i.primaryName.replace('<', '&lt;') if htmlSafe
 
     $scope.searchRequest = null
     $scope.search = (query, limit) ->
@@ -425,7 +406,12 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.searchRequest = $scope.searchRequest.then (res) ->
         return if res.searchKey != $scope.searchKey
         identities = res.identities
-        identities.forEach (i) -> $scope.setIdentityNames(i, true)
+        identities.forEach (i) ->
+          i.gun.on (data) ->
+            i.data = data
+            i.gun.get('linkTo').once((linkTo) -> i.linkTo = linkTo)
+            console.log i
+          $scope.setIdentityNames(i, true)
         searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
         if searchKey != $scope.previousSearchKey
           return # search key changed
