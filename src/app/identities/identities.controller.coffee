@@ -271,7 +271,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.isUniqueType = config.uniqueAttributeTypes.indexOf($scope.idType) > -1
       if !$scope.isUniqueType
         $state.go 'identities.list', { search: $scope.idValue }
-        $scope.tabs[2].active = true
+        $scope.tabs[2].active = true if $scope.tabs
       $scope.setPageTitle $scope.idValue
       $scope.$watch 'apiReady', (isReady) ->
         if isReady

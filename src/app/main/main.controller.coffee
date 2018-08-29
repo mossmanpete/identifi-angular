@@ -89,9 +89,15 @@ angular.module('identifiAngular').controller 'MainController', [
       console.log 'Got index', $scope.identifiIndex
       $scope.identifiIndex.getViewpoint().then (vp) ->
         $scope.viewpoint = vp
+        $scope.viewpoint.gun.get('linkTo').open (linkTo) ->
+          $scope.viewpoint.linkTo = linkTo
+        $scope.viewpoint.gun.get('attrs').open (attrs) ->
+          console.log 'attrs', attrs
+          $scope.viewpoint.attrs = attrs
+          $scope.viewpoint.mostVerifiedAttributes = $scope.identifiLib.Identity.getMostVerifiedAttributes(attrs)
       $scope.$apply -> $scope.apiReady = true
 
-    gun = new Gun(['http://localhost:8765/gun'])
+    gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun'])
     $window.identifiLib.Index.create(gun.get('identifi')).then(setIndex)
 
     $scope.setPageTitle = (title) ->
@@ -373,13 +379,13 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.setIdentityNames = (i, htmlSafe) ->
       i.gun.get('attrs').load (attrs) ->
-        console.log attrs
         mva = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
         if mva.name
           i.primaryName = mva.name.attribute.val
         else if mva.nickname
           i.primaryName = mva.nickname.attribute.val
         else
+          console.log 1111, attrs[Object.keys(attrs)[0]].val
           i.primaryName = attrs[Object.keys(attrs)[0]].val
         if i.primaryName
           if mva.nickname and mva.nickname.attribute.val != i.primaryName
