@@ -79,101 +79,103 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.getConnections = ->
       $scope.connections = {}
-      connections = $scope.identity.data.attrs or []
-      if connections.length > 0
-        c = connections[0]
-        mostConfirmations = c.conf
-      else
-        mostConfirmations = 1
-      for id in connections
-        $scope.connections[$scope.getIdKey(id)] = Object.assign({}, id)
-      for key, conn of $scope.connections
-        conn.isCurrent = conn.name == $scope.idType and conn.val == $scope.idValue
-        switch conn.name
-          when 'email'
-            conn.iconStyle = 'glyphicon glyphicon-envelope'
-            conn.btnStyle = 'btn-success'
-            conn.link = 'mailto:' + conn.val
-            conn.quickContact = true
-          when 'bitcoin_address', 'bitcoin'
-            conn.iconStyle = 'fa fa-bitcoin'
-            conn.btnStyle = 'btn-primary'
-            conn.link = 'https://blockchain.info/address/' + conn.val
-            conn.quickContact = true
-          when 'gpg_fingerprint', 'gpg_keyid'
-            conn.iconStyle = 'fa fa-key'
-            conn.btnStyle = 'btn-default'
-            conn.link = 'https://pgp.mit.edu/pks/lookup?op=get&search=0x' + conn.val
-          when 'account'
-            conn.iconStyle = 'fa fa-at'
-          when 'nickname'
-            conn.iconStyle = 'glyphicon glyphicon-font'
-          when 'name'
-            conn.iconStyle = 'glyphicon glyphicon-font'
-          when 'tel', 'phone'
-            conn.iconStyle = 'glyphicon glyphicon-earphone'
-            conn.btnStyle = 'btn-success'
-            conn.link = 'tel:' + conn.val
-            conn.quickContact = true
-          when 'keyID'
-            conn.iconStyle = 'fa fa-key'
-          when 'coverPhoto'
-            if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-              $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(' + ($scope.ipfsRoot or '') + conn.val + ')' }
-          when 'profilePhoto'
-            if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-              $scope.profilePhoto = $scope.profilePhoto or ($scope.ipfsRoot or '') + conn.val
-          when 'url'
-            conn.link = conn.val
-            if conn.val.indexOf('facebook.com/') > -1
-              conn.iconStyle = 'fa fa-facebook'
-              conn.btnStyle = 'btn-facebook'
-              conn.link = conn.val
-              conn.linkName = conn.val.split('facebook.com/')[1]
+      $scope.identity.gun.get('attrs').open (attrs) ->
+        console.log attrs
+        connections = attrs or []
+        if connections.length > 0
+          c = connections[0]
+          mostConfirmations = c.conf
+        else
+          mostConfirmations = 1
+        for key, id of connections
+          $scope.connections[$scope.getIdKey(id)] = Object.assign({}, id)
+        for key, conn of $scope.connections
+          conn.isCurrent = conn.name == $scope.idType and conn.val == $scope.idValue
+          switch conn.name
+            when 'email'
+              conn.iconStyle = 'glyphicon glyphicon-envelope'
+              conn.btnStyle = 'btn-success'
+              conn.link = 'mailto:' + conn.val
               conn.quickContact = true
-            else if conn.val.indexOf('twitter.com/') > -1
-              conn.iconStyle = 'fa fa-twitter'
-              conn.btnStyle = 'btn-twitter'
-              conn.link = conn.val
-              conn.linkName = conn.val.split('twitter.com/')[1]
+            when 'bitcoin_address', 'bitcoin'
+              conn.iconStyle = 'fa fa-bitcoin'
+              conn.btnStyle = 'btn-primary'
+              conn.link = 'https://blockchain.info/address/' + conn.val
               conn.quickContact = true
-            else if conn.val.indexOf('plus.google.com/') > -1
-              conn.iconStyle = 'fa fa-google-plus'
-              conn.btnStyle = 'btn-google-plus'
-              conn.link = conn.val
-              conn.linkName = conn.val.split('plus.google.com/')[1]
-              conn.quickContact = true
-            else if conn.val.indexOf('linkedin.com/') > -1
-              conn.iconStyle = 'fa fa-linkedin'
-              conn.btnStyle = 'btn-linkedin'
-              conn.link = conn.val
-              conn.linkName = conn.val.split('linkedin.com/')[1]
-              conn.quickContact = true
-            else if conn.val.indexOf('github.com/') > -1
-              conn.iconStyle = 'fa fa-github'
-              conn.btnStyle = 'btn-github'
-              conn.link = conn.val
-              conn.linkName = conn.val.split('github.com/')[1]
-              conn.quickContact = true
-            else
-              conn.iconStyle = 'glyphicon glyphicon-link'
+            when 'gpg_fingerprint', 'gpg_keyid'
+              conn.iconStyle = 'fa fa-key'
               conn.btnStyle = 'btn-default'
-        if conn.val and conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-          conn.link = ($scope.ipfsRoot or '') + conn.val
-          conn.linkName = conn.val
-          conn.iconStyle = 'glyphicon glyphicon-link'
-          conn.btnStyle = 'btn-default'
-        if conn.conf + conn.ref > 0
-          percentage = conn.conf * 100 / (conn.conf + conn.ref)
-          if percentage >= 80
-            alpha = conn.conf / mostConfirmations * 0.7 + 0.3
-            # conn.rowStyle = 'background-color: rgba(223,240,216,' + alpha + ')'
-          else if percentage >= 60
-            conn.rowClass = 'warning'
-          else
-            conn.rowClass = 'danger'
-        $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
-      $scope.connectionsLength = Object.keys($scope.connections).length
+              conn.link = 'https://pgp.mit.edu/pks/lookup?op=get&search=0x' + conn.val
+            when 'account'
+              conn.iconStyle = 'fa fa-at'
+            when 'nickname'
+              conn.iconStyle = 'glyphicon glyphicon-font'
+            when 'name'
+              conn.iconStyle = 'glyphicon glyphicon-font'
+            when 'tel', 'phone'
+              conn.iconStyle = 'glyphicon glyphicon-earphone'
+              conn.btnStyle = 'btn-success'
+              conn.link = 'tel:' + conn.val
+              conn.quickContact = true
+            when 'keyID'
+              conn.iconStyle = 'fa fa-key'
+            when 'coverPhoto'
+              if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+                $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(' + ($scope.ipfsRoot or '') + conn.val + ')' }
+            when 'profilePhoto'
+              if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+                $scope.profilePhoto = $scope.profilePhoto or ($scope.ipfsRoot or '') + conn.val
+            when 'url'
+              conn.link = conn.val
+              if conn.val.indexOf('facebook.com/') > -1
+                conn.iconStyle = 'fa fa-facebook'
+                conn.btnStyle = 'btn-facebook'
+                conn.link = conn.val
+                conn.linkName = conn.val.split('facebook.com/')[1]
+                conn.quickContact = true
+              else if conn.val.indexOf('twitter.com/') > -1
+                conn.iconStyle = 'fa fa-twitter'
+                conn.btnStyle = 'btn-twitter'
+                conn.link = conn.val
+                conn.linkName = conn.val.split('twitter.com/')[1]
+                conn.quickContact = true
+              else if conn.val.indexOf('plus.google.com/') > -1
+                conn.iconStyle = 'fa fa-google-plus'
+                conn.btnStyle = 'btn-google-plus'
+                conn.link = conn.val
+                conn.linkName = conn.val.split('plus.google.com/')[1]
+                conn.quickContact = true
+              else if conn.val.indexOf('linkedin.com/') > -1
+                conn.iconStyle = 'fa fa-linkedin'
+                conn.btnStyle = 'btn-linkedin'
+                conn.link = conn.val
+                conn.linkName = conn.val.split('linkedin.com/')[1]
+                conn.quickContact = true
+              else if conn.val.indexOf('github.com/') > -1
+                conn.iconStyle = 'fa fa-github'
+                conn.btnStyle = 'btn-github'
+                conn.link = conn.val
+                conn.linkName = conn.val.split('github.com/')[1]
+                conn.quickContact = true
+              else
+                conn.iconStyle = 'glyphicon glyphicon-link'
+                conn.btnStyle = 'btn-default'
+          if conn.val and conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+            conn.link = ($scope.ipfsRoot or '') + conn.val
+            conn.linkName = conn.val
+            conn.iconStyle = 'glyphicon glyphicon-link'
+            conn.btnStyle = 'btn-default'
+          if conn.conf + conn.ref > 0
+            percentage = conn.conf * 100 / (conn.conf + conn.ref)
+            if percentage >= 80
+              alpha = conn.conf / mostConfirmations * 0.7 + 0.3
+              # conn.rowStyle = 'background-color: rgba(223,240,216,' + alpha + ')'
+            else if percentage >= 60
+              conn.rowClass = 'warning'
+            else
+              conn.rowClass = 'danger'
+          $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
+        $scope.connectionsLength = Object.keys($scope.connections).length
 
 
     $scope.getConnectingMsgs = (id1, id2) ->
@@ -208,12 +210,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           id.collapse = !id.collapse
 
     $scope.getSentMsgs = ->
-      return if $scope.sent.loading or not $scope.identity or not $scope.identity.data.sent
+      return if $scope.sent.loading or not $scope.identity
       $scope.sent.loading = true
-      if $scope.sent.length == 0
-        $scope.identity.data.sentPositive = 0
-        $scope.identity.data.sentNeutral = 0
-        $scope.identity.data.sentNegative = 0
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       $scope.identifiIndex.getSentMsgs($scope.identity, $scope.filters.limit, cursor)
       .then (sent) ->
@@ -223,22 +221,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.sent.loading = false
           if sent.length < $scope.filters.limit - 1
             $scope.sent.finished = true
-        sent.forEach (msg) ->
-          if msg.data.type == 'rating'
-            neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
-            if msg.data.rating > neutralRating
-              $scope.identity.data.sentPositive++
-            else if msg.data.rating < neutralRating
-              $scope.identity.data.sentNegative++
-            else
-              console.log msg
-              $scope.identity.data.sentNeutral++
       .catch (error) ->
         console.log 'error loading sent messages', error
         $scope.sent.finished = true
 
     $scope.getReceivedMsgs = ->
-      return if $scope.received.loading or not $scope.identity or not $scope.identity.data.received
+      return if $scope.received.loading or not $scope.identity
       $scope.received.loading = true
       cursor = if $scope.received.length then $scope.received[$scope.received.length - 1].cursor else ''
       $scope.identifiIndex.getReceivedMsgs($scope.identity, $scope.filters.limit, cursor)
