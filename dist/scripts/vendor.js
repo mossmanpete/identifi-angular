@@ -71458,7 +71458,7 @@ angular
 	    var bestVerificationScore = -1;
 	    _Object$keys(data.mostVerifiedAttributes).forEach(function (k) {
 	      var v = data.mostVerifiedAttributes[k];
-	      if (v.verificationScore > bestVerificationScore) {
+	      if (Attribute.isUniqueType(k) && v.verificationScore > bestVerificationScore) {
 	        data.linkTo = { name: k, val: v.attribute.val };
 	        bestVerificationScore = v.verificationScore;
 	      }
@@ -71523,6 +71523,9 @@ angular
 	    details.appendChild(links);
 
 	    this.gun.on(async function (data) {
+	      if (!data) {
+	        return;
+	      }
 	      var attrs = await new _Promise(function (resolve) {
 	        _this.gun.get('attrs').load(function (r) {
 	          return resolve(r);
@@ -71665,6 +71668,9 @@ angular
 	    identicon$$1.appendChild(img);
 
 	    this.gun.on(function (data) {
+	      if (!data) {
+	        return;
+	      }
 	      // Define colors etc
 	      var bgColor = 'rgba(0,0,0,0.2)';
 	      var bgImage = 'none';
