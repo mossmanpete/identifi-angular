@@ -71463,6 +71463,9 @@ angular
 	        bestVerificationScore = v.verificationScore;
 	      }
 	    });
+	    if (!data.linkTo) {
+	      data.linkTo = data.attrs[_Object$keys(data.attrs)[0]];
+	    }
 	    if (data.linkTo.name !== 'keyID' && data.mostVerifiedAttributes.keyID) {
 	      data.linkTo = data.mostVerifiedAttributes.keyID.attribute;
 	    }
@@ -71795,20 +71798,19 @@ angular
 	      var privKeyFile = datadir + '/private.key';
 	      if (fs.existsSync(privKeyFile)) {
 	        var f = fs.readFileSync(privKeyFile, 'utf8');
-	        var jwk = JSON.parse(f);
-	        myKey = Key.fromJwk(jwk);
+	        myKey = Key.fromJwk(f);
 	      } else {
 	        myKey = Key.generate();
-	        fs.writeFileSync(privKeyFile, _JSON$stringify(Key.toJwk(myKey)));
+	        fs.writeFileSync(privKeyFile, Key.toJwk(myKey));
 	        fs.chmodSync(privKeyFile, 400);
 	      }
 	    } else {
-	      var _jwk = window.localStorage.getItem('identifi.myKey');
-	      if (_jwk) {
-	        myKey = Key.fromJwk(JSON.parse(_jwk));
+	      var jwk = window.localStorage.getItem('identifi.myKey');
+	      if (jwk) {
+	        myKey = Key.fromJwk(jwk);
 	      } else {
 	        myKey = Key.generate();
-	        window.localStorage.setItem('identifi.myKey', _JSON$stringify(Key.toJwk(myKey)));
+	        window.localStorage.setItem('identifi.myKey', Key.toJwk(myKey));
 	      }
 	    }
 	    return myKey;
@@ -71816,23 +71818,23 @@ angular
 
 	  /**
 	  * Serialize key as JSON Web key
-	  * @returns {Object} JSON Web Key
+	  * @returns {String} JSON Web Key string
 	  */
 
 
 	  Key.toJwk = function toJwk(key) {
-	    return KEYUTIL_1.getJWKFromKey(key);
+	    return _JSON$stringify(KEYUTIL_1.getJWKFromKey(key));
 	  };
 
 	  /**
 	  * Get a Key from a JSON Web Key object.
 	  * @param {Object} jwk JSON Web Key
-	  * @returns {Object}
+	  * @returns {String}
 	  */
 
 
 	  Key.fromJwk = function fromJwk(jwk) {
-	    var prv = KEYUTIL_1.getKey(jwk);
+	    var prv = KEYUTIL_1.getKey(JSON.parse(jwk));
 	    prv.pubKeyASN1 = Key._getPubKeyASN1(prv);
 	    prv.keyID = util.getHash(prv.pubKeyASN1);
 	    return prv;

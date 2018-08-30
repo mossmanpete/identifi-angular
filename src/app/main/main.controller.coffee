@@ -17,15 +17,7 @@ angular.module('identifiAngular').controller 'MainController', [
   #'Persona'
   ($scope, $rootScope, $location, $http, $state, config,
   localStorageService, $uibModal, $window, $q, focus) -> # Authentication, Menus, Persona
-    ###
-    Persona.watch
-      loggedInUser: Authentication.user.email
-      onlogin: (assertion) ->
-        $http.post('/auth/persona', assertion: assertion).then ->
-          location.reload()
-          # FIXME
-                        onlogout: ->
-    ###
+    $scope.gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun'])
 
     # set authentication
     $scope.authentication = {} # Authentication
@@ -63,19 +55,20 @@ angular.module('identifiAngular').controller 'MainController', [
       ])
 
     $scope.loginWithKey = (privateKeySerialized) ->
-      privateKeySerialized = JSON.parse(privateKeySerialized) if typeof privateKeySerialized == 'string'
-      console.log typeof privateKeySerialized, privateKeySerialized
       $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
-      localStorageService.set('identifiKey', JSON.stringify(privateKeySerialized))
+      localStorageService.set('identifiKey', privateKeySerialized)
       $scope.authentication.user =
         idType: 'keyID'
         idValue: $scope.privateKey.keyID
-      $scope.authentication.identity = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.privateKey.keyID}]})
+      $scope.authentication.identity = $window.identifiLib.Identity.create(
+        $scope.gun.get('identifi').get('identities'),
+        {attrs:[{name: 'keyID', val: $scope.privateKey.keyID}]}
+      )
       $scope.loginModal.close() if $scope.loginModal
 
     privateKey = localStorageService.get('identifiKey')
     if privateKey
-      $scope.loginWithKey(JSON.stringify(privateKey))
+      $scope.loginWithKey(privateKey)
 
     $scope.ipfs.on 'ready', ->
       $scope.ipfsReady = true
@@ -94,8 +87,7 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.viewpoint.mostVerifiedAttributes = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
       $scope.$apply -> $scope.apiReady = true
 
-    gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun'])
-    $window.identifiLib.Index.create(gun.get('identifi')).then(setIndex)
+    $window.identifiLib.Index.create($scope.gun.get('identifi')).then(setIndex)
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
@@ -167,7 +159,7 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.generateKey = ->
       $scope.privateKey = $window.identifiLib.Key.generate()
       console.log $scope.privateKey
-      $scope.privateKeySerialized = JSON.stringify($window.identifiLib.Key.toJwk($scope.privateKey))
+      $scope.privateKeySerialized = $window.identifiLib.Key.toJwk($scope.privateKey)
 
     $scope.downloadKey = ->
       hiddenElement = document.createElement('a')
@@ -184,7 +176,6 @@ angular.module('identifiAngular').controller 'MainController', [
       $state.go('identities.list')
       $scope.privateKey = null
       $scope.publicKey = null
-      $scope.initIpfsIndexes()
 
     $scope.msgFilter = (value, index, array) ->
       data = value.data or value.signedData
@@ -237,8 +228,8 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.profileFromData = (data, fallbackId) ->
       if data.attrs and data.attrs.length
-        return new $window.identifiLib.Identity({attrs:data.attrs})
-      return new $window.identifiLib.Identity({attrs:[fallbackId]})
+        return $window.identifiLib.Identity.create($scope.gun.get('identifi').get('identities'), {attrs:data.attrs})
+      return $window.identifiLib.Identity.create($scope.gun.get('identifi').get('identities'), {attrs:[fallbackId]})
 
     $scope.openMessage = (event, message, size) ->
       t = event.target
@@ -249,7 +240,10 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.message.signerKeyHash = $scope.message.getSignerKeyID()
       $scope.identifiIndex.get($scope.message.signerKeyHash, 'keyID').then (profile) ->
         unless profile
-          profile = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.message.signerKeyHash}]})
+          profile = $window.identifiLib.Identity.create(
+            $scope.gun.get('identifi').get('identities'),
+            {attrs:[{name: 'keyID', val: $scope.message.signerKeyHash}]}
+          )
         $scope.$apply -> $scope.message.verifiedBy = profile
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
