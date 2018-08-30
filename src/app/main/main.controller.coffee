@@ -63,22 +63,19 @@ angular.module('identifiAngular').controller 'MainController', [
       ])
 
     $scope.loginWithKey = (privateKeySerialized) ->
+      privateKeySerialized = JSON.parse(privateKeySerialized) if typeof privateKeySerialized == 'string'
+      console.log typeof privateKeySerialized, privateKeySerialized
       $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
-      localStorageService.set('identifiKey', privateKeySerialized)
+      localStorageService.set('identifiKey', JSON.stringify(privateKeySerialized))
       $scope.authentication.user =
         idType: 'keyID'
         idValue: $scope.privateKey.keyID
       $scope.authentication.identity = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.privateKey.keyID}]})
       $scope.loginModal.close() if $scope.loginModal
-      if $scope.ipfs.isOnline()
-        $scope.initIpfsIndexes {name: 'keyID', val: $scope.privateKey.keyID}
-      else
-        $scope.ipfs.on 'ready', ->
-          $scope.initIpfsIndexes {name: 'keyID', val: $scope.privateKey.keyID}
 
     privateKey = localStorageService.get('identifiKey')
     if privateKey
-      $scope.loginWithKey(privateKey)
+      $scope.loginWithKey(JSON.stringify(privateKey))
 
     $scope.ipfs.on 'ready', ->
       $scope.ipfsReady = true
@@ -145,17 +142,6 @@ angular.module('identifiAngular').controller 'MainController', [
       options = {}
 
       $scope.identifiIndex.addMessage(message) # publishMessage
-      .then ->
-        $scope.identifiIndex.save()
-      .then (response) ->
-        if response.length
-          localStorageService.set('identifiIndexUri', response)
-        # Clear form fields
-        $scope.newMessage.comment = ''
-        $scope.newMessage.rating = 1
-        $scope.newVerification.type = ''
-        $scope.newVerification.value = ''
-        $scope.$root.$broadcast 'MessageAdded', {message, id}
       .catch (e) ->
         console.error(e)
         $scope.error = e
@@ -181,7 +167,7 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.generateKey = ->
       $scope.privateKey = $window.identifiLib.Key.generate()
       console.log $scope.privateKey
-      $scope.privateKeySerialized = $window.identifiLib.Key.toJwk($scope.privateKey)
+      $scope.privateKeySerialized = JSON.stringify($window.identifiLib.Key.toJwk($scope.privateKey))
 
     $scope.downloadKey = ->
       hiddenElement = document.createElement('a')
