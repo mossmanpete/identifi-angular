@@ -82,12 +82,12 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.viewpoint.gun.get('linkTo').open (linkTo) ->
           $scope.viewpoint.linkTo = linkTo
         $scope.viewpoint.gun.get('attrs').open (attrs) ->
-          console.log 'attrs', attrs
           $scope.viewpoint.attrs = attrs
           $scope.viewpoint.mostVerifiedAttributes = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
-      $scope.$apply -> $scope.apiReady = true
+      $scope.apiReady = true
 
-    $window.identifiLib.Index.create($scope.gun.get('identifi')).then(setIndex)
+    # $window.identifiLib.Index.create($scope.gun.get('identifi')).then(setIndex)
+    setIndex new $window.identifiLib.Index($scope.gun.get('identifi'))
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
@@ -266,7 +266,6 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.processMessages = (messages, msgOptions, verifySignature) ->
       processMessage = (msg) ->
-        console.log msg
         msg.data = msg.signedData
         if (msg.getAuthor and not (msgOptions and msgOptions.authorIsSelf))
           p = msg.getAuthor($scope.identifiIndex)
@@ -274,7 +273,6 @@ angular.module('identifiAngular').controller 'MainController', [
           p = Promise.resolve()
         p.then (author) ->
           $scope.$apply ->
-            console.log author
             msg.author = author
             # TODO: make sure message signature is checked
 
@@ -367,14 +365,12 @@ angular.module('identifiAngular').controller 'MainController', [
           else if mva.nickname
             i.primaryName = mva.nickname.attribute.val
           else
-            console.log 1111, attrs[Object.keys(attrs)[0]].val
             i.primaryName = attrs[Object.keys(attrs)[0]].val
           if i.primaryName
             if mva.nickname and mva.nickname.attribute.val != i.primaryName
               i.nickname = mva.nickname.attribute.val
               i.nickname = i.nickname.replace('<', '&lt;') if htmlSafe
           i.primaryName = i.primaryName.replace('<', '&lt;') if htmlSafe
-          console.log i.primaryName
 
     $scope.searchRequest = null
     $scope.search = (query, limit) ->

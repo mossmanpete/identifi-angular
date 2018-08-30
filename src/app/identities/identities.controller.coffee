@@ -278,15 +278,22 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.identifiIndex.get($scope.idValue, $scope.idType).then (profile) ->
             if profile
               $scope.identity = profile
-              $scope.setIdentityNames($scope.identity)
               $scope.setPageTitle($scope.identity.primaryName)
-              $scope.getSentMsgs(0)
-              $scope.getReceivedMsgs(0)
+              if profile.gun
+                profile.gun.get('attrs').on ->
+                  $scope.setIdentityNames($scope.identity)
+                  $scope.$apply ->
+                    $scope.getConnections()
+                profile.gun.get('sent').on ->
+                  $scope.getSentMsgs(0)
+                profile.gun.get('received').on ->
+                  $scope.getReceivedMsgs(0)
             else
               $scope.$apply ->
-                $scope.identity = new $window.identifiLib.Identity({attrs:[{name:$scope.idType, val:$scope.idValue}]})
-            $scope.$apply ->
-              $scope.getConnections()
+                $scope.identity = $window.identifiLib.Identity.create(
+                  $scope.gun.get('identifi').get('identities'),
+                  {attrs:[{name:$scope.idType, val:$scope.idValue}]}
+                )
           .catch (err) ->
             console.log 'error fetching profile', err
 
