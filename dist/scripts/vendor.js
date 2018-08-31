@@ -74159,12 +74159,11 @@ angular
 
 	  Index.create = async function create(gun, viewpoint) {
 	    var i = new Index(gun);
-	    if (viewpoint) {
-	      i.viewpoint = new Attribute(viewpoint);
-	    } else {
-	      i.viewpoint = { name: 'keyID', val: Key.getDefault().keyID, conf: 1, ref: 0 };
+	    if (!viewpoint) {
+	      viewpoint = { name: 'keyID', val: Key.getDefault().keyID, conf: 1, ref: 0 };
 	    }
-	    var vp = Identity.create(i.gun.get('identities'), { attrs: [i.viewpoint], trustDistance: 0 });
+	    i.gun.get('viewpoint').put(new Attribute(viewpoint));
+	    var vp = Identity.create(i.gun.get('identities'), { attrs: [viewpoint], trustDistance: 0 });
 	    await i._addIdentityToIndexes(vp.gun);
 	    return i;
 	  };
@@ -74324,9 +74323,10 @@ angular
 	    if (!signer) {
 	      return;
 	    }
+	    var vp = await this.gun.get('viewpoint').then();
 	    for (var i = 0; i < msg.signedData.author.length; i++) {
 	      var a = new Attribute(msg.signedData.author[i]);
-	      if (Attribute.equals(a, this.viewpoint)) {
+	      if (Attribute.equals(a, vp)) {
 	        return 0;
 	      } else {
 	        var d = await this._getAttributeTrustDistance(a);

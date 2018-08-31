@@ -373,7 +373,6 @@ angular.module('identifiAngular').controller 'MainController', [
               i.nickname = mva.nickname.attribute.val
               i.nickname = i.nickname.replace('<', '&lt;') if htmlSafe
             i.primaryName = i.primaryName.replace('<', '&lt;') if htmlSafe
-          console.log i.primaryName, attrs, mva
 
     $scope.searchRequest = null
     $scope.search = (query, limit) ->
