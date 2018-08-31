@@ -164,6 +164,18 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.$on '$stateChangeStart', ->
         $scope.loginModal.close()
 
+    $scope.openUploadModal = ->
+      $scope.uploadModal = $uibModal.open(
+        animation: $scope.animationsEnabled
+        templateUrl: 'app/identities/upload.modal.html'
+        size: 'lg'
+        scope: $scope
+      )
+      $scope.uploadModal.rendered.then ->
+        document.activeElement.blur()
+      $scope.$on '$stateChangeStart', ->
+        $scope.uploadModal.close()
+
     $scope.generateKey = ->
       $scope.privateKey = $window.identifiLib.Key.generate()
       console.log $scope.privateKey
