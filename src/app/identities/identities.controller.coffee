@@ -280,6 +280,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               $scope.identity = profile
               $scope.setPageTitle($scope.identity.primaryName)
               if profile.gun
+                profile.gun.on (data) ->
+                  profile.data = data
                 profile.gun.get('attrs').on ->
                   $scope.setIdentityNames($scope.identity)
                   $scope.$apply ->
