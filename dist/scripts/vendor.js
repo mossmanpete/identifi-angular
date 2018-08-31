@@ -74151,31 +74151,21 @@ angular
 	*/
 
 	var Index = function () {
-	  function Index(gun, viewpoint) {
-	    var _this = this;
-
+	  function Index(gun) {
 	    _classCallCheck(this, Index);
 
 	    this.gun = gun || new gun_min();
-	    if (viewpoint) {
-	      this.viewpoint = new Attribute(viewpoint);
-	    } else {
-	      this.viewpoint = { name: 'keyID', val: Key.getDefault().keyID, conf: 1, ref: 0 };
-	    }
-	    var vp = Identity.create(this.gun.get('identities'), { attrs: [this.viewpoint], trustDistance: 0 });
-	    this.ready = new _Promise(async function (resolve, reject) {
-	      try {
-	        await _this._addIdentityToIndexes(vp.gun);
-	        resolve();
-	      } catch (e) {
-	        reject(e);
-	      }
-	    });
 	  }
 
 	  Index.create = async function create(gun, viewpoint) {
-	    var i = new Index(gun, viewpoint);
-	    await i.ready;
+	    var i = new Index(gun);
+	    if (viewpoint) {
+	      i.viewpoint = new Attribute(viewpoint);
+	    } else {
+	      i.viewpoint = { name: 'keyID', val: Key.getDefault().keyID, conf: 1, ref: 0 };
+	    }
+	    var vp = Identity.create(i.gun.get('identities'), { attrs: [i.viewpoint], trustDistance: 0 });
+	    await i._addIdentityToIndexes(vp.gun);
 	    return i;
 	  };
 
@@ -74191,6 +74181,9 @@ angular
 	    var indexKeys = [];
 	    var d = await identity.get('trustDistance').then();
 	    await identity.get('attrs').map().once(function (a) {
+	      if (!a) {
+	        return;
+	      }
 	      var distance = d !== undefined ? d : parseInt(a.dist);
 	      distance = _Number$isNaN(distance) ? 99 : distance;
 	      distance = ('00' + distance).substring(distance.toString().length); // pad with zeros
@@ -74546,17 +74539,17 @@ angular
 
 
 	  Index.prototype.search = async function search(value) {
-	    var _this2 = this;
+	    var _this = this;
 
 	    // TODO: param 'exact', type param
 	    var r = {};
 	    return new _Promise(function (resolve) {
-	      _this2.gun.get('identitiesByTrustDistance').map(function (id, key) {
+	      _this.gun.get('identitiesByTrustDistance').map(function (id, key) {
 	        if (key.indexOf(encodeURIComponent(value)) === -1) {
 	          return;
 	        }
 	        if (!r.hasOwnProperty(gun_min.node.soul(id))) {
-	          r[gun_min.node.soul(id)] = new Identity(_this2.gun.get('identitiesByTrustDistance').get(key));
+	          r[gun_min.node.soul(id)] = new Identity(_this.gun.get('identitiesByTrustDistance').get(key));
 	        }
 	      });
 	      setTimeout(function () {

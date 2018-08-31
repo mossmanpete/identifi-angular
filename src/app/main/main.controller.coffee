@@ -402,7 +402,6 @@ angular.module('identifiAngular').controller 'MainController', [
             i.data = data
             i.gun.get('linkTo').once (linkTo) ->
               $scope.$apply ->
-                console.log 'linkTo', linkTo
                 i.linkTo = linkTo
           $scope.setIdentityNames(i, true)
         searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
