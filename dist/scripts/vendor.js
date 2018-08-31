@@ -74140,7 +74140,7 @@ angular
 	    });
 	    setTimeout(function () {
 	      /* console.log(`r`, r);*/sortAndResolve();
-	    }, 300);
+	    }, 1000);
 	  });
 	}
 
@@ -74182,6 +74182,7 @@ angular
 	    var d = await identity.get('trustDistance').then();
 	    await identity.get('attrs').map().once(function (a) {
 	      if (!a) {
+	        // TODO: this sometimes returns undefined
 	        return;
 	      }
 	      var distance = d !== undefined ? d : parseInt(a.dist);
@@ -74227,10 +74228,14 @@ angular
 
 
 	  Index.prototype.getViewpoint = async function getViewpoint() {
-	    var r = await searchText(this.gun.get('identitiesByTrustDistance'), '00', 1);
-	    if (r.length) {
-	      return new Identity(this.gun.get('identitiesByTrustDistance').get(r[0].key));
-	    }
+	    var _this = this;
+
+	    var k = await new _Promise(function (resolve) {
+	      return _this.gun.get('identitiesByTrustDistance').map(function (v, k) {
+	        return k.indexOf('00') === 0 ? resolve(k) : 0;
+	      });
+	    });
+	    return new Identity(this.gun.get('identitiesByTrustDistance').get(k));
 	  };
 
 	  /**
@@ -74539,17 +74544,17 @@ angular
 
 
 	  Index.prototype.search = async function search(value) {
-	    var _this = this;
+	    var _this2 = this;
 
 	    // TODO: param 'exact', type param
 	    var r = {};
 	    return new _Promise(function (resolve) {
-	      _this.gun.get('identitiesByTrustDistance').map(function (id, key) {
+	      _this2.gun.get('identitiesByTrustDistance').map(function (id, key) {
 	        if (key.indexOf(encodeURIComponent(value)) === -1) {
 	          return;
 	        }
 	        if (!r.hasOwnProperty(gun_min.node.soul(id))) {
-	          r[gun_min.node.soul(id)] = new Identity(_this.gun.get('identitiesByTrustDistance').get(key));
+	          r[gun_min.node.soul(id)] = new Identity(_this2.gun.get('identitiesByTrustDistance').get(key));
 	        }
 	      });
 	      setTimeout(function () {
