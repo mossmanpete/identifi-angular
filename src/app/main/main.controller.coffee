@@ -84,7 +84,9 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.viewpoint.gun.get('attrs').open (attrs) ->
           $scope.viewpoint.attrs = attrs
           $scope.viewpoint.mostVerifiedAttributes = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
-      $scope.apiReady = true
+        $scope.apiReady = true
+        if $state.is 'identities.list'
+          $scope.search()
 
     # $window.identifiLib.Index.create($scope.gun.get('identifi')).then(setIndex)
     setIndex new $window.identifiLib.Index($scope.gun.get('identifi'))
@@ -357,7 +359,7 @@ angular.module('identifiAngular').controller 'MainController', [
       return
 
     $scope.setIdentityNames = (i, htmlSafe) ->
-      i.gun.get('attrs').load (attrs) ->
+      i.gun.get('attrs').open (attrs) ->
         $scope.$apply ->
           mva = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
           if mva.name
@@ -365,12 +367,13 @@ angular.module('identifiAngular').controller 'MainController', [
           else if mva.nickname
             i.primaryName = mva.nickname.attribute.val
           else
-            i.primaryName = attrs[Object.keys(attrs)[0]].val
+            i.primaryName = Object.values(attrs)[0].val
           if i.primaryName
             if mva.nickname and mva.nickname.attribute.val != i.primaryName
               i.nickname = mva.nickname.attribute.val
               i.nickname = i.nickname.replace('<', '&lt;') if htmlSafe
-          i.primaryName = i.primaryName.replace('<', '&lt;') if htmlSafe
+            i.primaryName = i.primaryName.replace('<', '&lt;') if htmlSafe
+          console.log i.primaryName, attrs, mva
 
     $scope.searchRequest = null
     $scope.search = (query, limit) ->
