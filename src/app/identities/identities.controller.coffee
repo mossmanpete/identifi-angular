@@ -240,11 +240,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           received.forEach (msg) ->
             neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
             if Object.keys(thumbsUpObj).length < 12 and msg.data.rating > neutralRating
-              thumbsUpObj[msg.linkToAuthor] = msg
+              thumbsUpObj[JSON.stringify(msg.signedData.author)] = msg
               $scope.thumbsUp = Object.values(thumbsUpObj)
               $scope.hasThumbsUp = true
             else if Object.keys(thumbsDownObj).length < 12 and msg.data.rating < neutralRating
-              thumbsDownObj[msg.linkToAuthor] = msg
+              thumbsDownObj[JSON.stringify(msg.signedData.author)] = msg
               $scope.thumbsDown = Object.values(thumbsDownObj)
               $scope.hasThumbsDown = true
       .catch (error) ->
