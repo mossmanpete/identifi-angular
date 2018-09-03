@@ -135,10 +135,10 @@ angular.module('identifiAngular').controller 'MainController', [
       if params.type == 'rating'
         params.maxRating |= 3
         params.minRating |= -3
-        message = new $window.identifiLib.Message.createRating(params, $scope.privateKey)
+        message = $window.identifiLib.Message.createRating(params, $scope.privateKey)
         console.log message
       else
-        message = new $window.identifiLib.Message.createVerification(params, $scope.privateKey)
+        message = $window.identifiLib.Message.createVerification(params, $scope.privateKey)
       options = {}
 
       $scope.identifiIndex.addMessage(message) # publishMessage
@@ -176,12 +176,20 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.$on '$stateChangeStart', ->
         $scope.uploadModal.close()
 
-    $scope.uploadFile = (buffer) ->
-      console.log 'uploading', buffer
-      $scope.ipfs.files.add buffer, (err, files) ->
-        console.log 'done:', err, files
-        # TODO: create identifi verification
-        $scope.uploadModal.close() unless err
+    $scope.uploadFile = (blob) ->
+      return new Promise (resolve, reject) ->
+        console.log 'uploading', blob
+        fileReader = new FileReader()
+        fileReader.onload = (event) ->
+          buffer = $scope.ipfs.types.Buffer.from(event.target.result)
+          console.log 'buffer', buffer
+          $scope.ipfs.files.add buffer, (err, files) ->
+            if err
+              reject('adding to ipfs failed', err)
+            else
+              resolve(files)
+              console.log 'done:', err, files
+        fileReader.readAsArrayBuffer(blob)
 
     $scope.generateKey = ->
       $scope.privateKey = $window.identifiLib.Key.generate()

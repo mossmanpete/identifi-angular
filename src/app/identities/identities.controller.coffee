@@ -257,6 +257,14 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.received = []
       $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
+    $scope.uploadProfilePhoto = (blob, identity) ->
+      $scope.uploadFile(blob).then (files) ->
+        console.log files, $scope.identity
+        recipient = [[$scope.idType, $scope.idValue], ['profilePhoto', '/ipfs/' + files[0].path]]
+        v = $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
+        $scope.identifiIndex.addMessage(v)
+        $scope.uploadModal.close()
+
     $scope.findOne = ->
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value

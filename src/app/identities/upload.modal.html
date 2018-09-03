@@ -1,11 +1,11 @@
-<div class="col-md-10 col-md-offset-1">
+<div class="col-md-10 col-md-offset-1" ng-controller="IdentitiesController">
   <div class="panel panel-default mar-top15">
     <div class="panel-heading">
       <form name="form">
         <div class="drop-box" ngf-select ngf-drop ng-model="file" name="file" ngf-pattern="'image/*'"
           ngf-accept="'image/*'" ngf-max-size="20MB" ngf-min-height="100"
-          ngf-resize="{width: 100, height: 100}" style="width:300px;height:300px;">Drop file or click</div>
-        <button class="btn btn-primary" type="submit" ng-click="uploadFile(file)">Upload</button>
+          ngf-resize="{width: 100, height: 100}" style="width:100%;height:300px;">Drop file or click</div>
+        <button class="btn btn-primary" type="submit" ng-click="uploadProfilePhoto(file)">Upload</button>
       </form>
     </div>
   </div>
