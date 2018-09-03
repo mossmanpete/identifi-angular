@@ -121,7 +121,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               conn.iconStyle = 'fa fa-key'
             when 'coverPhoto'
               if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-                $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(' + ($scope.ipfsRoot or '') + conn.val + ')' }
+                $scope.ipfsGet(conn.val).then (coverPhoto) ->
+                  $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(data:image;base64,' + coverPhoto.toString('base64') + ')' }
             when 'profilePhoto'
               if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
                 $scope.profilePhoto = $scope.profilePhoto or ($scope.ipfsRoot or '') + conn.val
@@ -264,6 +265,20 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         v = $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
         $scope.identifiIndex.addMessage(v)
         $scope.uploadModal.close()
+
+    $scope.uploadCoverPhoto = (blob, identity) ->
+      $scope.uploadFile(blob).then (files) ->
+        console.log files, $scope.identity
+        recipient = [[$scope.idType, $scope.idValue], ['coverPhoto', '/ipfs/' + files[0].path]]
+        v = $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
+        $scope.identifiIndex.addMessage(v)
+        $scope.uploadModal.close()
+
+    $scope.openProfilePhotoUploadModal = ->
+      $scope.openUploadModal($scope.uploadProfilePhoto, 'Upload profile photo')
+
+    $scope.openCoverPhotoUploadModal = ->
+      $scope.openUploadModal($scope.uploadCoverPhoto, 'Upload cover photo')
 
     $scope.findOne = ->
       $scope.idType = $stateParams.type

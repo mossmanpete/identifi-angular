@@ -103,23 +103,19 @@ angular.module('identifiAngular').controller 'MainController', [
         $rootScope.pageTitle += ' - ' + title
 
     $scope.ipfsGet = (uri, getJson) ->
-      jsIpfsGet = ->
-        console.log 'Getting from js-ipfs', uri
-        $scope.ipfs.files.cat(uri).then (stream) ->
-          new Promise (resolve, reject) ->
-            stream.on 'data', (file) ->
-              file = $scope.ipfs.types.Buffer(file).toString()
-              file = JSON.parse(file) if getJson
-              resolve(file)
-            stream.on 'error', (error) ->
-              reject(error)
+      return new Promise (resolve) ->
+        go = ->
+          $scope.ipfs.files.cat(uri).then (file) ->
+            file = $scope.ipfs.types.Buffer(file)
+            if getJson
+              file = JSON.parse(file.toString())
+            resolve file
 
-      if true # TODO: hmm
-        return $http.get('https://identi.fi/ipfs/' + uri)
-        .then (res) -> res.data
-        .catch -> jsIpfsGet()
-      else
-        return jsIpfsGet()
+        if $scope.ipfsReady
+          go()
+        else
+          $scope.ipfs.on 'ready', ->
+            go()
 
     $scope.newMessage =
       rating: 1
@@ -164,7 +160,9 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.$on '$stateChangeStart', ->
         $scope.loginModal.close()
 
-    $scope.openUploadModal = ->
+    $scope.openUploadModal = (callback, modalButtonText) ->
+      $scope.uploadModalCallback = callback
+      $scope.modalButtonText = modalButtonText or 'Upload'
       $scope.uploadModal = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/identities/upload.modal.html'
