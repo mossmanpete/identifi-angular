@@ -42,7 +42,7 @@
             <li class="" ui-sref-active="active"><a ui-sref="about"><span class="glyphicon glyphicon-info-sign"></span></a></li>
       			<li ng-cloak ng-show="authentication.identity" ui-sref-active="active">
       				<a ui-sref="identities.show({ type: authentication.user.idType, value: authentication.user.idValue })" class="nav-identicon">
-      					<identicon width="26" identity="authentication.identity" show-distance="0">
+      					<identicon width="26" identity="authentication.identity" show-distance="0" ipfs="ipfs">
       				</a>
       			</li>
             <li ng-cloak ng-show="authentication.user"><a href="" ng-click="logout()" class="glyphicon glyphicon-log-out"></span></a></li>
