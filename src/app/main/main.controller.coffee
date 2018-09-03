@@ -176,6 +176,13 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.$on '$stateChangeStart', ->
         $scope.uploadModal.close()
 
+    $scope.uploadFile = (buffer) ->
+      console.log 'uploading', buffer
+      $scope.ipfs.files.add buffer, (err, files) ->
+        console.log 'done:', err, files
+        # TODO: create identifi verification
+        $scope.uploadModal.close() unless err
+
     $scope.generateKey = ->
       $scope.privateKey = $window.identifiLib.Key.generate()
       console.log $scope.privateKey
