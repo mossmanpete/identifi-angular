@@ -275,9 +275,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.uploadModal.close()
 
     $scope.openProfilePhotoUploadModal = ->
+      return unless $scope.authentication.identity
       $scope.openUploadModal($scope.uploadProfilePhoto, 'Upload profile photo')
 
     $scope.openCoverPhotoUploadModal = ->
+      return unless $scope.authentication.identity
       $scope.openUploadModal($scope.uploadCoverPhoto, 'Upload cover photo')
 
     $scope.findOne = ->
