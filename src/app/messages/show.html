@@ -1,13 +1,13 @@
 <section ng-init="findOne()">
   <div class="col-md-8 col-md-offset-2 msg-col">
-    <message msg-data="msg" page-info="info" ng-repeat="msg in [message]"></message>
+    <message ipfs="ipfs" msg-data="msg" page-info="info" ng-repeat="msg in [message]"></message>
     <div class="panel panel-info">
       <div class="panel-heading">
         Message origin verified by:
         <a ng-if="false" ng-bind="message.signerName||message.signerKeyHash" ui-sref="identities.show({type: 'keyID', value: message.signerKeyHash })"></a>
         <strong ng-if="message.verifiedBy">
           <a ui-sref="identities.show({ type: 'keyID', value: message.signerKeyHash })" class="id-link">
-            <identicon identity="message.verifiedBy" class="mar-right5" border="3" width="35"></identicon>
+            <identicon ipfs="ipfs" identity="message.verifiedBy" class="mar-right5" border="3" width="35"></identicon>
             <span ng-bind="message.verifiedBy.mostVerifiedAttributes.name.attribute.val"></span> <small>{{message.signerKeyHash}}</small>
           </a>
         </strong>
