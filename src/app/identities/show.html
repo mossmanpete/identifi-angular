@@ -47,14 +47,12 @@
             <div class="row">
               <div class="col-xs-12">
                 <p class="align-center">
-                  <a href="" ng-click="openProfilePhotoUploadModal()">
-                    <identicon identity="identity"
-                      ipfs="ipfs"
-                      border="4"
-                      show-distance="0"
-                      width="230">
-                    </identicon>
-                  </a>
+                  <identicon ng-click="openProfilePhotoUploadModal()" identity="identity"
+                    ipfs="ipfs"
+                    border="4"
+                    show-distance="0"
+                    width="230">
+                  </identicon>
                   <!-- <a ng-href="" class="circle {{profileImageCircleClass}}">
                     <span class="arc"></span>
                     <img ng-src="{{profilePhotoUrl}}" width="230" height="230" class="profile-image mar-right5">
