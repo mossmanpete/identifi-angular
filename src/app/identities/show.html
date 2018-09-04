@@ -210,7 +210,7 @@
                     </ul>
                   </div>
                 </div>
-                <message msg-data="msg" page-info="identity" ng-repeat="msg in received | filter:msgFilter | orderBy:'-data.timestamp' as receivedFiltered" ng-click="openMessage($event, msg, 'lg')"></message>
+                <message ipfs="ipfs" msg-data="msg" page-info="identity" ng-repeat="msg in received | filter:msgFilter | orderBy:'-data.timestamp' as receivedFiltered" ng-click="openMessage($event, msg, 'lg')"></message>
               </div>
               <div ng-if="apiReady && !isCurrentUser && !received.loading && receivedFiltered.length == 0" class="alert alert-info text-center">No messages to show</div>
               <div ng-if="apiReady && isCurrentUser && !received.loading && received.length == 0" class="alert alert-warning text-center">
@@ -240,7 +240,7 @@
                     </ul>
                   </div>
                 </div>
-                <message msg-data="msg" page-info="identity" ng-repeat="msg in sent | filter:msgFilter | orderBy:'-data.timestamp' as sentFiltered" ng-click="openMessage($event, msg, 'lg')"></message>
+                <message ipfs="ipfs" msg-data="msg" page-info="identity" ng-repeat="msg in sent | filter:msgFilter | orderBy:'-data.timestamp' as sentFiltered" ng-click="openMessage($event, msg, 'lg')"></message>
               </div>
               <div ng-if="!sent.loading && sentFiltered.length == 0" class="alert alert-info text-center">No messages to show</div>
               <div ng-if="sent.loading" style="position:relative;padding:20px" us-spinner></div>

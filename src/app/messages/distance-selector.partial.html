@@ -3,7 +3,7 @@
   <strong ng-if="viewpoint">
     <a ui-sref="identities.show({ type: viewpoint.linkTo.name, value: viewpoint.linkTo.val })" class="id-link">
       <span class="distance-container mar-right5 mar-left5">
-        <identicon identity="viewpoint" class="" border="3" width="35"></identicon>
+        <identicon ipfs="ipfs" identity="viewpoint" class="" border="3" width="35"></identicon>
       </span>
       <span ng-bind="viewpoint.mostVerifiedAttributes.name.attribute.val"></span>
     </a>

@@ -7,7 +7,7 @@
           <div ng-if="!file" style="padding:120px 0">Drop file or click</div>
           <img ng-if="file" ngf-src="file" width="70%">
         </div>
-        <button class="btn btn-primary" type="submit" ng-click="uploadModalCallback(file)">{{ modalButtonText }}</button>
+        <button class="btn btn-primary" ng-disabled="!file" type="submit" ng-click="uploadModalCallback(file)">{{ modalButtonText }}</button>
       </form>
     </div>
   </div>
