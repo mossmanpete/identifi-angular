@@ -294,7 +294,8 @@ angular.module('identifiAngular').controller 'MainController', [
           p = Promise.resolve()
         p.then (author) ->
           msg.author = author
-          msg.author.gun.get('trustDistance').on (d) -> msg.authorTrustDistance = d
+          if msg.author
+            msg.author.gun.get('trustDistance').on (d) -> msg.authorTrustDistance = d
           $scope.$apply ->
             # TODO: make sure message signature is checked
 
