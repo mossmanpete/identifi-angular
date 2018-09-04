@@ -293,8 +293,9 @@ angular.module('identifiAngular').controller 'MainController', [
         else
           p = Promise.resolve()
         p.then (author) ->
+          msg.author = author
+          msg.author.gun.get('trustDistance').on (d) -> msg.authorTrustDistance = d
           $scope.$apply ->
-            msg.author = author
             # TODO: make sure message signature is checked
 
             msg.linkToAuthor = msg.data.author[0]
@@ -418,10 +419,8 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.searchRequest = $scope.searchRequest.then (res) ->
         return if res.searchKey != $scope.searchKey
         identities = res.identities
-        console.log limit
         identities.splice(limit) if limit
         identities.forEach (i) ->
-          console.log i
           i.gun.on (data) ->
             i.data = data
             i.gun.get('linkTo').once (linkTo) ->
