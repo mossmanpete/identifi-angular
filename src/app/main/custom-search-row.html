@@ -1,4 +1,4 @@
-<a class="search-result-row">
-  <identicon identity="match.label" border="3" width="46" class="mar-right10"></identicon>
-  <span ng-bind-html="(match.label.profile.name || match.label.profile.nickname) | uibTypeaheadHighlight:query"></span>
+<a class="search-result-row" ng-if="match.label.linkTo">
+  <identicon ipfs="ipfs" identity="match.label" border="3" width="46" class="mar-right10"></identicon>
+  <span ng-bind-html="match.label.primaryName | uibTypeaheadHighlight:query"></span>
 </a>

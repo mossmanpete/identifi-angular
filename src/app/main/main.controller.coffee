@@ -418,7 +418,10 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.searchRequest = $scope.searchRequest.then (res) ->
         return if res.searchKey != $scope.searchKey
         identities = res.identities
+        console.log limit
+        identities.splice(limit) if limit
         identities.forEach (i) ->
+          console.log i
           i.gun.on (data) ->
             i.data = data
             i.gun.get('linkTo').once (linkTo) ->
