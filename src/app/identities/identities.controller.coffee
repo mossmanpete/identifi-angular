@@ -78,7 +78,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.newVerification.type = ''
 
     $scope.getConnections = ->
-      $scope.connections = {}
       $scope.identity.gun.get('attrs').open (attrs) ->
         console.log attrs
         connections = attrs or []
@@ -87,9 +86,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           mostConfirmations = c.conf
         else
           mostConfirmations = 1
-        for key, id of connections
-          $scope.connections[$scope.getIdKey(id)] = Object.assign({}, id)
-        for key, conn of $scope.connections
+        $scope.connections = Object.values(connections).sort (a, b) ->
+          (b.conf - 2 * b.ref) - (a.conf - 2 * a.ref)
+        for conn in $scope.connections
           conn.isCurrent = conn.name == $scope.idType and conn.val == $scope.idValue
           switch conn.name
             when 'email'
