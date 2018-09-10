@@ -126,7 +126,8 @@ angular.module('identifiAngular').controller 'MainController', [
         message = $window.identifiLib.Message.createVerification(params, $scope.privateKey)
       options = {}
 
-      $scope.identifiIndex.addMessage(message) # publishMessage
+      message.then (m) ->
+        $scope.identifiIndex.addMessage(m) # publishMessage
       .catch (e) ->
         console.error(e)
         $scope.error = e
