@@ -24,12 +24,16 @@
     "identifi-lib": "^0.0.58",
     "angular-clipboard": "^1.6.2",
     "angular-qrcode": "^7.2.0",
-    "ng-file-upload": "^12.2.13"
+    "ng-file-upload": "^12.2.13",
+    "gun": "^0.9.9993"
   },
   "devDependencies": {
     "angular-mocks": "~1.5.9"
   },
   "overrides": {
+    "gun": {
+      "main": ["gun.js", "lib/open.js", "sea.js", "lib/then.js"]
+    },
     "components-font-awesome": {
       "main": [
         "css/font-awesome.css",

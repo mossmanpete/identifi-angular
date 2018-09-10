@@ -47,17 +47,18 @@ angular.module('identifiAngular').controller 'MainController', [
       localStorageService.set('identifiKey', privateKeySerialized)
       $scope.authentication.user =
         idType: 'keyID'
-        idValue: $scope.privateKey.keyID
+        idValue: $window.identifiLib.Key.getId($scope.privateKey)
       $scope.loginModal.close() if $scope.loginModal
       $scope.$watch 'apiReady', (isReady) ->
         if isReady
-          $scope.identifiIndex.get($scope.privateKey.keyID, 'keyID').then (identity) ->
+          $scope.identifiIndex.get($window.identifiLib.Key.getId($scope.privateKey), 'keyID').then (identity) ->
+            console.log 'identity', identity
             if identity
               $scope.authentication.identity = identity
             else
               $scope.authentication.identity = $window.identifiLib.Identity.create(
                 $scope.gun.get('identifi').get('identities'),
-                { attrs: [{name: 'keyID', val: $scope.privateKey.keyID}] }
+                { attrs: [{name: 'keyID', val: $window.identifiLib.Key.getId(privateKey)}] }
               )
 
     privateKey = localStorageService.get('identifiKey')
