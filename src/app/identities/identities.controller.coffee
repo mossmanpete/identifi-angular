@@ -262,7 +262,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         console.log files, $scope.identity
         recipient = [[$scope.idType, $scope.idValue], ['profilePhoto', '/ipfs/' + files[0].path]]
         v = $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
-        $scope.identifiIndex.addMessage(v)
+        .then (m) ->
+          $scope.identifiIndex.addMessage(m)
         $scope.uploadModal.close()
 
     $scope.uploadCoverPhoto = (blob, identity) ->
@@ -270,7 +271,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         console.log files, $scope.identity
         recipient = [[$scope.idType, $scope.idValue], ['coverPhoto', '/ipfs/' + files[0].path]]
         v = $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
-        $scope.identifiIndex.addMessage(v)
+        .then (m) ->
+          $scope.identifiIndex.addMessage(m)
         $scope.uploadModal.close()
 
     $scope.openProfilePhotoUploadModal = ->
