@@ -32,7 +32,7 @@
   },
   "overrides": {
     "gun": {
-      "main": ["gun.js", "lib/open.js", "sea.js", "lib/then.js"]
+      "main": ["gun.js", "lib/open.js", "lib/load.js", "sea.js", "lib/then.js"]
     },
     "components-font-awesome": {
       "main": [
