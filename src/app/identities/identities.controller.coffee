@@ -122,9 +122,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
               if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
                 $scope.ipfsGet(conn.val).then (coverPhoto) ->
                   $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(data:image;base64,' + coverPhoto.toString('base64') + ')' }
-            when 'profilePhoto'
-              if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-                $scope.profilePhoto = $scope.profilePhoto or ($scope.ipfsRoot or '') + conn.val
             when 'url'
               conn.link = conn.val
               if conn.val.indexOf('facebook.com/') > -1
@@ -261,19 +258,19 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.uploadFile(blob).then (files) ->
         console.log files, $scope.identity
         recipient = [[$scope.idType, $scope.idValue], ['profilePhoto', '/ipfs/' + files[0].path]]
-        v = $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
-        .then (m) ->
-          $scope.identifiIndex.addMessage(m)
-        $scope.uploadModal.close()
+        $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
+          $scope.hideProfilePhoto = true # There's a weird bug where the profile identicon doesn't update
+          $scope.identifiIndex.addMessage(m).then ->
+            $scope.hideProfilePhoto = false
+          $scope.uploadModal.close()
 
     $scope.uploadCoverPhoto = (blob, identity) ->
       $scope.uploadFile(blob).then (files) ->
         console.log files, $scope.identity
         recipient = [[$scope.idType, $scope.idValue], ['coverPhoto', '/ipfs/' + files[0].path]]
-        v = $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
-        .then (m) ->
+        $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
           $scope.identifiIndex.addMessage(m)
-        $scope.uploadModal.close()
+          $scope.uploadModal.close()
 
     $scope.openProfilePhotoUploadModal = ->
       return unless $scope.authentication.identity
@@ -304,17 +301,16 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           $scope.identifiIndex.get($scope.idValue, $scope.idType).then (profile) ->
             if profile
               $scope.identity = profile
-              $scope.setPageTitle($scope.identity.primaryName)
-              if profile.gun
-                profile.gun.on (data) ->
-                  profile.data = data
-                profile.gun.get('attrs').on ->
-                  $scope.setIdentityNames($scope.identity)
+              $scope.setIdentityNames($scope.identity, false, true)
+              if $scope.identity.gun
+                $scope.identity.gun.on (data) ->
+                  $scope.identity.data = data
+                $scope.identity.gun.get('attrs').on ->
                   $scope.$apply ->
                     $scope.getConnections()
-                profile.gun.get('sent').on ->
+                $scope.identity.gun.get('sent').on ->
                   $scope.getSentMsgs(0)
-                profile.gun.get('received').on ->
+                $scope.identity.gun.get('received').on ->
                   $scope.getReceivedMsgs(0)
             else
               $scope.$apply ->

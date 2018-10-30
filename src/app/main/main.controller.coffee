@@ -381,7 +381,7 @@ angular.module('identifiAngular').controller 'MainController', [
           $window.scrollTo 0, pos.bottom - ($window.innerHeight or document.documentElement.clientHeight) + 15
       return
 
-    $scope.setIdentityNames = (i, htmlSafe) ->
+    $scope.setIdentityNames = (i, htmlSafe, setTitle) ->
       i.gun.get('attrs').open (attrs) ->
         $scope.$apply ->
           mva = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
@@ -396,6 +396,8 @@ angular.module('identifiAngular').controller 'MainController', [
               i.nickname = mva.nickname.attribute.val
               i.nickname = i.nickname.replace('<', '&lt;') if htmlSafe
             i.primaryName = i.primaryName.replace('<', '&lt;') if htmlSafe
+          $scope.setPageTitle i.primaryName if setTitle
+
 
     $scope.searchRequest = null
     $scope.search = (query, limit) ->
