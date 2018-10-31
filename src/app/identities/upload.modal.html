@@ -2,7 +2,7 @@
   <div class="panel panel-default mar-top15">
     <div class="panel-heading">
       <form name="form">
-        <div class="drop-box mar-bot10" ngf-select ngf-drop ng-model="file" name="file" ngf-pattern="'image/*'"
+        <div class="drop-box mar-bot10" ngf-resize="{ratio:'1:1',centerCrop:true}" ngf-select ngf-drop ng-model="file" name="file" ngf-pattern="'image/*'"
           ngf-accept="'image/*'" ngf-max-size="5MB" ngf-min-height="100" style="width:100%;min-height:300px;text-align:center">
           <div ng-if="!file" style="padding:120px 0">Drop file or click</div>
           <img ng-if="file" ngf-src="file" width="70%">
