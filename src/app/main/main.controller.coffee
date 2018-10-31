@@ -58,7 +58,7 @@ angular.module('identifiAngular').controller 'MainController', [
             else
               $scope.authentication.identity = $window.identifiLib.Identity.create(
                 $scope.gun.get('identifi').get('identities'),
-                { attrs: [{name: 'keyID', val: $window.identifiLib.Key.getId(privateKey)}] }
+                { attrs: [{name: 'keyID', val: $window.identifiLib.Key.getId($scope.privateKey)}] }
               )
 
     privateKey = localStorageService.get('identifiKey')
@@ -121,12 +121,12 @@ angular.module('identifiAngular').controller 'MainController', [
         params.maxRating |= 3
         params.minRating |= -3
         message = $window.identifiLib.Message.createRating(params, $scope.privateKey)
-        console.log message
       else
         message = $window.identifiLib.Message.createVerification(params, $scope.privateKey)
       options = {}
 
       message.then (m) ->
+        console.log m
         $scope.identifiIndex.addMessage(m) # publishMessage
       .catch (e) ->
         console.error(e)
@@ -180,9 +180,11 @@ angular.module('identifiAngular').controller 'MainController', [
         fileReader.readAsArrayBuffer(blob)
 
     $scope.generateKey = ->
-      $scope.privateKey = $window.identifiLib.Key.generate()
-      console.log $scope.privateKey
-      $scope.privateKeySerialized = $window.identifiLib.Key.toJwk($scope.privateKey)
+      $window.identifiLib.Key.generate().then (key) ->
+        $scope.$apply ->
+          $scope.privateKey = key
+          console.log $scope.privateKey
+          $scope.privateKeySerialized = $window.identifiLib.Key.toJwk($scope.privateKey)
 
     $scope.downloadKey = ->
       hiddenElement = document.createElement('a')
