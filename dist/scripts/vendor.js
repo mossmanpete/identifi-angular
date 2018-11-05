@@ -79783,14 +79783,15 @@ angular
 	      pie.style.transform = transform;
 	      pie.style.opacity = (data.receivedPositive + data.receivedNegative) / 10 * 0.5 + 0.35;
 
-	      var hash = util$1.getHash(_JSON$stringify(data.linkTo), 'hex');
-	      var identiconImg = new identicon(hash, { width: width, format: 'svg' });
-
-	      img.src = img.src || 'data:image/svg+xml;base64,' + identiconImg.toString();
-
 	      if (showDistance) {
 	        distance.textContent = data.trustDistance < 1000 ? Identity._ordinal(data.trustDistance) : '\u2013';
 	      }
+	    });
+
+	    this.gun.get('linkTo').on(function (data) {
+	      var hash = util$1.getHash(encodeURIComponent(data.name) + ':' + encodeURIComponent(data.val), 'hex');
+	      var identiconImg = new identicon(hash, { width: width, format: 'svg' });
+	      img.src = img.src || 'data:image/svg+xml;base64,' + identiconImg.toString();
 	    });
 
 	    if (ipfs) {

@@ -42,33 +42,6 @@ angular.module('identifiAngular').controller 'MainController', [
       repo: 'ipfs7-identifi'
     )
 
-    $scope.loginWithKey = (privateKeySerialized) ->
-      $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
-      localStorageService.set('identifiKey', privateKeySerialized)
-      $scope.authentication.user =
-        idType: 'keyID'
-        idValue: $window.identifiLib.Key.getId($scope.privateKey)
-      $scope.loginModal.close() if $scope.loginModal
-      $scope.$watch 'apiReady', (isReady) ->
-        if isReady
-          $scope.identifiIndex.get($window.identifiLib.Key.getId($scope.privateKey), 'keyID').then (identity) ->
-            console.log 'identity', identity
-            if identity
-              $scope.authentication.identity = identity
-            else
-              $scope.authentication.identity = $window.identifiLib.Identity.create(
-                $scope.gun.get('identifi').get('identities'),
-                { attrs: [{name: 'keyID', val: $window.identifiLib.Key.getId($scope.privateKey)}] }
-              )
-
-    privateKey = localStorageService.get('identifiKey')
-    if privateKey
-      $scope.loginWithKey(privateKey)
-
-    $scope.ipfs.on 'ready', ->
-      $scope.ipfsReady = true
-      $window.ipfs = $scope.ipfs
-
     setIndex = (results) ->
       $scope.identifiIndex = results
       console.log 'Got index', $scope.identifiIndex
@@ -83,8 +56,39 @@ angular.module('identifiAngular').controller 'MainController', [
         if $state.is 'identities.list'
           $scope.search()
 
-    # $window.identifiLib.Index.create($scope.gun.get('identifi')).then(setIndex)
-    setIndex new $window.identifiLib.Index($scope.gun.get('identifi'))
+    $scope.loadDefaultIndex = ->
+      setIndex new $window.identifiLib.Index($scope.gun.get('identifi'))
+
+    $scope.loginWithKey = (privateKeySerialized) ->
+      $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
+      localStorageService.set('identifiKey', privateKeySerialized)
+      $scope.authentication.user =
+        idType: 'keyID'
+        idValue: $window.identifiLib.Key.getId($scope.privateKey)
+      $scope.loginModal.close() if $scope.loginModal
+      keyID = $window.identifiLib.Key.getId($scope.privateKey)
+      viewpoint = new $window.identifiLib.Attribute(['keyID', keyID])
+      $window.identifiLib.Index.create($scope.gun.get(keyID), viewpoint).then (i) ->
+        setIndex i
+        $scope.identifiIndex.get($window.identifiLib.Key.getId($scope.privateKey), 'keyID').then (identity) ->
+          console.log 'identity', identity
+          if identity
+            $scope.authentication.identity = identity
+          else
+            $scope.authentication.identity = $window.identifiLib.Identity.create(
+              $scope.gun.get('identifi').get('identities'),
+              { attrs: [{name: 'keyID', val: $window.identifiLib.Key.getId($scope.privateKey)}] }
+            )
+
+    privateKey = localStorageService.get('identifiKey')
+    if privateKey
+      $scope.loginWithKey(privateKey)
+    else
+      $scope.loadDefaultIndex()
+
+    $scope.ipfs.on 'ready', ->
+      $scope.ipfsReady = true
+      $window.ipfs = $scope.ipfs
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
@@ -150,9 +154,10 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.$on '$stateChangeStart', ->
         $scope.loginModal.close()
 
-    $scope.openUploadModal = (callback, modalButtonText) ->
+    $scope.openUploadModal = (callback, modalButtonText, squarify) ->
       $scope.uploadModalCallback = callback
       $scope.modalButtonText = modalButtonText or 'Upload'
+      $scope.squarify = squarify
       $scope.uploadModal = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/identities/upload.modal.html'
@@ -201,6 +206,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $state.go('identities.list')
       $scope.privateKey = null
       $scope.publicKey = null
+      $scope.loadDefaultIndex()
 
     $scope.msgFilter = (value, index, array) ->
       data = value.data or value.signedData
@@ -389,8 +395,10 @@ angular.module('identifiAngular').controller 'MainController', [
           mva = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
           if mva.name
             i.primaryName = mva.name.attribute.val
+            i.hasProperName = true
           else if mva.nickname
             i.primaryName = mva.nickname.attribute.val
+            i.hasProperName = true
           else
             i.primaryName = Object.values(attrs)[0].val
           if i.primaryName

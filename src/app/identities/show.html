@@ -67,7 +67,7 @@
             <div class="row">
               <div class="col-xs-12">
                 <h4>
-                  <span class="visible-xs visible-sm" ng-if="!(identity.mostVerifiedAttributes.name||identity.mostVerifiedAttributes.nickname)">
+                  <span class="visible-xs visible-sm" ng-if="!(identity.data.mostVerifiedAttributes.name||identity.data.mostVerifiedAttributes.nickname)">
                     <span ng-bind="idValue"></span>
                     <small class="text-muted">
                       <span ng-hide="idType === 'url'" ng-bind="idType" id="id-type"></span>
@@ -75,7 +75,7 @@
                     </small>
                   </span>
                   <span ng-bind="identity.primaryName"></span>
-                  <span ng-hide="!identity.nickname || identity.nickname == identity.primaryName">
+                  <span ng-hide="!identity.data.mostVerifiedAttributes.nickname || identity.data.mostVerifiedAttributes.nickname == identity.data.mostVerifiedAttributes.primaryName">
                     (<span class="text-muted" ng-bind="identity.nickname"></span>)
                   </span>
                   <span ng-if="identity.data.trustDistance == 0" class="label label-default pull-right">viewpoint</span>
@@ -85,6 +85,15 @@
             </div>
             <div class="row">
               <div class="col-xs-12 col-sm-6 col-md-12 mar-bot10 mar-top10">
+                <div class="mar-bot10" ng-if="!identity.hasProperName && !nameAdded">
+                  <a href="" ng-click="addName()" ng-hide="addingName">Add name</a>
+                  <form class="form-inline" ng-show="addingName" ng-submit="addName(name)">
+                    <div class="form-group">
+                      <input focus-on="addNameFocus" type="text" class="form-control" ng-model="name" placeholder="Add name">
+                    </div>
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button>
+                  </form>
+                </div>
                 <p>
                   <b>Received:
                     <span ng-if="identity.data.receivedPositive || identity.data.receivedNegative">

@@ -14,7 +14,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   # 'Authentication'
   'config'
   'localStorageService'
-  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, clipboard, config, localStorageService) -> #, Authentication
+  'focus'
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, clipboard, config,
+  localStorageService, focus) -> #, Authentication
     $scope.activeTab = 0
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.sent = []
@@ -77,6 +79,16 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       else
         $scope.newVerification.type = ''
 
+    $scope.addName = (name) ->
+      if name
+        recipient = [[$scope.idType, $scope.idValue], ['name', name]]
+        $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
+          $scope.identifiIndex.addMessage(m)
+        $scope.nameAdded = true
+      else
+        $scope.addingName = true
+        focus('addNameFocus')
+
     $scope.getConnections = ->
       $scope.identity.gun.get('attrs').open (attrs) ->
         console.log attrs
@@ -108,8 +120,10 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             when 'account'
               conn.iconStyle = 'fa fa-at'
             when 'nickname'
+              $scope.identity.hasProperName = true
               conn.iconStyle = 'glyphicon glyphicon-font'
             when 'name'
+              $scope.identity.hasProperName = true
               conn.iconStyle = 'glyphicon glyphicon-font'
             when 'tel', 'phone'
               conn.iconStyle = 'glyphicon glyphicon-earphone'
@@ -274,11 +288,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.openProfilePhotoUploadModal = ->
       return unless $scope.authentication.identity
-      $scope.openUploadModal($scope.uploadProfilePhoto, 'Upload profile photo')
+      $scope.openUploadModal($scope.uploadProfilePhoto, 'Upload profile photo', true)
 
     $scope.openCoverPhotoUploadModal = ->
       return unless $scope.authentication.identity
-      $scope.openUploadModal($scope.uploadCoverPhoto, 'Upload cover photo')
+      $scope.openUploadModal($scope.uploadCoverPhoto, 'Upload cover photo', false)
 
     $scope.findOne = ->
       $scope.idType = $stateParams.type
