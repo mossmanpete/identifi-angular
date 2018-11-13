@@ -390,12 +390,14 @@ angular.module('identifiAngular').controller 'MainController', [
       return
 
     $scope.setIdentityNames = (i, htmlSafe, setTitle) ->
+      i.verified = false
       i.gun.get('attrs').open (attrs) ->
         $scope.$apply ->
           mva = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
           if mva.name
             i.primaryName = mva.name.attribute.val
             i.hasProperName = true
+            i.verified = true if mva.name.verified
           else if mva.nickname
             i.primaryName = mva.nickname.attribute.val
             i.hasProperName = true
