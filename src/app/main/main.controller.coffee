@@ -68,7 +68,11 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.loginModal.close() if $scope.loginModal
       keyID = $window.identifiLib.Key.getId($scope.privateKey)
       viewpoint = new $window.identifiLib.Attribute(['keyID', keyID])
-      $window.identifiLib.Index.create($scope.gun.get(keyID), viewpoint).then (i) ->
+      if keyID == 'j0QRrzOQrPCJlSgPet9uhrTF+0jRRbrOjo3S1V+QkHw='
+        gunNode = $scope.gun.get('identifi')
+      else
+        gunNode = $scope.gun.get(keyID)
+      $window.identifiLib.Index.create(gunNode, viewpoint).then (i) ->
         setIndex i
         $scope.identifiIndex.get($window.identifiLib.Key.getId($scope.privateKey), 'keyID').then (identity) ->
           console.log 'identity', identity
