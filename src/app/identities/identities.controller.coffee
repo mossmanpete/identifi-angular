@@ -249,14 +249,14 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           if received.length < $scope.filters.limit - 1
             $scope.received.finished = true
           received.forEach (msg) ->
-            neutralRating = (msg.data.maxRating + msg.data.minRating) / 2
-            if Object.keys(thumbsUpObj).length < 12 and msg.data.rating > neutralRating
-              thumbsUpObj[JSON.stringify(msg.signedData.author)] = msg
-              $scope.thumbsUp = Object.values(thumbsUpObj)
-              $scope.hasThumbsUp = true
-            else if Object.keys(thumbsDownObj).length < 12 and msg.data.rating < neutralRating
-              thumbsDownObj[JSON.stringify(msg.signedData.author)] = msg
-              $scope.thumbsDown = Object.values(thumbsDownObj)
+            if msg.isPositive()
+              if $scope.thumbsUp.length < 12 and not thumbsUpObj[JSON.stringify(msg.signedData.author)]
+                thumbsUpObj[JSON.stringify(msg.signedData.author)] = true
+                $scope.thumbsUp.push msg
+                $scope.hasThumbsUp = true
+            else if msg.isNegative() and $scope.thumbsDown.length < 12 and not thumbsDownObj[JSON.stringify(msg.signedData.author)]
+              thumbsDownObj[JSON.stringify(msg.signedData.author)] = true
+              $scope.thumbsDown.push msg
               $scope.hasThumbsDown = true
       .catch (error) ->
         console.log 'error loading received messages', error
