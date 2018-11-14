@@ -310,6 +310,12 @@ angular.module('identifiAngular').controller 'MainController', [
           msg.author = author
           if msg.author
             msg.author.gun.get('trustDistance').on (d) -> msg.authorTrustDistance = d
+            msg.author.gun.get('attrs').open (d) ->
+              mva = $window.identifiLib.Identity.getMostVerifiedAttributes(d)
+              if mva.name
+                $scope.$apply -> msg.author_name = mva.name.attribute.val
+              else if mva.nickname
+                $scope.$apply -> msg.author_name = mva.nickname.attribute.val
           $scope.$apply ->
             # TODO: make sure message signature is checked
 
