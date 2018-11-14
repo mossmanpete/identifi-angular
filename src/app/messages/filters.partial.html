@@ -10,7 +10,7 @@
         <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="glyphicon glyphicon-question-sign"></span> Neutral</span></a></li>
         <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> Negative</span></a></li>
       </ul>
-      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="glyphicon glyphicon-ok"></span> Verification</a></li>
+      <li ng-class="{active: (filters.type === 'verification') }" ng-click="setFilters({type:'verification'})"><a><span class="glyphicon glyphicon-ok"></span> Verification</a></li>
       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
     </ul>
     <div ng-include="'app/messages/distance-selector.partial.html'"></div>

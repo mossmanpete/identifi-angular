@@ -86,7 +86,7 @@
             </div>
             <div class="row">
               <div class="col-xs-12 col-sm-6 col-md-12 mar-bot10 mar-top10">
-                <div class="mar-bot10" ng-if="!identity.hasProperName && !nameAdded">
+                <div class="mar-bot10" ng-if="authentication.user && !identity.hasProperName && !nameAdded">
                   <a href="" ng-click="addName()" ng-hide="addingName">Add name</a>
                   <form class="form-inline" ng-show="addingName" ng-submit="addName(name)">
                     <div class="form-group">
@@ -133,6 +133,11 @@
                     <span class="negative"><span class="glyphicon glyphicon-thumbs-down"></span> <span ng-bind="identity.data.sentNegative">-</span></span>
                   </div>
                 </p> -->
+                <div ng-if="scores.verifier && scores.verifier.score > 0" class="text-center alert alert-info">
+                  <span class="fa fa-shield" style="font-size:2em"></span>
+                  <p>This identity is a <b>trusted verifier</b> in this web of trust.
+                    It can grant verification checkmarks.</p>
+                </div>
                 <div ng-if="isUniqueType" class="mar-top10 quick-contact">
                   <ul class="list-unstyled">
                     <li ng-repeat="id in connections" ng-if="id.quickContact"><a ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span><span ng-bind="id.linkName || id.val"></span></a></li>
@@ -217,7 +222,7 @@
                       <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span><span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+identity.data.receivedPositive}})</span></a></li>
                       <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="visible-xs-inline glyphicon glyphicon-question-sign"></span><span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+identity.data.receivedNeutral}})</span></a></li>
                       <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="visible-xs-inline glyphicon glyphicon-thumbs-down"></span><span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+identity.data.receivedNegative}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="visible-xs-inline glyphicon glyphicon-ok"></span><span class="hidden-xs">Verification</span></a></li>
+                      <li ng-class="{active: (filters.type === 'verification') }" ng-click="setFilters({type:'verification'})"><a><span class="visible-xs-inline glyphicon glyphicon-ok"></span><span class="hidden-xs">Verification</span></a></li>
                       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
                     </ul>
                   </div>
@@ -247,7 +252,7 @@
                       <li ng-class="{active: (filters.type === 'rating:positive') }" ng-click="setFilters({type: 'rating:positive'})"><a><span class="positive"><span class="visible-xs-inline glyphicon glyphicon-thumbs-up"></span><span class="hidden-xs">Pos<span class="hidden-md">itive</span></span> ({{0+identity.data.sentPositive}})</span></a></li>
                       <li ng-class="{active: (filters.type === 'rating:neutral') }" ng-click="setFilters({type: 'rating:neutral'})"><a><span class="neutral"><span class="visible-xs-inline glyphicon glyphicon-question-sign"></span><span class="hidden-xs">Neut<span class="hidden-md">ral</span></span> ({{0+identity.data.sentNeutral}})</span></a></li>
                       <li ng-class="{active: (filters.type === 'rating:negative') }" ng-click="setFilters({type: 'rating:negative'})"><a><span class="negative"><span class="visible-xs-inline glyphicon glyphicon-thumbs-down"></span><span class="hidden-xs">Neg<span class="hidden-md">ative</span></span> ({{0+identity.data.sentNegative}})</span></a></li>
-                      <li ng-class="{active: (filters.type === 'verify_identity') }" ng-click="setFilters({type:'verify_identity'})"><a><span class="visible-xs-inline glyphicon glyphicon-ok"></span><span class="hidden-xs">Verification</span></a></li>
+                      <li ng-class="{active: (filters.type === 'verification') }" ng-click="setFilters({type:'verification'})"><a><span class="visible-xs-inline glyphicon glyphicon-ok"></span><span class="hidden-xs">Verification</span></a></li>
                       <!-- <li ><a href="#" data-val="other"><span class="glyphicon glyphicon-question-sign"></span> Other</a></li> -->
                     </ul>
                   </div>

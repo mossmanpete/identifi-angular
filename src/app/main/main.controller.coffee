@@ -344,12 +344,9 @@ angular.module('identifiAngular').controller 'MainController', [
             msg.iconCount = new Array(1)
             switch signedData.type
               when 'verify_identity', 'verification'
-                msg.iconStyle = 'glyphicon glyphicon-ok positive'
+                msg.iconStyle = 'glyphicon glyphicon-ok-sign'
                 msg.hasSuccess = 'has-success'
                 msg.isVerification = true
-              when 'connection'
-                msg.iconStyle = 'glyphicon glyphicon-ok positive'
-                msg.hasSuccess = 'has-success'
               when 'unverify_identity', 'unverification'
                 msg.iconStyle = 'glyphicon glyphicon-remove negative'
                 msg.hasSuccess = 'has-error'
@@ -361,8 +358,11 @@ angular.module('identifiAngular').controller 'MainController', [
                 maxRatingDiff = signedData.maxRating - neutralRating
                 minRatingDiff = signedData.minRating - neutralRating
                 if rating > neutralRating
-                  msg.iconStyle = 'glyphicon glyphicon-thumbs-up positive'
-                  msg.iconCount = if maxRatingDiff < 2 then msg.iconCount else new Array(Math.ceil(3 * rating / maxRatingDiff))
+                  if signedData.context == 'verifier'
+                    msg.iconStyle = 'fa fa-shield positive'
+                  else
+                    msg.iconStyle = 'glyphicon glyphicon-thumbs-up positive'
+                    msg.iconCount = if maxRatingDiff < 2 then msg.iconCount else new Array(Math.ceil(3 * rating / maxRatingDiff))
                   alpha = (rating - neutralRating - 0.5) / maxRatingDiff / 1.25 + 0.2
                   msg.bgColor = 'background-color: rgba(223,240,216,' + alpha + ');'
                 else if rating < neutralRating

@@ -326,6 +326,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
                   $scope.getSentMsgs(0)
                 $scope.identity.gun.get('received').on ->
                   $scope.getReceivedMsgs(0)
+                $scope.identity.gun.get('scores').open (scores) ->
+                  $scope.scores = scores
             else
               $scope.$apply ->
                 $scope.identity = $window.identifiLib.Identity.create(
