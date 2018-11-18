@@ -100,9 +100,10 @@ angular.module('identifiAngular').controller 'MessagesController', [
               $scope.ipfsGet(hash).then (res) ->
                 s = JSON.parse(res.toString())
                 console.log 'msg from ipfs', res, s
-                $scope.message = await $window.identifiLib.Message.fromSig(s)
-                $scope.message.ipfsUri = hash
-                processResponse()
+                $window.identifiLib.Message.fromSig(s).then (r) ->
+                  $scope.message = r
+                  $scope.message.ipfsUri = hash
+                  processResponse()
               .catch (e) ->
                 console.log e
 
