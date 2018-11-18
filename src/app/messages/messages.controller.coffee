@@ -59,7 +59,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
         messages = []
         for pair in res
           m = $window.identifiLib.Message.fromJws(pair.value.jws)
-          m.ipfs_hash = pair.value.ipfs_hash
+          m.ipfsUri = pair.value.ipfsUri
           m.authorPos = pair.value.author_pos
           m.authorNeg = pair.value.author_neg
           m.authorTrustDistance = pair.value.distance
@@ -98,8 +98,10 @@ angular.module('identifiAngular').controller 'MessagesController', [
           if isReady
             if hash.match /^Qm[1-9A-Za-z]{40,50}$/ # looks like an ipfs address
               $scope.ipfsGet(hash).then (res) ->
-                $scope.message = $window.identifiLib.Message.fromJws(res)
-                $scope.message.ipfs_hash = hash
+                s = JSON.parse(res.toString())
+                console.log 'msg from ipfs', res, s
+                $scope.message = await $window.identifiLib.Message.fromSig(s)
+                $scope.message.ipfsUri = hash
                 processResponse()
               .catch (e) ->
                 console.log e

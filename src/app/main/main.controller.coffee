@@ -135,7 +135,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
       message.then (m) ->
         console.log m
-        $scope.identifiIndex.addMessage(m) # publishMessage
+        $scope.identifiIndex.addMessage(m, $scope.ipfs) # publishMessage
       .catch (e) ->
         console.error(e)
         $scope.error = e
