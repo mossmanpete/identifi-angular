@@ -51,26 +51,14 @@ angular.module('identifiAngular').controller 'MessagesController', [
       return if $scope.msgs.loading
       $scope.msgs.loading = true
       # Get latest messages from ipfs index
-      searchKey = ''
       if $scope.msgs.list.length
-        searchKey = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
-      $scope.identifiIndex.messagesByTimestamp.searchText('', $scope.filters.limit, searchKey, true) # TODO: implement in identifi-lib
-      .then (res) ->
-        messages = []
-        for pair in res
-          m = $window.identifiLib.Message.fromJws(pair.value.jws)
-          m.ipfsUri = pair.value.ipfsUri
-          m.authorPos = pair.value.author_pos
-          m.authorNeg = pair.value.author_neg
-          m.authorTrustDistance = pair.value.distance
-          m.authorName = pair.value.author_name
-          m.searchKey = pair.key
-          m.isVerification = m.signedData.type in ['verification', 'verify_identity']
-          m.isUnverification = m.signedData.type in ['unverification', 'unverify_identity']
-          messages.push(m)
+        cursor = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
+      $scope.identifiIndex.getMessagesByTimestamp($scope.filters.limit, cursor)
+      .then (messages) ->
+        console.log 'msgs', messages
         $scope.processMessages messages
         Array.prototype.push.apply($scope.msgs.list, messages)
-        if res.length < $scope.filters.limit - 1 # bug
+        if messages.length < $scope.filters.limit - 1 # bug
           $scope.$apply -> $scope.msgs.finished = true
         $scope.$apply -> $scope.msgs.loading = false
 

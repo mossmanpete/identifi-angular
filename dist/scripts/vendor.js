@@ -77209,7 +77209,7 @@ angular
 	    const Buffer$$1 = USE('./buffer');
 	    const api = {Buffer: Buffer$$1};
 
-	    if (typeof __webpack_require__ === 'function' || (typeof window !== 'undefined' && (window.crypto || window.msCrypto))) {
+	    if (typeof __webpack_require__ === 'function' || (typeof window !== 'undefined' && window.crypto)) {
 	      var crypto = window.crypto || window.msCrypto;
 	      var subtle = crypto.subtle || crypto.webkitSubtle;
 	      const TextEncoder = window.TextEncoder;
@@ -80514,6 +80514,17 @@ angular
 	        resolve(_Object$values(r));
 	      }, 200);
 	    });
+	  };
+
+	  /**
+	  * @returns {Array} list of messages
+	  */
+
+
+	  Index.prototype.getMessagesByTimestamp = async function getMessagesByTimestamp(limit) {
+	    var cursor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+	    return this._getMsgs(this.gun.get('messagesByTimestamp'), limit, cursor);
 	  };
 
 	  return Index;
