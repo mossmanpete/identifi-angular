@@ -52,7 +52,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.viewpoint.gun.get('attrs').open (attrs) ->
           $scope.viewpoint.attrs = attrs
           $scope.viewpoint.mostVerifiedAttributes = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
-        $scope.apiReady = true
+        $scope.$apply -> $scope.apiReady = true
         if $state.is 'identities.list'
           $scope.search()
 
