@@ -310,38 +310,21 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $state.go 'identities.list', { search: $scope.idValue }
         $scope.tabs[2].active = true if $scope.tabs
       $scope.setPageTitle $scope.idValue
-
-      doStuff = () ->
-        $scope.setIdentityNames($scope.identity, false, true)
-        if $scope.identity.gun
-          $scope.identity.gun.on (data) ->
-            $scope.identity.data = data
-          $scope.identity.gun.get('attrs').on ->
-            $scope.$apply ->
-              $scope.getConnections()
-          $scope.identity.gun.get('sent').on ->
-            $scope.getSentMsgs(0)
-          $scope.identity.gun.get('received').on ->
-            $scope.getReceivedMsgs(0)
-          $scope.identity.gun.get('scores').open (scores) ->
-            $scope.scores = scores
-
       $scope.$watch 'apiReady', (isReady) ->
         if isReady
-          $scope.identifiIndex.get($scope.idValue, $scope.idType).then (i) ->
-            console.log 'got identity', i
-            if i
-              $scope.identity = i
-              doStuff()
-            else
-              $scope.$apply ->
-                $scope.identity = $window.identifiLib.Identity.create(
-                  $scope.gun.get('identifi').get('identities'),
-                  {attrs:[{name:$scope.idType, val:$scope.idValue}]}
-                )
-              doStuff()
-          .catch (err) ->
-            console.log 'error fetching profile', err
+          $scope.identity = $scope.identifiIndex.get($scope.idValue, $scope.idType)
+          $scope.setIdentityNames($scope.identity, false, true)
+          if $scope.identity.gun
+            $scope.identity.gun.on (data) ->
+              $scope.identity.data = data
+            $scope.identity.gun.get('attrs').on ->
+              $scope.getConnections()
+            $scope.identity.gun.get('sent').on ->
+              $scope.getSentMsgs(0)
+            $scope.identity.gun.get('received').on ->
+              $scope.getReceivedMsgs(0)
+            $scope.identity.gun.get('scores').open (scores) ->
+              $scope.scores = scores
 
     if $state.is 'identities.show'
       $scope.findOne()

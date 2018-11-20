@@ -74,11 +74,12 @@ angular.module('identifiAngular').controller 'MainController', [
         gunNode = $scope.gun.get(keyID)
       $window.identifiLib.Index.create(gunNode, viewpoint).then (i) ->
         setIndex i
-        $scope.identifiIndex.get($window.identifiLib.Key.getId($scope.privateKey), 'keyID').then (identity) ->
+        identity = $scope.identifiIndex.get($window.identifiLib.Key.getId($scope.privateKey), 'keyID')
+        identity.gun.then (data) ->
           console.log 'identity', identity
-          if identity
+          if data
             $scope.authentication.identity = identity
-          else
+          else # TODO: change api so this is not needed
             $scope.authentication.identity = $window.identifiLib.Identity.create(
               $scope.gun.get('identifi').get('identities'),
               { attrs: [{name: 'keyID', val: $window.identifiLib.Key.getId($scope.privateKey)}] }
@@ -272,14 +273,9 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.setMsgRawData(message)
       $scope.message = message
       # TODO: check sig
-      $scope.message.signerKeyHash = $scope.message.getSignerKeyID()
-      $scope.identifiIndex.get($scope.message.signerKeyHash, 'keyID').then (profile) ->
-        unless profile
-          profile = $window.identifiLib.Identity.create(
-            $scope.gun.get('identifi').get('identities'),
-            {attrs:[{name: 'keyID', val: $scope.message.signerKeyHash}]}
-          )
-        $scope.$apply -> $scope.message.verifiedBy = profile
+      $scope.message.signerKeyID = $scope.message.getSignerKeyID()
+      $scope.$apply ->
+        $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/messages/show.modal.html'
@@ -302,83 +298,77 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.processMessages = (messages, msgOptions, verifySignature) ->
       processMessage = (msg) ->
         msg.data = msg.signedData
-        if (msg.getAuthor and not (msgOptions and msgOptions.authorIsSelf))
-          p = msg.getAuthor($scope.identifiIndex)
-        else
-          p = Promise.resolve()
-        p.then (author) ->
-          msg.author = author
-          if msg.author
-            msg.author.gun.get('trustDistance').on (d) -> msg.authorTrustDistance = d
-            msg.author.gun.get('attrs').open (d) ->
-              mva = $window.identifiLib.Identity.getMostVerifiedAttributes(d)
-              if mva.name
-                $scope.$apply -> msg.author_name = mva.name.attribute.val
-              else if mva.nickname
-                $scope.$apply -> msg.author_name = mva.nickname.attribute.val
-          $scope.$apply ->
-            # TODO: make sure message signature is checked
+        msg.author = msg.getAuthor($scope.identifiIndex)
+        msg.author.gun.get('trustDistance').on (d) -> msg.authorTrustDistance = d
+        msg.author.gun.get('attrs').open (d) ->
+          mva = $window.identifiLib.Identity.getMostVerifiedAttributes(d)
+          if mva.name
+            $scope.$apply -> msg.author_name = mva.name.attribute.val
+          else if mva.nickname
+            $scope.$apply -> msg.author_name = mva.nickname.attribute.val
+        $scope.$apply ->
+          # TODO: make sure message signature is checked
 
-            msg.linkToAuthor = msg.data.author[0]
-            i = undefined
-            i = 0
-            smallestIndex = 1000
-            while i < msg.data.author.length
-              index = config.uniqueAttributeTypes.indexOf(msg.data.author[i][0])
-              if index > -1 and index < smallestIndex
-                smallestIndex = index
-                msg.linkToAuthor = msg.data.author[i]
-              else if !msg.author_name and msg.data.author[i][0] in ['name', 'nickname']
-                msg.author_name = msg.data.author[i][1]
-              i++
-            msg.linkToRecipient = msg.data.recipient[0]
-            i = 0
-            smallestIndex = 1000
-            while i < msg.data.recipient.length
-              index = config.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0])
-              if index > -1 and index < smallestIndex
-                smallestIndex = index
-                msg.linkToRecipient = msg.data.recipient[i]
-              else if !msg.recipient_name and msg.data.recipient[i][0] in ['name', 'nickname']
-                msg.recipient_name = msg.data.recipient[i][1]
-              i++
-            signedData = msg.data
-            alpha = undefined
-            msg.iconStyle = ''
-            msg.hasSuccess = ''
-            msg.bgColor = ''
-            msg.iconCount = new Array(1)
-            switch signedData.type
-              when 'verify_identity', 'verification'
-                msg.iconStyle = 'glyphicon glyphicon-ok-sign'
-                msg.hasSuccess = 'has-success'
-                msg.isVerification = true
-              when 'unverify_identity', 'unverification'
-                msg.iconStyle = 'glyphicon glyphicon-remove negative'
-                msg.hasSuccess = 'has-error'
-                msg.bgColor = 'background-color: #FFF0DE;border-color:#FFE2C6;'
-                msg.isUnverification = true
-              when 'rating'
-                rating = signedData.rating
-                neutralRating = (signedData.minRating + signedData.maxRating) / 2
-                maxRatingDiff = signedData.maxRating - neutralRating
-                minRatingDiff = signedData.minRating - neutralRating
-                if rating > neutralRating
-                  if signedData.context == 'verifier'
-                    msg.iconStyle = 'fa fa-shield positive'
-                  else
-                    msg.iconStyle = 'glyphicon glyphicon-thumbs-up positive'
-                    msg.iconCount = if maxRatingDiff < 2 then msg.iconCount else new Array(Math.ceil(3 * rating / maxRatingDiff))
-                  alpha = (rating - neutralRating - 0.5) / maxRatingDiff / 1.25 + 0.2
-                  msg.bgColor = 'background-color: rgba(223,240,216,' + alpha + ');'
-                else if rating < neutralRating
-                  msg.iconStyle = 'glyphicon glyphicon-thumbs-down negative'
-                  msg.iconCount = if minRatingDiff > -2 then msg.iconCount else new Array(Math.ceil(3 * rating / minRatingDiff))
-                  alpha = (rating - neutralRating + 0.5) / minRatingDiff / 1.25 + 0.2
-                  msg.bgColor = 'background-color:rgba(242,222,222,' + alpha + ');'
+          msg.linkToAuthor = msg.data.author[0]
+          i = undefined
+          i = 0
+          smallestIndex = 1000
+          while i < msg.data.author.length
+            index = config.uniqueAttributeTypes.indexOf(msg.data.author[i][0])
+            if index > -1 and index < smallestIndex
+              smallestIndex = index
+              msg.linkToAuthor = msg.data.author[i]
+            else if !msg.author_name and msg.data.author[i][0] in ['name', 'nickname']
+              msg.author_name = msg.data.author[i][1]
+            i++
+          msg.linkToRecipient = msg.data.recipient[0]
+          i = 0
+          smallestIndex = 1000
+          while i < msg.data.recipient.length
+            index = config.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0])
+            if index > -1 and index < smallestIndex
+              smallestIndex = index
+              msg.linkToRecipient = msg.data.recipient[i]
+            else if !msg.recipient_name and msg.data.recipient[i][0] in ['name', 'nickname']
+              msg.recipient_name = msg.data.recipient[i][1]
+            i++
+          signedData = msg.data
+          alpha = undefined
+          msg.iconStyle = ''
+          msg.hasSuccess = ''
+          msg.bgColor = ''
+          msg.iconCount = new Array(1)
+          switch signedData.type
+            when 'verify_identity', 'verification'
+              msg.iconStyle = 'glyphicon glyphicon-ok-sign'
+              msg.hasSuccess = 'has-success'
+              msg.isVerification = true
+            when 'unverify_identity', 'unverification'
+              msg.iconStyle = 'glyphicon glyphicon-remove negative'
+              msg.hasSuccess = 'has-error'
+              msg.bgColor = 'background-color: #FFF0DE;border-color:#FFE2C6;'
+              msg.isUnverification = true
+            when 'rating'
+              rating = signedData.rating
+              neutralRating = (signedData.minRating + signedData.maxRating) / 2
+              maxRatingDiff = signedData.maxRating - neutralRating
+              minRatingDiff = signedData.minRating - neutralRating
+              if rating > neutralRating
+                if signedData.context == 'verifier'
+                  msg.iconStyle = 'fa fa-shield positive'
                 else
-                  msg.bgColor = 'background-color: #fcf8e3;'
-                  msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
+                  msg.iconStyle = 'glyphicon glyphicon-thumbs-up positive'
+                  msg.iconCount = if maxRatingDiff < 2 then msg.iconCount else new Array(Math.ceil(3 * rating / maxRatingDiff))
+                alpha = (rating - neutralRating - 0.5) / maxRatingDiff / 1.25 + 0.2
+                msg.bgColor = 'background-color: rgba(223,240,216,' + alpha + ');'
+              else if rating < neutralRating
+                msg.iconStyle = 'glyphicon glyphicon-thumbs-down negative'
+                msg.iconCount = if minRatingDiff > -2 then msg.iconCount else new Array(Math.ceil(3 * rating / minRatingDiff))
+                alpha = (rating - neutralRating + 0.5) / minRatingDiff / 1.25 + 0.2
+                msg.bgColor = 'background-color:rgba(242,222,222,' + alpha + ');'
+              else
+                msg.bgColor = 'background-color: #fcf8e3;'
+                msg.iconStyle = 'glyphicon glyphicon-question-sign neutral'
 
       angular.forEach messages, (msg, key) ->
         msg[k] = v for k, v of msgOptions

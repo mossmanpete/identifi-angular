@@ -76,11 +76,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
           $scope.processMessages([$scope.message], {}, true)
           $scope.setPageTitle 'Message ' + hash
           $scope.setMsgRawData($scope.message)
-          $scope.message.signerKeyHash = $scope.message.getSignerKeyID()
-          $scope.identifiIndex.get($scope.message.signerKeyHash, 'keyID').then (profile) ->
-            unless profile
-              profile = new $window.identifiLib.Identity({attrs:[{name: 'keyID', val: $scope.message.signerKeyHash}]})
-            $scope.$apply -> $scope.message.verifiedBy = profile
+          $scope.message.signerKeyID = $scope.message.getSignerKeyID()
+          $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
 
         $scope.$watch 'apiReady', (isReady) ->
           if isReady
