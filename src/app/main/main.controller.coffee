@@ -74,16 +74,7 @@ angular.module('identifiAngular').controller 'MainController', [
         gunNode = $scope.gun.get(keyID)
       $window.identifiLib.Index.create(gunNode, viewpoint).then (i) ->
         setIndex i
-        identity = $scope.identifiIndex.get($window.identifiLib.Key.getId($scope.privateKey), 'keyID')
-        identity.gun.then (data) ->
-          console.log 'identity', identity
-          if data
-            $scope.authentication.identity = identity
-          else # TODO: change api so this is not needed
-            $scope.authentication.identity = $window.identifiLib.Identity.create(
-              $scope.gun.get('identifi').get('identities'),
-              { attrs: [{name: 'keyID', val: $window.identifiLib.Key.getId($scope.privateKey)}] }
-            )
+        $scope.authentication.identity = $scope.identifiIndex.get($window.identifiLib.Key.getId($scope.privateKey), 'keyID')
 
     privateKey = localStorageService.get('identifiKey')
     if privateKey
@@ -262,11 +253,6 @@ angular.module('identifiAngular').controller 'MainController', [
         jws: msg.jws
       msg.strData = JSON.stringify(showRawData, undefined, 2)
 
-    $scope.profileFromData = (data, fallbackId) ->
-      if data.attrs and data.attrs.length
-        return $window.identifiLib.Identity.create($scope.gun.get('identifi').get('identities'), {attrs:data.attrs})
-      return $window.identifiLib.Identity.create($scope.gun.get('identifi').get('identities'), {attrs:[fallbackId]})
-
     $scope.openMessage = (event, message, size) ->
       t = event.target
       return if angular.element(t).closest('a').length
@@ -274,8 +260,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.message = message
       # TODO: check sig
       $scope.message.signerKeyID = $scope.message.getSignerKeyID()
-      $scope.$apply ->
-        $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
+      $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
       modalInstance = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/messages/show.modal.html'
