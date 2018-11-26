@@ -1,13 +1,11 @@
 <div class="text-center alert alert-info">
   Viewing as:
-  <strong ng-if="viewpoint">
+  <br class="hidden-sm">
+  <span ng-if="viewpoint">
     <a ui-sref="identities.show({ type: viewpoint.linkTo.name, value: viewpoint.linkTo.val })" class="id-link">
-      <span class="distance-container mar-right5 mar-left5">
-        <identicon ipfs="ipfs" identity="viewpoint" class="" border="3" width="35"></identicon>
-      </span>
-      <span ng-bind="viewpoint.mostVerifiedAttributes.name.attribute.val"></span>
+      <span class="distance-container mar-right5 mar-left5"><identicon ipfs="ipfs" identity="viewpoint" class="" border="3" width="35"></identicon></span><strong ng-bind="viewpoint.mostVerifiedAttributes.name.attribute.val"></strong>
     </a>
-  </strong>
+  </span>
   <br class="hidden-sm">
   Max distance from viewpoint:
   <span class="btn-group trust-distance-selector">

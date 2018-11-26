@@ -6,7 +6,7 @@
       </div>
       <div class="col-md-8">
         <div infinite-scroll="find()" infinite-scroll-distance="2" infinite-scroll-disabled="!apiReady || msgs.loading || msgs.finished" infinite-scroll-listen-for-event="msgScrollCheck">
-          <message ng-repeat="msg in msgs.list | filter:msgFilter" msg-data="msg" ng-click="openMessage($event, msg, 'lg')"></message>
+          <message ng-repeat="msg in msgs.list | filter:msgFilter" ipfs="ipfs" msg-data="msg" ng-click="openMessage($event, msg, 'lg')"></message>
         </div>
         <div us-spinner ng-if="!messages.$resolved" style="position:relative;padding:20px"></div>
         <div class="alert alert-info text-center" ng-if="!msgs.loading && !msgs.list.length">
