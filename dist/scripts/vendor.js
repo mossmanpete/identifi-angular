@@ -74864,6 +74864,10 @@ angular
 	    return this.name === a.name && this.val === a.val;
 	  };
 
+	  Attribute.prototype.uri = function uri() {
+	    return encodeURIComponent(this.val) + ":" + encodeURIComponent(this.name);
+	  };
+
 	  return Attribute;
 	}();
 
@@ -77209,7 +77213,7 @@ angular
 	    const Buffer$$1 = USE('./buffer');
 	    const api = {Buffer: Buffer$$1};
 
-	    if (typeof __webpack_require__ === 'function' || (typeof window !== 'undefined' && window.crypto)) {
+	    if (typeof __webpack_require__ === 'function' || (typeof window !== 'undefined' && (window.crypto || window.msCrypto))) {
 	      var crypto = window.crypto || window.msCrypto;
 	      var subtle = crypto.subtle || crypto.webkitSubtle;
 	      const TextEncoder = window.TextEncoder;
@@ -79010,7 +79014,7 @@ angular
 
 	  /**
 	  * @param {Index} index index to look up the message author from
-	  * @returns {Promise(Identity)} message author identity
+	  * @returns {Identity} message author identity
 	  */
 
 
@@ -79025,7 +79029,7 @@ angular
 
 	  /**
 	  * @param {Index} index index to look up the message recipient from
-	  * @returns {Promise(Identity)} message recipient identity
+	  * @returns {Identity} message recipient identity
 	  */
 
 
@@ -79533,46 +79537,53 @@ angular
 	*/
 
 	var Identity = function () {
-	  function Identity(gun) {
+	  /**
+	  * @param {Object} gun node where the Identity data lives
+	  * @param {Object} tempData temporary data to present before data from gun is received
+	  * @param {Boolean} save whether to save identity data to the given gun node
+	  */
+	  function Identity(gun, tempData, save) {
+	    var _this = this;
+
 	    _classCallCheck(this, Identity);
 
 	    this.gun = gun;
+	    if (save) {
+	      if (tempData.linkTo && !tempData.attrs) {
+	        var linkTo = new Attribute(tempData.linkTo);
+	        tempData.attrs = tempData.attrs || {};
+	        if (!tempData.attrs.hasOwnProperty(linkTo.uri())) {
+	          tempData.attrs[linkTo.uri()] = linkTo;
+	        }
+	      } else {
+	        tempData.linkTo = Identity.getLinkTo(tempData.attrs);
+	        console.log('tempData.linkTo', tempData.linkTo);
+	      }
+	      this.gun.put(tempData);
+	    } else {
+	      this.tempData = tempData;
+	      this.gun.on(function (data) {
+	        if (data) {
+	          //this.gun.off();
+	          _this.tempData = null;
+	        }
+	      });
+	    }
 	  }
 
-	  Identity.create = function create(gunRoot, data) {
-	    data.receivedNegative |= data.receivedNegative || 0;
-	    data.receivedPositive |= data.receivedPositive || 0;
-	    data.receivedNeutral = data.receivedNeutral || 0;
-	    data.sentNegative = data.sentNegative || 0;
-	    data.sentPositive = data.sentPositive || 0;
-	    data.sentNeutral = data.sentNeutral || 0;
-	    data.trustDistance = data.hasOwnProperty('trustDistance') ? data.trustDistance : 99;
-	    data.attrs = data.attrs || {};
-	    data.scores = data.scores || { identifi: { score: 'todo', ratings: 0 } };
-	    if (Array.isArray(data.attrs)) {
-	      var attrs = {};
-	      while (data.attrs.length) {
-	        var a = data.attrs.pop();
-	        attrs[encodeURIComponent(a.name) + ':' + encodeURIComponent(a.val)] = a;
+	  Identity.getLinkTo = function getLinkTo(attrs) {
+	    var mva = Identity.getMostVerifiedAttributes(attrs);
+	    var keys = _Object$keys(mva);
+	    var linkTo = void 0;
+	    for (var i = 0; i < keys.length; i++) {
+	      if (keys[i] === 'keyID') {
+	        linkTo = mva[keys[i]].attribute;
+	        break;
+	      } else if (Attribute.isUniqueType(keys[i])) {
+	        linkTo = mva[keys[i]].attribute;
 	      }
-	      data.attrs = attrs;
 	    }
-	    data.mostVerifiedAttributes = Identity.getMostVerifiedAttributes(data.attrs);
-	    var bestVerificationScore = -1;
-	    _Object$keys(data.mostVerifiedAttributes).forEach(function (k) {
-	      var v = data.mostVerifiedAttributes[k];
-	      if (Attribute.isUniqueType(k) && v.verificationScore > bestVerificationScore) {
-	        data.linkTo = { name: k, val: v.attribute.val };
-	        bestVerificationScore = v.verificationScore;
-	      }
-	    });
-	    if (!data.linkTo) {
-	      data.linkTo = data.attrs[_Object$keys(data.attrs)[0]];
-	    }
-	    if (data.linkTo.name !== 'keyID' && data.mostVerifiedAttributes.keyID) {
-	      data.linkTo = data.mostVerifiedAttributes.keyID.attribute;
-	    }
-	    return new Identity(gunRoot.set(data));
+	    return linkTo;
 	  };
 
 	  Identity.getMostVerifiedAttributes = function getMostVerifiedAttributes(attrs) {
@@ -79580,6 +79591,8 @@ angular
 	    _Object$keys(attrs).forEach(function (k) {
 	      var a = attrs[k];
 	      var keyExists = _Object$keys(mostVerifiedAttributes).indexOf(a.name) > -1;
+	      a.conf = isNaN(a.conf) ? 1 : a.conf;
+	      a.ref = isNaN(a.ref) ? 0 : a.ref;
 	      if (a.conf * 2 > a.ref * 3 && (!keyExists || a.conf - a.ref > mostVerifiedAttributes[a.name].verificationScore)) {
 	        mostVerifiedAttributes[a.name] = {
 	          attribute: a,
@@ -79612,7 +79625,7 @@ angular
 
 
 	  Identity.prototype.profileCard = function profileCard(ipfs) {
-	    var _this = this;
+	    var _this2 = this;
 
 	    var card = document.createElement('div');
 	    card.className = 'identifi-card';
@@ -79639,11 +79652,11 @@ angular
 	        return;
 	      }
 	      var attrs = await new _Promise(function (resolve) {
-	        _this.gun.get('attrs').load(function (r) {
+	        _this2.gun.get('attrs').load(function (r) {
 	          return resolve(r);
 	        });
 	      });
-	      var linkTo = await _this.gun.get('linkTo').then();
+	      var linkTo = await _this2.gun.get('linkTo').then();
 	      var link = 'https://identi.fi/#/identities/' + linkTo.name + '/' + linkTo.val;
 	      var mva = Identity.getMostVerifiedAttributes(attrs);
 	      linkEl.innerHTML = '<a href="' + link + '">' + (mva.name && mva.name.attribute.val || mva.nickname && mva.nickname.attribute.val || linkTo.name + ':' + linkTo.val) + '</a><br>';
@@ -79782,7 +79795,7 @@ angular
 	    identicon$$1.appendChild(pie);
 	    identicon$$1.appendChild(img);
 
-	    this.gun.on(function (data) {
+	    function setPie(data) {
 	      if (!data) {
 	        return;
 	      }
@@ -79815,27 +79828,37 @@ angular
 	      pie.style.opacity = (data.receivedPositive + data.receivedNegative) / 10 * 0.5 + 0.35;
 
 	      if (showDistance) {
-	        distance.textContent = data.trustDistance < 1000 ? Identity._ordinal(data.trustDistance) : '\u2013';
+	        distance.textContent = data.trustDistance < 1000 ? Identity._ordinal(data.trustDistance) : '\u2715';
 	      }
-	    });
+	    }
 
-	    this.gun.get('linkTo').on(function (data) {
+	    function setIdenticonImg(data) {
 	      var hash = util$1.getHash(encodeURIComponent(data.name) + ':' + encodeURIComponent(data.val), 'hex');
 	      var identiconImg = new identicon(hash, { width: width, format: 'svg' });
 	      img.src = img.src || 'data:image/svg+xml;base64,' + identiconImg.toString();
-	    });
+	    }
+
+	    if (this.tempData) {
+	      setPie(this.tempData);
+	      if (this.tempData.linkTo) {
+	        setIdenticonImg(this.tempData.linkTo);
+	      }
+	    }
+
+	    this.gun.on(setPie);
+	    this.gun.get('linkTo').on(setIdenticonImg);
 
 	    if (ipfs) {
 	      this.gun.get('attrs').open(function (attrs) {
 	        var mva = Identity.getMostVerifiedAttributes(attrs);
 	        if (mva.profilePhoto) {
-	          var timeout = ipfs.isOnline() ? 0 : 5000;
-	          setTimeout(function () {
+	          var go = function go() {
 	            ipfs.files.cat(mva.profilePhoto.attribute.val).then(function (file) {
 	              var f = ipfs.types.Buffer.from(file).toString('base64');
 	              img.src = 'data:image;base64,' + f;
 	            });
-	          }, timeout);
+	          };
+	          ipfs.isOnline() ? go() : ipfs.on('ready', go);
 	        }
 	      });
 	    }
@@ -80055,30 +80078,47 @@ angular
 	  });
 	}
 
-	// TODO: make the whole thing use GUN for indexing and flush onto IPFS
+	// TODO: flush onto IPFS
 	/**
-	* Identifi index root. Contains four indexes: identitiesBySearchKey, gun.get(`identitiesByTrustDistance`),
+	* Identifi index root. Contains four indexes: identitiesBySearchKey, identitiesByTrustDistance,
 	* messagesByTimestamp, messagesByDistance.
 	*/
 
 	var Index = function () {
+	  /**
+	  * When you use someone else's index, initialise it with this constructor
+	  */
 	  function Index(gun) {
 	    _classCallCheck(this, Index);
 
 	    this.gun = gun || new gun_min();
 	  }
 
-	  Index.create = async function create(gun, viewpoint) {
+	  /**
+	  * Use this to load an index that you can write to
+	  * @returns {Index}
+	  */
+
+
+	  Index.create = function create(gun, viewpoint) {
 	    var i = new Index(gun);
-	    if (!viewpoint) {
-	      var defaultKey = await Key.getDefault();
-	      viewpoint = { name: 'keyID', val: Key.getId(defaultKey), conf: 1, ref: 0 };
-	    }
-	    i.gun.get('viewpoint').put(new Attribute(viewpoint));
-	    var vp = await util$1.timeoutPromise(i.getViewpoint(), 2000);
-	    if (!vp) {
-	      vp = Identity.create(i.gun.get('identities'), { attrs: [viewpoint], trustDistance: 0 });
-	      await i._addIdentityToIndexes(vp.gun);
+	    var setViewpoint = function setViewpoint(vp) {
+	      i.viewpoint = new Attribute(vp);
+	      i.gun.get('viewpoint').put(i.viewpoint);
+	      var uri = i.viewpoint.uri();
+	      var g = i.gun.get('identitiesBySearchKey').get(uri);
+	      var vpId = new Identity(g, {
+	        trustDistance: 0,
+	        linkTo: i.viewpoint
+	      }, true);
+	      i._addIdentityToIndexes(vpId.gun);
+	    };
+	    if (viewpoint) {
+	      setViewpoint(viewpoint);
+	    } else {
+	      Key.getDefault().then(function (defaultKey) {
+	        setViewpoint({ name: 'keyID', val: Key.getId(defaultKey) });
+	      });
 	    }
 	    return i;
 	  };
@@ -80142,14 +80182,13 @@ angular
 
 
 	  Index.prototype.getViewpoint = async function getViewpoint() {
-	    var _this = this;
-
-	    var k = await new _Promise(function (resolve) {
-	      return _this.gun.get('identitiesByTrustDistance').map(function (v, k) {
-	        return k.indexOf('00') === 0 ? resolve(k) : 0;
-	      });
-	    });
-	    return new Identity(this.gun.get('identitiesByTrustDistance').get(k));
+	    var vpAttr = void 0;
+	    if (this.viewpoint) {
+	      vpAttr = this.viewpoint;
+	    } else {
+	      vpAttr = new Attribute((await this.gun.get('viewpoint').then()));
+	    }
+	    return new Identity(this.gun.get('identitiesBySearchKey').get(vpAttr.uri()));
 	  };
 
 	  /**
@@ -80160,19 +80199,15 @@ angular
 	  */
 
 
-	  Index.prototype.get = async function get(value, type) {
+	  Index.prototype.get = function get(value, type) {
 	    if (typeof value === 'undefined') {
 	      throw 'Value is undefined';
 	    }
 	    if (typeof type === 'undefined') {
 	      type = Attribute.guessTypeOf(value);
 	    }
-	    var key = encodeURIComponent(value) + ':' + encodeURIComponent(type);
-	    var found = await this.gun.get('identitiesBySearchKey').get(key).then();
-	    if (!found) {
-	      return undefined;
-	    }
-	    return new Identity(this.gun.get('identitiesBySearchKey').get(key));
+	    var a = new Attribute([type, value]);
+	    return new Identity(this.gun.get('identitiesBySearchKey').get(a.uri()), { linkTo: a });
 	  };
 
 	  Index.prototype._getMsgs = async function _getMsgs(msgIndex, limit, cursor) {
@@ -80207,7 +80242,6 @@ angular
 	  Index.prototype.getSentMsgs = async function getSentMsgs(identity, limit) {
 	    var cursor = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
 
-	    console.log('getSentMsgs');
 	    return this._getMsgs(identity.gun.get('sent'), limit, cursor);
 	  };
 
@@ -80219,7 +80253,6 @@ angular
 	  Index.prototype.getReceivedMsgs = async function getReceivedMsgs(identity, limit) {
 	    var cursor = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
 
-	    console.log('getReceivedMsgs');
 	    return this._getMsgs(identity.gun.get('received'), limit, cursor);
 	  };
 
@@ -80227,8 +80260,15 @@ angular
 	    if (!Attribute.isUniqueType(a.name)) {
 	      return;
 	    }
-	    var id = await this.get(a.val, a.name);
-	    return id && id.gun.get('trustDistance').then();
+	    if (this.viewpoint.equals(a)) {
+	      return 0;
+	    }
+	    var id = this.get(a.val, a.name);
+	    var d = await id.gun.get('trustDistance').then();
+	    if (isNaN(d)) {
+	      d = Infinity;
+	    }
+	    return d;
 	  };
 
 	  /**
@@ -80239,20 +80279,18 @@ angular
 
 	  Index.prototype.getMsgTrustDistance = async function getMsgTrustDistance(msg) {
 	    var shortestDistance = Infinity;
-	    var signer = await this.get(msg.getSignerKeyID(), 'keyID');
-	    if (!signer) {
-	      return;
+	    var signerAttr = new Attribute(['keyID', msg.getSignerKeyID()]);
+	    if (!signerAttr.equals(this.viewpoint)) {
+	      var signer = this.get(signerAttr.val, signerAttr.name);
+	      var d = await signer.gun.get('trustDistance').then();
+	      if (isNaN(d)) {
+	        return;
+	      }
 	    }
-	    var vp = await this.gun.get('viewpoint').then();
 	    for (var i = 0; i < msg.signedData.author.length; i++) {
-	      var a = new Attribute(msg.signedData.author[i]);
-	      if (Attribute.equals(a, vp)) {
-	        return 0;
-	      } else {
-	        var d = await this._getAttributeTrustDistance(a);
-	        if (d < shortestDistance) {
-	          shortestDistance = d;
-	        }
+	      var _d = await this._getAttributeTrustDistance(new Attribute(msg.signedData.author[i]));
+	      if (_d < shortestDistance) {
+	        shortestDistance = _d;
 	      }
 	    }
 	    return shortestDistance < Infinity ? shortestDistance : undefined;
@@ -80277,10 +80315,10 @@ angular
 	          }
 	        });
 	        if (!hasAttr) {
-	          attrs[encodeURIComponent(a1[0]) + ':' + encodeURIComponent(a1[1])] = { name: a1[0], val: a1[1], conf: 1, ref: 0 };
+	          attrs[encodeURIComponent(a1[1]) + ':' + encodeURIComponent(a1[0])] = { name: a1[0], val: a1[1], conf: 1, ref: 0 };
 	        }
 	        if (msg.goodVerification) {
-	          attrs[encodeURIComponent(a1[0]) + ':' + encodeURIComponent(a1[1])].verified = true;
+	          attrs[encodeURIComponent(a1[1]) + ':' + encodeURIComponent(a1[0])].verified = true;
 	        }
 	      });
 	      recipient.get('mostVerifiedAttributes').put(Identity.getMostVerifiedAttributes(attrs));
@@ -80288,16 +80326,22 @@ angular
 	    }
 	    if (msg.signedData.type === 'rating') {
 	      var id = await recipient.then();
+	      id.receivedPositive = id.receivedPositive || 0;
+	      id.receivedNegative = id.receivedNegative || 0;
+	      id.receivedNeutral = id.receivedNeutral || 0;
 	      if (msg.isPositive()) {
 	        if (msg.distance + 1 < id.trustDistance) {
 	          recipient.get('trustDistance').put(msg.distance + 1);
 	        }
-	        recipient.get('receivedPositive').put(id.receivedPositive + 1);
+	        id.receivedPositive++;
 	      } else if (msg.isNegative()) {
-	        recipient.get('receivedNegative').put(id.receivedNegative + 1);
+	        id.receivedNegative++;
 	      } else {
-	        recipient.get('receivedNeutral').put(id.receivedNeutral + 1);
+	        id.receivedNeutral++;
 	      }
+	      recipient.get('receivedPositive').put(id.receivedPositive);
+	      recipient.get('receivedNegative').put(id.receivedNegative);
+	      recipient.get('receivedNeutral').put(id.receivedNeutral);
 	      if (msg.signedData.context === 'verifier') {
 	        if (msg.distance === 0) {
 	          if (msg.isPositive) {
@@ -80328,13 +80372,19 @@ angular
 	  Index.prototype._updateMsgAuthorIdentity = async function _updateMsgAuthorIdentity(msg, msgIndexKey, author) {
 	    if (msg.signedData.type === 'rating') {
 	      var id = await author.then();
+	      id.sentPositive = id.sentPositive || 0;
+	      id.sentNegative = id.sentNegative || 0;
+	      id.sentNeutral = id.sentNeutral || 0;
 	      if (msg.isPositive()) {
-	        author.get('sentPositive').put(id.sentPositive + 1);
+	        id.sentPositive++;
 	      } else if (msg.isNegative()) {
-	        author.get('sentNegative').put(id.sentNegative + 1);
+	        id.sentNegative++;
 	      } else {
-	        author.get('sentNeutral').put(id.sentNeutral + 1);
+	        id.sentNeutral++;
 	      }
+	      author.get('sentPositive').put(id.sentPositive);
+	      author.get('sentNegative').put(id.sentNegative);
+	      author.get('sentNeutral').put(id.sentNeutral);
 	    }
 	    var obj = { sig: msg.sig, pubKey: msg.pubKey };
 	    if (msg.ipfsUri) {
@@ -80364,8 +80414,9 @@ angular
 	    var authorIdentities = {};
 	    for (var i = 0; i < msg.signedData.author.length; i++) {
 	      var a = msg.signedData.author[i];
-	      var id = await this.get(a[1], a[0]);
-	      if (id) {
+	      var id = this.get(a[1], a[0]);
+	      var td = await id.gun.get('trustDistance').then();
+	      if (!isNaN(td)) {
 	        authorIdentities[id.gun['_'].link] = id;
 	        var scores = await id.gun.get('scores').then();
 	        if (scores && scores.verifier && msg.signedData.type === 'verification') {
@@ -80378,18 +80429,22 @@ angular
 	    }
 	    for (var _i = 0; _i < msg.signedData.recipient.length; _i++) {
 	      var _a = msg.signedData.recipient[_i];
-	      var _id = await this.get(_a[1], _a[0]);
-	      if (_id) {
+	      var _id = this.get(_a[1], _a[0]);
+	      var _td = await _id.gun.get('trustDistance').then();
+	      if (!isNaN(_td)) {
 	        recipientIdentities[_id.gun['_'].link] = _id;
 	      }
 	    }
 	    if (!_Object$keys(recipientIdentities).length) {
 	      // recipient is previously unknown
-	      var attrs = [];
+	      var attrs = {};
 	      msg.signedData.recipient.forEach(function (a) {
-	        attrs.push({ name: a[0], val: a[1], conf: 1, ref: 0 });
+	        var attr = new Attribute([a[0], a[1]]);
+	        attrs[attr.uri()] = attr;
 	      });
-	      var _id2 = Identity.create(this.gun.get('identities'), { attrs: attrs });
+	      var linkTo = Identity.getLinkTo(attrs);
+	      var _id2 = new Identity(this.gun.get('identities').set({}), { attrs: attrs, linkTo: linkTo, trustDistance: 99 }, true);
+
 	      // TODO: take msg author trust into account
 	      recipientIdentities[_id2.gun['_'].link] = _id2;
 	    }
@@ -80473,6 +80528,7 @@ angular
 	      throw new Error('addMessage failed: param must be a Message, received ' + msg.constructor.name);
 	    }
 	    msg.distance = await this.getMsgTrustDistance(msg);
+
 	    if (msg.distance === undefined) {
 	      return false; // do not save messages from untrusted author
 	    }
@@ -80497,17 +80553,17 @@ angular
 
 
 	  Index.prototype.search = async function search(value) {
-	    var _this2 = this;
+	    var _this = this;
 
 	    // TODO: param 'exact', type param
 	    var r = {};
 	    return new _Promise(function (resolve) {
-	      _this2.gun.get('identitiesByTrustDistance').map(function (id, key) {
+	      _this.gun.get('identitiesByTrustDistance').map(function (id, key) {
 	        if (key.indexOf(encodeURIComponent(value)) === -1) {
 	          return;
 	        }
 	        if (!r.hasOwnProperty(gun_min.node.soul(id))) {
-	          r[gun_min.node.soul(id)] = new Identity(_this2.gun.get('identitiesByTrustDistance').get(key));
+	          r[gun_min.node.soul(id)] = new Identity(_this.gun.get('identitiesByTrustDistance').get(key));
 	        }
 	      });
 	      setTimeout(function () {
@@ -80525,6 +80581,17 @@ angular
 	    var cursor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
 	    return this._getMsgs(this.gun.get('messagesByTimestamp'), limit, cursor);
+	  };
+
+	  /**
+	  * @returns {Array} list of messages
+	  */
+
+
+	  Index.prototype.getMessagesByDistance = async function getMessagesByDistance(limit) {
+	    var cursor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+	    return this._getMsgs(this.gun.get('messagesByDistance'), limit, cursor);
 	  };
 
 	  return Index;

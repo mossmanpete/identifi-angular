@@ -10,7 +10,10 @@
         </a>
       </strong>
       <small><i class="glyphicon glyphicon-play"></i></small>
-      <a ui-sref="identities.show({ type: $ctrl.msgData.linkToRecipient[0], value: $ctrl.msgData.linkToRecipient[1] })" ng-bind="($ctrl.msgData.recipientIsSelf && $ctrl.pageInfo.primaryName)||$ctrl.msgData.recipient_name||$ctrl.msgData.linkToRecipient[1]" class="id-link"></a>
+      <a ui-sref="identities.show({ type: $ctrl.msgData.linkToRecipient[0], value: $ctrl.msgData.linkToRecipient[1] })" class="id-link">
+        <identicon ng-if="$ctrl.showRecipient" ipfs="$ctrl.ipfs" identity="$ctrl.msgData.recipient" class="mar-right5" border="3" width="35"></identicon>
+        <span ng-bind="($ctrl.msgData.recipientIsSelf && $ctrl.pageInfo.primaryName)||$ctrl.msgData.recipient_name||$ctrl.msgData.linkToRecipient[1]"></span>
+      </a>
        - <a ui-sref="messages.show({ id: ($ctrl.msgData.ipfsUri || $ctrl.msgData.hash) })" ng-bind="$ctrl.msgData.data.timestamp|date:'medium'" class="text-muted small" style="display:inline-block;"></a>
     </p>
 
