@@ -17,12 +17,13 @@ angular.module('identifiAngular').controller 'MainController', [
   #'Persona'
   ($scope, $rootScope, $location, $http, $state, config,
   localStorageService, $uibModal, $window, $q, focus) -> # Authentication, Menus, Persona
-    $scope.gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun'])
+    if $window.location.protocol == "https:"
+      $scope.gun = new Gun(['https://identifi.herokuapp.com/gun'])
+    else
+      $scope.gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun'])
 
     # set authentication
     $scope.authentication = {} # Authentication
-
-    $scope.ipfsRoot = 'https://identi.fi' # used for profile / cover photos
 
     $scope.getIdKey = (id) ->
       if Array.isArray(id)
