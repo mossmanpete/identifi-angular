@@ -5,7 +5,7 @@
       <div class="panel-heading">
         Message origin verified by:
         <a ng-if="false" ng-bind="message.signerName||message.signerKeyID" ui-sref="identities.show({type: 'keyID', value: message.signerKeyID })"></a>
-        <strong ng-if="message.verifiedBy">
+        <strong>
           <a ui-sref="identities.show({ type: 'keyID', value: message.signerKeyID })" class="id-link">
             <identicon ipfs="ipfs" identity="message.verifiedBy" class="mar-right5" border="3" width="35"></identicon>
             <span ng-bind="message.verifiedBy.mostVerifiedAttributes.name.attribute.val"></span> <small>{{message.signerKeyID}}</small>
