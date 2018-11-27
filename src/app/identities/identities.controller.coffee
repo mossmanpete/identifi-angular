@@ -17,6 +17,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   'focus'
   ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, clipboard, config,
   localStorageService, focus) -> #, Authentication
+    $scope.newEntry = {}
     $scope.activeTab = 0
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.sent = []
@@ -328,4 +329,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     if $state.is 'identities.show'
       $scope.findOne()
+
+    capitalizeWords = (s) ->
+      s.replace(/\b\w/g, (l) -> l.toUpperCase())
+
+    if $state.is 'identities.create'
+      focus('idNameFocus')
+      $scope.newEntry.name = capitalizeWords($scope.query.term)
 ]

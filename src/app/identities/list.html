@@ -13,13 +13,13 @@
 
     <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="2" infinite-scroll-disabled="!apiReady || ids.loading || ids.finished">
       <tbody>
-        <tr ng-if="!query.term || (!ids.loading && !ids.list.length)" ui-sref="identities.create" class="search-result-row">
+        <tr ng-class="{active: ids.activeKey == -1}" ng-if="!query.term || (!ids.loading && !ids.list.length)" ui-sref="identities.create" class="search-result-row">
           <td class="gravatar-col align-center"><span style="line-height:46px" class="glyphicon glyphicon-plus"></span></td>
           <td>
-            <a ng-click="addEntryClicked()">Add entry</a>
+            <a ui-sref="identities.create">Add entry</a>
           </td>
         </tr>
-        <tr ng-repeat="result in ids.list" id="result{{$index}}" ng-hide="!result.linkTo" ui-sref="identities.show({ type: result.linkTo.name, value: result.linkTo.val })" class="search-result-row" ng-class="{active: result.active}">
+        <tr ng-repeat="result in ids.list" id="result{{$index}}" ui-sref="identities.show({ type: result.linkTo.name, value: result.linkTo.val })" class="search-result-row" ng-class="{active: result.active}">
           <td class="gravatar-col"><identicon identity="result" border="3" width="50" positive-score="result.pos" negative-score="result.neg" ipfs="ipfs"></identicon></td>
           <td>
             <span ng-if="result.data.trustDistance == 0" class="label label-default pull-right">viewpoint</span>

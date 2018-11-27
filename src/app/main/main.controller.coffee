@@ -61,6 +61,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.searchRequest = $scope.searchRequest.then (res) ->
         return if res.searchKey != $scope.searchKey
         identities = res.identities
+        console.log identities
         identities.splice(limit) if limit
         identities.forEach (i) ->
           i.gun.on (data) ->
@@ -82,6 +83,8 @@ angular.module('identifiAngular').controller 'MainController', [
         if identities.length > 0 && $scope.ids.list.length == identities.length
           $scope.ids.activeKey = 0
           $scope.ids.list[0].active = true
+        else
+          $scope.ids.activeKey = -1
         $scope.$apply -> $scope.ids.loading = false
         $scope.ids.list
       return $scope.searchRequest
@@ -279,10 +282,6 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.removeFocus = (event) ->
       event.currentTarget.blur()
 
-    $scope.addEntryClicked = ->
-      $state.go 'identities.create'
-      focus('idNameFocus')
-
     $scope.logoClicked = ->
       focus('searchFocus')
       if $state.is 'identities.list'
@@ -464,22 +463,28 @@ angular.module('identifiAngular').controller 'MainController', [
       switch (if event then event.which else -1)
         when 38
           event.preventDefault()
-          if $scope.ids.activeKey > 0
+          if $scope.ids.activeKey > -1
+            $scope.addEntryActive = false
             $scope.ids.list[$scope.ids.activeKey].active = false
-            $scope.ids.list[$scope.ids.activeKey - 1].active = true
             $scope.ids.activeKey--
+            if $scope.ids.activeKey >= 0
+              $scope.ids.list[$scope.ids.activeKey].active = true
           scrollTo document.getElementById('result' + $scope.ids.activeKey)
         when 40
           event.preventDefault()
           if $scope.ids.activeKey < ($scope.ids.list.length || 0) - 1
-            $scope.ids.list[$scope.ids.activeKey].active = false
+            if $scope.ids.activeKey >= 0
+              $scope.ids.list[$scope.ids.activeKey].active = false
             $scope.ids.list[$scope.ids.activeKey + 1].active = true
             $scope.ids.activeKey++
           scrollTo document.getElementById('result' + $scope.ids.activeKey)
         when 13
           event.preventDefault()
-          id = $scope.ids.list[$scope.ids.activeKey]
-          $state.go 'identities.show', { type: id.linkTo.name, value: id.linkTo.val }
+          if $scope.ids.activeKey == -1
+            $state.go 'identities.create'
+          else
+            id = $scope.ids.list[$scope.ids.activeKey]
+            $state.go 'identities.show', { type: id.linkTo.name, value: id.linkTo.val }
         when -1
           clearTimeout $scope.timer
           $scope.query.term = ''
