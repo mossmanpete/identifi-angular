@@ -13,7 +13,7 @@
 
     <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="2" infinite-scroll-disabled="!apiReady || ids.loading || ids.finished">
       <tbody>
-        <tr ng-class="{active: ids.activeKey == -1}" ng-if="!query.term || (!ids.loading && !ids.list.length)" ui-sref="identities.create" class="search-result-row">
+        <tr ng-class="{active: ids.activeKey == -1}" ui-sref="identities.create" class="search-result-row">
           <td class="gravatar-col align-center"><span style="line-height:46px" class="glyphicon glyphicon-plus"></span></td>
           <td>
             <a ui-sref="identities.create">Add entry<span ng-if="query.term">: <span ng-bind="capitalizeWords(query.term)"></span></span></a>

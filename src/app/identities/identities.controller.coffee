@@ -10,12 +10,13 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   '$http'
   '$q'
   '$timeout'
+  '$uibModal'
   'clipboard'
   # 'Authentication'
   'config'
   'localStorageService'
   'focus'
-  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, clipboard, config,
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, $uibModal, clipboard, config,
   localStorageService, focus) -> #, Authentication
     $scope.newEntry = {}
     $scope.activeTab = 0
@@ -286,6 +287,18 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
           $scope.identifiIndex.addMessage(m, $scope.ipfs)
           $scope.uploadModal.close()
+
+    $scope.openShareModal = () ->
+      $scope.shareModal = $uibModal.open(
+        animation: $scope.animationsEnabled
+        templateUrl: 'app/identities/share.modal.html'
+        size: 'md'
+        scope: $scope
+      )
+      $scope.shareModal.rendered.then ->
+        document.activeElement.blur()
+      $scope.$on '$stateChangeStart', ->
+        $scope.shareModal.close()
 
     $scope.openProfilePhotoUploadModal = ->
       return unless $scope.authentication.identity

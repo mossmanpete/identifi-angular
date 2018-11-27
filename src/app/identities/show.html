@@ -9,6 +9,9 @@
             <span ng-hide="idType === 'url'" ng-bind="idType" id="id-type"></span>
             <a ng-href="{{idValue}}" ng-show="idType === 'url'" ng-bind="idType" id="id-type"></a>
           </small>
+          <button class="btn btn-default" ng-click="openShareModal()">
+            <span class="glyphicon glyphicon-share"></span>
+          </button>
         </h4>
       </div>
     </div>
@@ -73,6 +76,9 @@
                       <span ng-hide="idType === 'url'" ng-bind="idType" id="id-type"></span>
                       <a ng-href="{{idValue}}" ng-show="idType === 'url'" ng-bind="idType" id="id-type"></a>
                     </small>
+                    <button class="btn btn-default" ng-click="openShareModal()">
+                      <span class="glyphicon glyphicon-share"></span>
+                    </button>
                   </span>
                   <span ng-bind="identity.primaryName"></span>
                   <span class="glyphicon glyphicon-ok-sign" style="color:#337ab7" uib-tooltip="Verified by a trusted verifier" ng-if="identity.verified"></span>

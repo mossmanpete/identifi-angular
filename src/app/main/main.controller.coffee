@@ -186,7 +186,8 @@ angular.module('identifiAngular').controller 'MainController', [
 
       message.then (m) ->
         console.log m
-        $scope.identifiIndex.addMessage(m, $scope.ipfs) # publishMessage
+        $scope.identifiIndex.addMessage(m, $scope.ipfs)
+        $scope.filters.type = 'rating'
       .catch (e) ->
         console.error(e)
         $scope.error = e
@@ -323,16 +324,16 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.$apply -> $scope.message.recipient_name = mva.nickname.attribute.val
       $scope.message.signerKeyID = $scope.message.getSignerKeyID()
       $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
-      modalInstance = $uibModal.open(
+      $scope.messageModal = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/messages/show.modal.html'
         size: size
         scope: $scope
       )
-      modalInstance.rendered.then ->
+      $scope.messageModal.rendered.then ->
         document.activeElement.blur()
       $scope.$on '$stateChangeStart', ->
-        modalInstance.close()
+        $scope.messageModal.close()
 
     $scope.filters = $scope.filters or config.defaultFilters
 
