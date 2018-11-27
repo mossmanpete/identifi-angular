@@ -43,6 +43,12 @@ angular.module('identifiAngular').controller 'MainController', [
       repo: 'ipfs7-identifi'
     )
 
+    $scope.capitalizeWords = (s) ->
+      if s and s.length
+        return (s.split(' ').map (word) -> word[0].toUpperCase() + word[1..-1].toLowerCase()).join ' '
+      else
+        return s
+
     $scope.searchRequest = null
     $scope.search = (query, limit) ->
       $scope.ids.loading = true

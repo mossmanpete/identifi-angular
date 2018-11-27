@@ -16,7 +16,7 @@
         <tr ng-class="{active: ids.activeKey == -1}" ng-if="!query.term || (!ids.loading && !ids.list.length)" ui-sref="identities.create" class="search-result-row">
           <td class="gravatar-col align-center"><span style="line-height:46px" class="glyphicon glyphicon-plus"></span></td>
           <td>
-            <a ui-sref="identities.create">Add entry</a>
+            <a ui-sref="identities.create">Add entry<span ng-if="query.term">: <span ng-bind="capitalizeWords(query.term)"></span></span></a>
           </td>
         </tr>
         <tr ng-repeat="result in ids.list" id="result{{$index}}" ui-sref="identities.show({ type: result.linkTo.name, value: result.linkTo.val })" class="search-result-row" ng-class="{active: result.active}">

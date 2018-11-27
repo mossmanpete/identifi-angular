@@ -330,10 +330,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     if $state.is 'identities.show'
       $scope.findOne()
 
-    capitalizeWords = (s) ->
-      s.replace(/\b\w/g, (l) -> l.toUpperCase())
-
     if $state.is 'identities.create'
       focus('idNameFocus')
-      $scope.newEntry.name = capitalizeWords($scope.query.term)
+      $scope.newEntry.name = $scope.capitalizeWords($scope.query.term)
 ]
