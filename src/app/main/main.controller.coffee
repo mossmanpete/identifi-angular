@@ -250,6 +250,21 @@ angular.module('identifiAngular').controller 'MainController', [
       hiddenElement.download = 'identifi_private_key.txt'
       hiddenElement.click()
 
+    $scope.openLogoutModal = ->
+      $scope.logoutModal = $uibModal.open(
+        animation: $scope.animationsEnabled
+        templateUrl: 'app/main/logout.modal.html'
+        size: 'lg'
+        scope: $scope
+      )
+      $scope.logoutModal.rendered.then ->
+        document.activeElement.blur()
+      $scope.$on '$stateChangeStart', ->
+        $scope.logoutModal.close()
+
+    $scope.closeLogoutModal = ->
+      $scope.logoutModal.close()
+
     $scope.logout = ->
       $scope.filters.max_distance = 0
       $scope.privateKeySerialized = ''
@@ -258,6 +273,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $state.go('identities.list')
       $scope.privateKey = null
       $scope.publicKey = null
+      $scope.logoutModal.close()
       $scope.loadDefaultIndex()
 
     $scope.msgFilter = (value, index, array) ->
