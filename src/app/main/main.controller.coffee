@@ -115,9 +115,9 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.finished = false
         $scope.search()
 
-    defaultIndexKeyID = 'j0QRrzOQrPCJlSgPet9uhrTF+0jRRbrOjo3S1V+QkHw='
+    defaultIndexKeyID = 'I3x1egC5QnZjtFaQjYUEw5Q52zlYsuiy6OHPJQpzLwM.5aK3zZmELWeEpRq3U4hOCSL6T1rnyxyFxIGL7cSHH7I'
     $scope.loadDefaultIndex = ->
-      setIndex new $window.identifiLib.Index($scope.gun.get('identifi'))
+      setIndex new $window.identifiLib.Index($scope.gun.user(defaultIndexKeyID))
 
     $scope.loginWithKey = (privateKeySerialized) ->
       $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
@@ -127,13 +127,9 @@ angular.module('identifiAngular').controller 'MainController', [
         idValue: $window.identifiLib.Key.getId($scope.privateKey)
       $scope.loginModal.close() if $scope.loginModal
       keyID = $window.identifiLib.Key.getId($scope.privateKey)
-      viewpoint = new $window.identifiLib.Attribute(['keyID', keyID])
-      if keyID == defaultIndexKeyID
-        gunNode = $scope.gun.get('identifi')
-      else
-        gunNode = $scope.gun.get(keyID)
-      setIndex new $window.identifiLib.Index.create(gunNode, viewpoint)
-      $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
+      $window.identifiLib.Index.create($scope.gun.get(keyID), $scope.privateKey).then (i) ->
+        setIndex(i).then ->
+          $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
 
     privateKey = localStorageService.get('identifiKey')
     if privateKey

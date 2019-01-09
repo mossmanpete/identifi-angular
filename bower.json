@@ -25,7 +25,7 @@
     "angular-clipboard": "^1.6.2",
     "angular-qrcode": "^7.2.0",
     "ng-file-upload": "^12.2.13",
-    "gun": "^0.9.9993"
+    "gun": "https://github.com/mmalmi/gun.git#0.9.102"
   },
   "devDependencies": {
     "angular-mocks": "~1.5.9"
@@ -35,7 +35,6 @@
       "main": [
         "gun.js",
         "lib/open.js",
-        "lib/space.js",
         "lib/load.js",
         "sea.js",
         "lib/then.js"
