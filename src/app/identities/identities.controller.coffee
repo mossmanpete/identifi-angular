@@ -11,12 +11,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   '$q'
   '$timeout'
   '$uibModal'
-  'clipboard'
   # 'Authentication'
   'config'
   'localStorageService'
   'focus'
-  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, $uibModal, clipboard, config,
+  ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, $uibModal, config,
   localStorageService, focus) -> #, Authentication
     $scope.newEntry = {}
     $scope.activeTab = 0
@@ -45,9 +44,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.$on 'MessageAdded', (event, args) ->
       $state.reload()
-
-    $scope.copyIdLink = ->
-      clipboard.copyText $scope.idUrl
 
     $scope.addEntry = (event, entry) ->
       recipient = []

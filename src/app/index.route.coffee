@@ -43,5 +43,9 @@ angular.module 'identifiAngular'
         url: '/about'
         templateUrl: 'app/main/about.html'
         title: 'Identifi - About'
+      .state 'settings',
+        url: '/settings'
+        templateUrl: 'app/main/settings.html'
+        title: 'Identifi - Settings'
 
     $urlRouterProvider.otherwise '/'

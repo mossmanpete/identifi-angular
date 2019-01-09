@@ -9,7 +9,7 @@
         </label>
       </div>-->
       <button class="btn btn-primary" ng-click="generateKey()">Generate new key</button>
-      <button class="btn btn-default pull-right" ng-disabled="!privateKeySerialized" ng-click="downloadKey()"><i class="fa fa-download"></i> Download key</button>
+      <button class="btn btn-default pull-right" ng-disabled="!privateKeySerialized" ng-click="downloadText(privateKeySerialized)"><i class="fa fa-download"></i> Download key</button>
       <button class="btn btn-primary" ng-disabled="!privateKeySerialized" ng-click="loginWithKey(privateKeySerialized, publicKeyPEM)">Log in</button>
     </div>
   </div>

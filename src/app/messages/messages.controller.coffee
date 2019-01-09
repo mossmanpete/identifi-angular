@@ -55,7 +55,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
         cursor = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
       $scope.identifiIndex.getMessagesByTimestamp($scope.filters.limit, cursor)
       .then (messages) ->
-        console.log 'msgs', messages
         $scope.processMessages messages
         Array.prototype.push.apply($scope.msgs.list, messages)
         if messages.length < $scope.filters.limit - 1 # bug
@@ -63,7 +62,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
         $scope.$apply -> $scope.msgs.loading = false
 
     $scope.setFilters = (filters) ->
-      console.log 'setFilters'
       angular.extend $scope.filters, filters
       $scope.resetMsgs()
       $timeout -> $rootScope.$broadcast 'msgScrollCheck'

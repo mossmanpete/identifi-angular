@@ -7,6 +7,7 @@ angular.module('identifiAngular').controller 'MainController', [
   '$state'
   'config',
   'localStorageService'
+  'clipboard'
   '$uibModal'
   '$window'
   '$q'
@@ -16,12 +17,13 @@ angular.module('identifiAngular').controller 'MainController', [
   #'Menus'
   #'Persona'
   ($scope, $rootScope, $location, $http, $state, config,
-  localStorageService, $uibModal, $window, $q, focus) -> # Authentication, Menus, Persona
+  localStorageService, clipboard, $uibModal, $window, $q, focus) -> # Authentication, Menus, Persona
     if $window.location.protocol == "https:"
       $scope.gun = new Gun(['https://identifi.herokuapp.com/gun'])
     else
       $scope.gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun'])
 
+    console.log $scope.gun['_'].opt.peers
     # set authentication
     $scope.authentication = {} # Authentication
 
@@ -48,6 +50,9 @@ angular.module('identifiAngular').controller 'MainController', [
         return (s.split(' ').map (word) -> word[0].toUpperCase() + word[1..-1].toLowerCase()).join ' '
       else
         return s
+
+    $scope.copyToClipboard = (text) ->
+      clipboard.copyText text
 
     $scope.searchRequest = null
     $scope.search = (query, limit) ->
@@ -246,9 +251,9 @@ angular.module('identifiAngular').controller 'MainController', [
           console.log $scope.privateKey
           $scope.privateKeySerialized = $window.identifiLib.Key.toJwk($scope.privateKey)
 
-    $scope.downloadKey = ->
+    $scope.downloadText = (text) ->
       hiddenElement = document.createElement('a')
-      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI($scope.privateKeySerialized)
+      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(text)
       hiddenElement.target = '_blank'
       hiddenElement.download = 'identifi_private_key.txt'
       hiddenElement.click()
