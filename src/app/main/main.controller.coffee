@@ -221,6 +221,9 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.$on '$stateChangeStart', ->
         $scope.uploadModal.close()
 
+    $scope.$on '$stateChangeStart', ->
+      $scope.filters.type = null
+
     $scope.uploadFile = (blob) ->
       return new Promise (resolve, reject) ->
         console.log 'uploading', blob

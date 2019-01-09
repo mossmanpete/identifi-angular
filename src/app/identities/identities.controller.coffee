@@ -33,7 +33,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.newVerification =
       type: ''
       value: ''
-    $scope.filters.type = null
     $scope.collapseLevel = {}
     $scope.collapseFilters = $window.innerWidth < 992
     $scope.slider =
