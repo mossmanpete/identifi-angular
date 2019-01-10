@@ -19,9 +19,9 @@ angular.module('identifiAngular').controller 'MainController', [
   ($scope, $rootScope, $location, $http, $state, config,
   localStorageService, clipboard, $uibModal, $window, $q, focus) -> # Authentication, Menus, Persona
     if $window.location.protocol == "https:"
-      $scope.gun = new Gun(['https://identifi.herokuapp.com/gun'])
+      $scope.gun = new Gun(['https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun'])
     else
-      $scope.gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun'])
+      $scope.gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun'])
 
     console.log $scope.gun['_'].opt.peers
     # set authentication
