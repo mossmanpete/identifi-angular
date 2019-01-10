@@ -120,7 +120,7 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.finished = false
         $scope.search()
 
-    defaultIndexKeyID = 'I3x1egC5QnZjtFaQjYUEw5Q52zlYsuiy6OHPJQpzLwM.5aK3zZmELWeEpRq3U4hOCSL6T1rnyxyFxIGL7cSHH7I'
+    defaultIndexKeyID = '_D8nRhjFgAGo8frfJHMi4H7M7fTMB2LJshgeKyLaL1Y.9uNU0eQO-1ThgA9fJXFFN3yYbk9SNewC2Pz4mvQvGUE'
     $scope.loadDefaultIndex = ->
       setIndex new $window.identifiLib.Index($scope.gun.user(defaultIndexKeyID))
 
