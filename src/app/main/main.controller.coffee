@@ -122,7 +122,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     defaultIndexKeyID = '_D8nRhjFgAGo8frfJHMi4H7M7fTMB2LJshgeKyLaL1Y.9uNU0eQO-1ThgA9fJXFFN3yYbk9SNewC2Pz4mvQvGUE'
     $scope.loadDefaultIndex = ->
-      setIndex new $window.identifiLib.Index($scope.gun.user(defaultIndexKeyID))
+      setIndex new $window.identifiLib.Index($scope.gun.user(defaultIndexKeyID).get('identifi'))
 
     $scope.loginWithKey = (privateKeySerialized) ->
       $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
@@ -132,7 +132,7 @@ angular.module('identifiAngular').controller 'MainController', [
         idValue: $window.identifiLib.Key.getId($scope.privateKey)
       $scope.loginModal.close() if $scope.loginModal
       keyID = $window.identifiLib.Key.getId($scope.privateKey)
-      $window.identifiLib.Index.create($scope.gun.get(keyID), $scope.privateKey).then (i) ->
+      $window.identifiLib.Index.create($scope.gun, $scope.privateKey).then (i) ->
         setIndex(i).then ->
           $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
 
