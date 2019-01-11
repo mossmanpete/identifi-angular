@@ -145,6 +145,15 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.ipfs.on 'ready', ->
       $scope.ipfsReady = true
       $window.ipfs = $scope.ipfs
+      updateIpfsPeers = () ->
+        $scope.ipfs.swarm.peers (err, peerInfos) ->
+          if err
+            console.error 'failed to fetch ipfs peers', err
+          else
+            $scope.$apply ->
+              $scope.ipfsPeers = peerInfos
+      updateIpfsPeers()
+      setInterval updateIpfsPeers, 10000
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'

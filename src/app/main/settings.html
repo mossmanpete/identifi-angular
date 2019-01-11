@@ -16,9 +16,16 @@
         Download
       </button>
     </p>
-    <h4>Peers</h4>
+    <h4>GUN peers</h4>
     <ul>
       <li ng-repeat="(key, value) in gun['_'].opt.peers" ng-bind="key"></li>
+    </ul>
+    <h4>IPFS peers</h4>
+    <p ng-hide="ipfsPeers && ipfsPeers.length">No IPFS peers</p>
+    <ul>
+      <li ng-repeat="peer in ipfsPeers">
+        <span ng-bind="peer.addr.toString()"></span>
+      </li>
     </ul>
     <h4>About</h4>
     <p>
