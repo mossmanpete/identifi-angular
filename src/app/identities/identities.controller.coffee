@@ -169,7 +169,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
                 conn.iconStyle = 'glyphicon glyphicon-link'
                 conn.btnStyle = 'btn-default'
           if conn.val and conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-            conn.link = ($scope.ipfsRoot or '') + conn.val
+            conn.link = 'https://ipfs.io' + conn.val
             conn.linkName = conn.val
             conn.iconStyle = 'glyphicon glyphicon-link'
             conn.btnStyle = 'btn-default'

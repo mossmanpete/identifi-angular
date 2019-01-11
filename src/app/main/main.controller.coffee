@@ -217,6 +217,7 @@ angular.module('identifiAngular').controller 'MainController', [
       )
       $scope.loginModal.rendered.then ->
         document.activeElement.blur()
+        focus('newUser')
       $scope.$on '$stateChangeStart', ->
         $scope.loginModal.close()
 
@@ -252,6 +253,20 @@ angular.module('identifiAngular').controller 'MainController', [
               resolve(files)
               console.log 'done:', err, files
         fileReader.readAsArrayBuffer(blob)
+
+    $scope.createUser = (name) ->
+      $window.identifiLib.Key.generate()
+      .then (key) ->
+        $scope.privateKey = key
+        $scope.privateKeySerialized = $window.identifiLib.Key.toJwk($scope.privateKey)
+        $scope.loginWithKey($scope.privateKeySerialized)
+      .then ->
+        recipient = [['keyID', $window.identifiLib.Key.getId($scope.privateKey)], ['name', name]]
+        $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
+      .then (msg) ->
+        $scope.identifiIndex.addMessage(msg, $scope.ipfs)
+      .then ->
+        $scope.search()
 
     $scope.generateKey = ->
       $window.identifiLib.Key.generate().then (key) ->

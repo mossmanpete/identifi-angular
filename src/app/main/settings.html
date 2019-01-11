@@ -3,7 +3,7 @@
     <h3>Settings</h3>
     <h4>Log out</h4>
     <p>
-      <button class="btn btn-primary" ng-click="openLogoutModal()">
+      <button class="btn btn-danger" ng-click="openLogoutModal()">
         Log out
       </button>
     </p>
@@ -17,10 +17,12 @@
       </button>
     </p>
     <h4>GUN peers</h4>
+    <p><a href="https://gun.eco/">GUN</a> stores dynamic content: indexes of messages and identities.</p>
     <ul>
       <li ng-repeat="(key, value) in gun['_'].opt.peers" ng-bind="key"></li>
     </ul>
     <h4>IPFS peers</h4>
+    <p><a href="https://ipfs.io">IPFS</a> stores static content: messages and image files.</p>
     <p ng-hide="ipfsPeers && ipfsPeers.length">No IPFS peers</p>
     <ul>
       <li ng-repeat="peer in ipfsPeers">

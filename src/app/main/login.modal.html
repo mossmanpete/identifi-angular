@@ -1,16 +1,23 @@
 <div class="col-md-10 col-md-offset-1">
   <div class="panel panel-default mar-top15">
     <div class="panel-heading">
-      <textarea rows="6" class="form-control" placeholder="Enter private key" ng-model="privateKeySerialized"></textarea>
       <!--<div class="checkbox">
         <label>
           <input type="checkbox" value="" checked="checked">
           Remember me
         </label>
       </div>-->
-      <button class="btn btn-primary" ng-click="generateKey()">Generate new key</button>
-      <button class="btn btn-default pull-right" ng-disabled="!privateKeySerialized" ng-click="downloadText(privateKeySerialized)"><i class="fa fa-download"></i> Download key</button>
-      <button class="btn btn-primary" ng-disabled="!privateKeySerialized" ng-click="loginWithKey(privateKeySerialized, publicKeyPEM)">Log in</button>
+      <h3>New user</h3>
+      <form>
+        <input focus-on="newUser" type="text" class="form-control" ng-model="newUserName" placeholder="Your name"><br>
+        <button class="btn btn-primary" ng-disabled="!newUserName" ng-click="createUser(newUserName)">Create user</button>
+      </form>
+      <br>
+      <h3>Existing user</h3>
+      <form>
+        <textarea rows="6" class="form-control" placeholder="Paste private key or drop file" ng-model="privateKeySerialized"></textarea><br>
+        <button class="btn btn-primary" ng-disabled="!privateKeySerialized" ng-click="loginWithKey(privateKeySerialized, publicKeyPEM)">Log in</button>
+      </form>
     </div>
   </div>
 </div>
