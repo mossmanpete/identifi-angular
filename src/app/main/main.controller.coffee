@@ -142,18 +142,19 @@ angular.module('identifiAngular').controller 'MainController', [
     else
       $scope.loadDefaultIndex()
 
+    $scope.updateIpfsPeers = () ->
+      $scope.ipfs.swarm.peers (err, peerInfos) ->
+        if err
+          console.error 'failed to fetch ipfs peers', err
+        else
+          $scope.$apply ->
+            $scope.ipfsPeers = peerInfos
+
     $scope.ipfs.on 'ready', ->
       $scope.ipfsReady = true
       $window.ipfs = $scope.ipfs
-      updateIpfsPeers = () ->
-        $scope.ipfs.swarm.peers (err, peerInfos) ->
-          if err
-            console.error 'failed to fetch ipfs peers', err
-          else
-            $scope.$apply ->
-              $scope.ipfsPeers = peerInfos
-      updateIpfsPeers()
-      setInterval updateIpfsPeers, 10000
+      $scope.updateIpfsPeers()
+      setInterval $scope.updateIpfsPeers, 5000
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
@@ -555,4 +556,18 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.dropdownSearchSelect = (item) ->
       $state.go('identities.show', { type: item.linkTo.name, value: item.linkTo.val })
       $scope.query.term = ''
+
+    $scope.addGunPeer = (url) ->
+      $scope.gun.opt({peers: [url]}); # TODO: validate url
+
+    $scope.removeGunPeer = (url) ->
+      console.log 'removeGunPeer' # TODO: how to do this?
+
+    $scope.addIpfsPeer = (url) ->
+      $scope.ipfs.swarm.connect(url).then ->
+        $scope.updateIpfsPeers()
+
+    $scope.removeIpfsPeer = (url) ->
+      $scope.ipfs.swarm.disconnect(url).then ->
+        $scope.updateIpfsPeers()
 ]
