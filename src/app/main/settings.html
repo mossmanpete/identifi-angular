@@ -1,9 +1,10 @@
 <div class="container">
   <div class="col-md-8">
     <h3>Settings</h3>
+    <p><b>For normal people</b></p>
     <div class="panel panel-default">
       <div class="panel-heading">
-        For normal people
+        Log out
       </div>
       <div class="panel-body">
         <p>
@@ -11,63 +12,83 @@
             Log out
           </button>
         </p>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        About
+      </div>
+      <div class="panel-body">
         <p>
           <a ui-sref="about">About page</a>
         </p>
       </div>
     </div>
-    <div class="panel panel-default">
+
+    <p><b>Geeky stuff</b></p>
+    <div class="panel panel-danger">
       <div class="panel-heading">
-        Geeky stuff
+        Private key
       </div>
       <div class="panel-body">
-        <h4>Private key</h4>
         <p>
-          <button class="btn btn-primary" ng-click="copyToClipboard(privateKey|json)">
+          <button class="btn btn-danger" ng-click="copyToClipboard(privateKey|json)">
             Copy to clipboard
           </button>
-          <button class="btn btn-primary" ng-click="downloadText(privateKey|json)">
+          <button class="btn btn-danger" ng-click="downloadText(privateKey|json)">
             Download
           </button>
         </p>
-        <h4 class="mar-top30">GUN peers</h4>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        GUN peers
+      </div>
+      <div class="panel-body">
         <p><a href="https://gun.eco/">GUN</a> stores dynamic content: indexes of messages and identities.</p>
-        <table class="mar-top30 table table-striped">
-          <tbody>
-            <tr ng-repeat="(key, value) in gun['_'].opt.peers">
-              <td><small ng-bind="key"></small></td>
-              <td><button ng-click="removeGunPeer(key)" class="pull-right btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button></td>
-            </tr>
-            <tr>
-              <td>
-                <form ng-submit="addGunPeer(url)">
-                  <input class="form-control" type="text" placeholder="Peer url" ng-model="url">
-                  <input class="btn btn-primary" type="submit" value="Add GUN peer">
-                </form>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <h4 class="mar-top30">IPFS peers</h4>
+      </div>
+      <table class="table table-striped">
+        <tbody>
+          <tr ng-repeat="(key, value) in gun['_'].opt.peers">
+            <td><small ng-bind="key"></small></td>
+            <td><button ng-click="removeGunPeer(key)" class="pull-right btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button></td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <form class="form-inline" ng-submit="addGunPeer(url)">
+                <input class="form-control" type="text" placeholder="Peer url" ng-model="url">
+                <input class="btn btn-primary" type="submit" value="Add GUN peer">
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        IPFS peers
+      </div>
+      <div class="panel-body">
         <p><a href="https://ipfs.io">IPFS</a> stores static content: messages and image files.</p>
         <p ng-hide="ipfsPeers && ipfsPeers.length">No IPFS peers</p>
-        <table class="mar-top30 table table-striped">
-          <tbody>
-            <tr ng-repeat="peer in ipfsPeers">
-              <td><small ng-bind="peer.addr.toString()"></small></td>
-              <td><button ng-click="removeIpfsPeer(peer.addr.toString())" class="pull-right btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button></td>
-            </tr>
-            <tr>
-              <td>
-                <form ng-submit="addIpfsPeer(url)">
-                  <input class="form-control" type="text" placeholder="Peer url" ng-model="url">
-                  <input class="btn btn-primary" type="submit" value="Add IPFS peer">
-                </form>
-              </td>
-            </tr>
-          </tbody>
-        </table>
       </div>
+      <table class="table table-striped">
+        <tbody>
+          <tr ng-repeat="peer in ipfsPeers">
+            <td><small ng-bind="peer.addr.toString()"></small></td>
+            <td><button ng-click="removeIpfsPeer(peer.addr.toString())" class="pull-right btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button></td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <form class="form-inline" ng-submit="addIpfsPeer(url)">
+                <input class="form-control" type="text" placeholder="Peer url" ng-model="url">
+                <input class="btn btn-primary" type="submit" value="Add IPFS peer">
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
