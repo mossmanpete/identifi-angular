@@ -120,9 +120,9 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.finished = false
         $scope.search()
 
-    defaultIndexKeyID = '_D8nRhjFgAGo8frfJHMi4H7M7fTMB2LJshgeKyLaL1Y.9uNU0eQO-1ThgA9fJXFFN3yYbk9SNewC2Pz4mvQvGUE'
+    $scope.defaultIndexKeyID = '_D8nRhjFgAGo8frfJHMi4H7M7fTMB2LJshgeKyLaL1Y.9uNU0eQO-1ThgA9fJXFFN3yYbk9SNewC2Pz4mvQvGUE'
     $scope.loadDefaultIndex = ->
-      setIndex new $window.identifiLib.Index($scope.gun.user(defaultIndexKeyID).get('identifi'))
+      setIndex new $window.identifiLib.Index($scope.gun.user($scope.defaultIndexKeyID).get('identifi'))
 
     $scope.loginWithKey = (privateKeySerialized) ->
       $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
