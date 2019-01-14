@@ -1,37 +1,73 @@
 <div class="container">
   <div class="col-md-8">
     <h3>Settings</h3>
-    <h4>Log out</h4>
-    <p>
-      <button class="btn btn-danger" ng-click="openLogoutModal()">
-        Log out
-      </button>
-    </p>
-    <h4>Private key</h4>
-    <p>
-      <button class="btn btn-primary" ng-click="copyToClipboard(privateKey|json)">
-        Copy to clipboard
-      </button>
-      <button class="btn btn-primary" ng-click="downloadText(privateKey|json)">
-        Download
-      </button>
-    </p>
-    <h4>GUN peers</h4>
-    <p><a href="https://gun.eco/">GUN</a> stores dynamic content: indexes of messages and identities.</p>
-    <ul>
-      <li ng-repeat="(key, value) in gun['_'].opt.peers" ng-bind="key"></li>
-    </ul>
-    <h4>IPFS peers</h4>
-    <p><a href="https://ipfs.io">IPFS</a> stores static content: messages and image files.</p>
-    <p ng-hide="ipfsPeers && ipfsPeers.length">No IPFS peers</p>
-    <ul>
-      <li ng-repeat="peer in ipfsPeers">
-        <span ng-bind="peer.addr.toString()"></span>
-      </li>
-    </ul>
-    <h4>About</h4>
-    <p>
-      <a ui-sref="about">About</a>
-    </p>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        For normal people
+      </div>
+      <div class="panel-body">
+        <p>
+          <button class="btn btn-danger" ng-click="openLogoutModal()">
+            Log out
+          </button>
+        </p>
+        <p>
+          <a ui-sref="about">About page</a>
+        </p>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Geeky stuff
+      </div>
+      <div class="panel-body">
+        <h4>Private key</h4>
+        <p>
+          <button class="btn btn-primary" ng-click="copyToClipboard(privateKey|json)">
+            Copy to clipboard
+          </button>
+          <button class="btn btn-primary" ng-click="downloadText(privateKey|json)">
+            Download
+          </button>
+        </p>
+        <h4 class="mar-top30">GUN peers</h4>
+        <p><a href="https://gun.eco/">GUN</a> stores dynamic content: indexes of messages and identities.</p>
+        <table class="mar-top30 table table-striped">
+          <tbody>
+            <tr ng-repeat="(key, value) in gun['_'].opt.peers">
+              <td><small ng-bind="key"></small></td>
+              <td><button ng-click="removeGunPeer(key)" class="pull-right btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button></td>
+            </tr>
+            <tr>
+              <td>
+                <form ng-submit="addGunPeer(url)">
+                  <input class="form-control" type="text" placeholder="Peer url" ng-model="url">
+                  <input class="btn btn-primary" type="submit" value="Add GUN peer">
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h4 class="mar-top30">IPFS peers</h4>
+        <p><a href="https://ipfs.io">IPFS</a> stores static content: messages and image files.</p>
+        <p ng-hide="ipfsPeers && ipfsPeers.length">No IPFS peers</p>
+        <table class="mar-top30 table table-striped">
+          <tbody>
+            <tr ng-repeat="peer in ipfsPeers">
+              <td><small ng-bind="peer.addr.toString()"></small></td>
+              <td><button ng-click="removeIpfsPeer(peer.addr.toString())" class="pull-right btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button></td>
+            </tr>
+            <tr>
+              <td>
+                <form ng-submit="addIpfsPeer(url)">
+                  <input class="form-control" type="text" placeholder="Peer url" ng-model="url">
+                  <input class="btn btn-primary" type="submit" value="Add IPFS peer">
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
