@@ -1,5 +1,5 @@
 <div class="container no-padding-xs">
-  <section >
+  <section>
     <div class="mar-top25-xs"></div>
     <div ng-if="!query.term && !authentication.user" class="jumbotron">
       <div class="align-center"><h1>Global address book</h1></div>
@@ -13,7 +13,7 @@
       <p class="align-center mar-top15" style="margin-bottom:0"><a ui-sref="about">Read more</a></p>
     </div>
 
-    <div ng-if="!query.term && authentication.user && !ids.loading && ids.list.length <= 1" class="alert alert-info text-center">
+    <div ng-if="apiReady && !query.term && authentication.user && !ids.loading && ids.list.length <= 1" class="alert alert-info text-center">
       <p>Welcome to Identifi! Start by <b><a ui-sref="identities.create">adding entries</a></b> or by asking for your friends' Identifi profile urls to connect to.</p>
       <p>Alternatively, you can trust this Identifi distribution's <b><a ui-sref="identities.show({type:'keyID', value:defaultIndexKeyID})">default address book</a></b> as a starting point.</p>
     </div>
