@@ -104,6 +104,9 @@ angular.module('identifiAngular').controller 'MainController', [
 
     setIndex = (results) ->
       $scope.apiReady = false
+      $scope.query.term = '' if $scope.query.term != ''
+      $scope.ids.list = []
+      $scope.ids.finished = false
       $scope.identifiIndex = results
       console.log 'Got index', $scope.identifiIndex
       $scope.viewpoint.identity = $scope.identifiIndex.get($scope.viewpoint.val, $scope.viewpoint.name)
@@ -111,13 +114,9 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.viewpoint.attrs = attrs
         $scope.viewpoint.mostVerifiedAttributes = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
       $scope.identifiIndex.gun.get('identitiesBySearchKey').on (a) ->
-        return if $scope.apiReady
+        console.log 'identitiesBySearchKey changed'
         $scope.apiReady = true if a
-        if $scope.query.term != ''
-          $scope.query.term = ''
-        $scope.ids.list = []
-        $scope.ids.finished = false
-        $scope.search()
+        setTimeout $scope.search, 2000 # TODO: it's a hack, but better than empty results for some reason
 
     $scope.loadDefaultIndex = ->
       $scope.viewpoint = {name: 'keyID', val: $scope.defaultIndexKeyID}
