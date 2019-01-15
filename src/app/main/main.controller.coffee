@@ -33,6 +33,7 @@ angular.module('identifiAngular').controller 'MainController', [
       else
         return encodeURIComponent(id.name) + ':' + encodeURIComponent(id.val)
 
+    $scope.defaultIndexKeyID = '_D8nRhjFgAGo8frfJHMi4H7M7fTMB2LJshgeKyLaL1Y.9uNU0eQO-1ThgA9fJXFFN3yYbk9SNewC2Pz4mvQvGUE'
     $scope.query = {}
     $scope.query.term = ''
     $scope.previousSearchKey = ''
@@ -101,27 +102,24 @@ angular.module('identifiAngular').controller 'MainController', [
       return $scope.searchRequest
 
     setIndex = (results) ->
+      $scope.apiReady = false
       $scope.identifiIndex = results
       console.log 'Got index', $scope.identifiIndex
-      $scope.identifiIndex.gun.get('identitiesByTrustDistance').once ->
-        $scope.identifiIndex.getViewpoint().then (vp) ->
-          console.log 'got viewpoint', vp
-          $scope.viewpoint = vp
-          $scope.viewpoint.gun.get('linkTo').open (linkTo) ->
-            $scope.viewpoint.linkTo = linkTo
-          $scope.viewpoint.gun.get('attrs').open (attrs) ->
-            $scope.viewpoint.attrs = attrs
-            $scope.viewpoint.mostVerifiedAttributes = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
-      $scope.identifiIndex.gun.get('identitiesBySearchKey').once ->
-        $scope.apiReady = true
+      $scope.viewpoint.identity = $scope.identifiIndex.get($scope.viewpoint.val, $scope.viewpoint.name)
+      $scope.viewpoint.identity.gun.get('attrs').open (attrs) ->
+        $scope.viewpoint.attrs = attrs
+        $scope.viewpoint.mostVerifiedAttributes = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
+      $scope.identifiIndex.gun.get('identitiesBySearchKey').on (a) ->
+        return if $scope.apiReady
+        $scope.apiReady = true if a
         if $scope.query.term != ''
           $scope.query.term = ''
         $scope.ids.list = []
         $scope.ids.finished = false
         $scope.search()
 
-    $scope.defaultIndexKeyID = '_D8nRhjFgAGo8frfJHMi4H7M7fTMB2LJshgeKyLaL1Y.9uNU0eQO-1ThgA9fJXFFN3yYbk9SNewC2Pz4mvQvGUE'
     $scope.loadDefaultIndex = ->
+      $scope.viewpoint = {name: 'keyID', val: $scope.defaultIndexKeyID}
       setIndex new $window.identifiLib.Index($scope.gun.user($scope.defaultIndexKeyID).get('identifi'))
 
     $scope.loginWithKey = (privateKeySerialized) ->
@@ -132,6 +130,7 @@ angular.module('identifiAngular').controller 'MainController', [
         idValue: $window.identifiLib.Key.getId($scope.privateKey)
       $scope.loginModal.close() if $scope.loginModal
       keyID = $window.identifiLib.Key.getId($scope.privateKey)
+      $scope.viewpoint = {name: 'keyID', val: keyID}
       $window.identifiLib.Index.create($scope.gun, $scope.privateKey).then (i) ->
         setIndex(i).then ->
           $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
