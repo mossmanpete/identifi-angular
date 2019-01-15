@@ -31,6 +31,7 @@
         Private key
       </div>
       <div class="panel-body">
+        <p>Private key is used to log in to your account. Keep your private key safe!</p>
         <p>
           <button class="btn btn-danger" ng-click="copyToClipboard(privateKey|json)">
             Copy to clipboard
@@ -51,7 +52,11 @@
       <table class="table table-striped">
         <tbody>
           <tr ng-repeat="(key, value) in gun['_'].opt.peers">
-            <td><small ng-bind="key"></small></td>
+            <td>
+              <span ng-show="value.wire && value.wire.hied" class="positive fa fa-check-circle"></span>
+              <span ng-hide="value.wire && value.wire.hied" class="negative fa fa-times-circle"></span>
+              <small ng-bind="key"></small>
+            </td>
             <td><button ng-click="removeGunPeer(key)" class="pull-right btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button></td>
           </tr>
           <tr>
@@ -71,12 +76,15 @@
       </div>
       <div class="panel-body">
         <p><a href="https://ipfs.io">IPFS</a> stores static content: messages and image files.</p>
-        <p ng-hide="ipfsPeers && ipfsPeers.length">No IPFS peers</p>
+        <p ng-hide="ipfsPeers && ipfsPeers.length"><small>No IPFS peers</small></p>
       </div>
       <table class="table table-striped">
         <tbody>
           <tr ng-repeat="peer in ipfsPeers">
-            <td><small ng-bind="peer.addr.toString()"></small></td>
+            <td>
+              <span class="positive fa fa-check-circle"></span>
+              <small ng-bind="peer.addr.toString()"></small>
+            </td>
             <td><button ng-click="removeIpfsPeer(peer.addr.toString())" class="pull-right btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button></td>
           </tr>
           <tr>
