@@ -78,7 +78,8 @@ angular.module('identifiAngular').controller 'MainController', [
         identities.forEach (i) ->
           i.gun.on (data) ->
             i.data = data
-            i.gun.get('linkTo').once (linkTo) ->
+            i.gun.get('linkTo').on (linkTo) ->
+              return if i.linkTo or !linkTo
               $scope.$apply ->
                 i.linkTo = linkTo
           $scope.setIdentityNames(i, true)
