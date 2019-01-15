@@ -1,3 +1,5 @@
-ssh $IDENTIFI_DEPLOY_HOST 'sh deploy.sh'
-# TODO: create dist zip
-# TODO: create dist crx
+ssh identifi 'sh deploy.sh'
+cp -r dist/* ../identifi.github.io/
+cd ../identifi.github.io
+git commit -a -m '.'
+git push origin master
