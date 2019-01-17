@@ -117,7 +117,7 @@ angular.module('identifiAngular').controller 'MainController', [
         console.log 'identitiesBySearchKey changed'
         $scope.apiReady = true if a
         doSearch = ->
-          if $state.is 'identities.list' && $scope.query.term == ''
+          if $state.is('identities.list') && $scope.query && $scope.query.term == ''
             $scope.search().then (res) ->
               if res.length <= 1
                 setTimeout doSearch, 1000 # TODO: redo search until we get results
