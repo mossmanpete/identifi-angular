@@ -116,7 +116,12 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.identifiIndex.gun.get('identitiesBySearchKey').on (a) ->
         console.log 'identitiesBySearchKey changed'
         $scope.apiReady = true if a
-        setTimeout $scope.search, 2000 # TODO: it's a hack, but better than empty results for some reason
+        doSearch = ->
+          if $state.is 'identities.list' && $scope.query.term == ''
+            $scope.search().then (res) ->
+              if res.length <= 1
+                setTimeout doSearch, 1000 # TODO: redo search until we get results
+        doSearch()
 
     $scope.loadDefaultIndex = ->
       $scope.viewpoint = {name: 'keyID', val: $scope.defaultIndexKeyID}
