@@ -240,6 +240,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         .catch (error) ->
           console.log 'error loading sent messages', error
           $scope.sent.finished = true
+      doSearch()
 
     $scope.getReceivedMsgs = ->
       return if $scope.received.loading or not $scope.identity
