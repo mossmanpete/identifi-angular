@@ -21,7 +21,7 @@
     "ngInfiniteScroll": "^1.3.4",
     "angular-local-storage": "^0.5.2",
     "angularjs-slider": "^5.8.7",
-    "identifi-lib": "^0.0.64",
+    "identifi-lib": "0.0.65",
     "angular-clipboard": "^1.6.2",
     "angular-qrcode": "^7.2.0",
     "ng-file-upload": "^12.2.13",

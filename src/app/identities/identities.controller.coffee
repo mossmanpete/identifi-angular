@@ -59,8 +59,12 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       if entry.phone
         recipient.push ['phone', entry.phone]
         linkTo = { type: 'phone', value: entry.phone } unless linkTo
+      unless entry.email or entry.url or entry.phone
+        uuid = $window.identifiLib.Attribute.getUuid()
+        recipient.push ['uuid', uuid.val]
+        linkTo = { type: 'uuid', value: uuid.val }
       params =
-        type: 'verify_identity'
+        type: 'verification'
         recipient: recipient
       $scope.createMessage(event, params).then (response) ->
         $state.go 'identities.show', linkTo
@@ -314,7 +318,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.authentication.user and
         $scope.idType == $scope.authentication.user.idType and
         $scope.idValue == $scope.authentication.user.idValue
-      $scope.isUniqueType = config.uniqueAttributeTypes.indexOf($scope.idType) > -1
+      $scope.isUniqueType = $window.identifiLib.Attribute.isUniqueType($scope.idType)
       if !$scope.isUniqueType
         $state.go 'identities.list', { search: $scope.idValue }
         $scope.tabs[2].active = true if $scope.tabs

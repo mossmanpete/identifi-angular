@@ -419,7 +419,7 @@ angular.module('identifiAngular').controller 'MainController', [
           i = 0
           smallestIndex = 1000
           while i < msg.data.author.length
-            index = config.uniqueAttributeTypes.indexOf(msg.data.author[i][0])
+            index = Object.keys($window.identifiLib.Attribute.getUniqueIdValidators()).indexOf(msg.data.author[i][0])
             if index > -1 and index < smallestIndex
               smallestIndex = index
               msg.linkToAuthor = msg.data.author[i]
@@ -430,7 +430,7 @@ angular.module('identifiAngular').controller 'MainController', [
           i = 0
           smallestIndex = 1000
           while i < msg.data.recipient.length
-            index = config.uniqueAttributeTypes.indexOf(msg.data.recipient[i][0])
+            index = Object.keys($window.identifiLib.Attribute.getUniqueIdValidators()).indexOf(msg.data.recipient[i][0])
             if index > -1 and index < smallestIndex
               smallestIndex = index
               msg.linkToRecipient = msg.data.recipient[i]

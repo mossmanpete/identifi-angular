@@ -48,4 +48,4 @@ angular.module 'identifiAngular'
         templateUrl: 'app/main/settings.html'
         title: 'Identifi - Settings'
 
-    $urlRouterProvider.otherwise '/'
+    $urlRouterProvider.otherwise ''
