@@ -18,7 +18,7 @@
       <p>Alternatively, you can trust this Identifi distribution's <b><a ui-sref="identities.show({type:'keyID', value:defaultIndexKeyID})">default address book</a></b> as a starting point.</p>
     </div>
 
-    <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="2" infinite-scroll-disabled="!apiReady || ids.loading || ids.finished">
+    <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="1" infinite-scroll-disabled="!apiReady || ids.loading || ids.finished">
       <tbody>
         <tr ng-class="{active: ids.activeKey == -1}" ui-sref="identities.create" class="search-result-row">
           <td class="gravatar-col align-center"><span style="line-height:46px" class="glyphicon glyphicon-plus"></span></td>
