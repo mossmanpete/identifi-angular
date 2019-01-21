@@ -309,6 +309,18 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.$on '$stateChangeStart', ->
         $scope.shareModal.close()
 
+    $scope.openReadQRModal = () ->
+      $scope.readQRModal = $uibModal.open(
+        animation: $scope.animationsEnabled
+        templateUrl: 'app/identities/readqr.modal.html'
+        size: 'md'
+        scope: $scope
+      )
+      $scope.readQRModal.rendered.then ->
+        document.activeElement.blur()
+      $scope.$on '$stateChangeStart', ->
+        $scope.readQRModal.close()
+
     $scope.openProfilePhotoUploadModal = ->
       return unless $scope.authentication.identity
       $scope.openUploadModal($scope.uploadProfilePhoto, 'Upload profile photo', true)
@@ -355,4 +367,16 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     if $state.is 'identities.create'
       focus('idNameFocus')
       $scope.newEntry.name = $scope.capitalizeWords($scope.query.term)
+
+    $scope.qrScanSuccess = (data) ->
+      a = data.split('/')
+      if data.indexOf 'https://identi.fi' == 0 and a.length > 4
+        type = a[a.length - 2]
+        value = a[a.length - 1]
+        $state.go 'identities.show', {type, value}
+      else
+        console.log 'Unrecognized identity url', data
+    $scope.qrScanError = (e) ->
+      # this is called each time a QR code is not found on the camera
+      # console.error e
 ]
