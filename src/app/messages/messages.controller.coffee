@@ -9,7 +9,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
   '$http'
   '$state'
   # 'Authentication'
-  'Messages'
   'config'
   '$timeout'
   'localStorageService'

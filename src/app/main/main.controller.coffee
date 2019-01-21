@@ -23,7 +23,6 @@ angular.module('identifiAngular').controller 'MainController', [
     else
       $scope.gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun'])
 
-    console.log $scope.gun['_'].opt.peers
     # set authentication
     $scope.authentication = {} # Authentication
 
