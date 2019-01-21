@@ -1417,7 +1417,9 @@ a {
 
 .heading-row {
   height: 50px;
+  width: 100%;
   h4 {
+    max-width: 100%;
     margin: 0;
     padding: 15px;
     display: inline-block;
@@ -1581,6 +1583,22 @@ a {
   .identicon {
     display: inline-block;
   }
+}
+
+.idValue {
+  max-width: 50%;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.idType {
+  max-width: 25%;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* enable absolute positioning */
