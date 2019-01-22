@@ -8,9 +8,13 @@
         <strong>
           <a ui-sref="identities.show({ type: 'keyID', value: message.signerKeyID })" class="id-link">
             <identicon ipfs="ipfs" identity="message.verifiedBy" class="mar-right5" border="3" width="35"></identicon>
-            <span ng-bind="message.verifiedBy.mostVerifiedAttributes.name.attribute.val"></span> <small>{{message.signerKeyID}}</small>
+            <span ng-bind="message.verifiedBy.primaryName"></span>
           </a>
         </strong>
+        <span ng-show="message.verifiedByAttr">
+        with key:
+          <identicon identity="message.verifiedByAttr" class="mar-right5" border="3" width="35"></identicon>
+        </span>
       </div>
     </div>
     <p ng-if="message.data.context"><small>Context: {{message.data.context}}</small></p>

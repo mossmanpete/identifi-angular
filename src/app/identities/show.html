@@ -3,7 +3,13 @@
   <div class="container hidden-xs hidden-sm">
     <div class="heading-row row">
       <div class="col-md-8 col-md-offset-3">
-        <h4>
+        <h4 ng-show="idType === 'keyID' || idType === 'uuid'">
+          <identicon identity="idAttr" width=35></identicon>
+          <button class="btn btn-default mar-left15" ng-click="openShareModal()">
+            <span class="glyphicon glyphicon-share"></span>
+          </button>
+        </h4>
+        <h4 ng-hide="idType === 'keyID' || idType === 'uuid'">
           <span ng-bind="idValue" class="idValue"></span>
           <small class="text-muted">
             <span ng-hide="idType === 'url'" ng-bind="idType" class="idType"></span>
@@ -212,7 +218,7 @@
                         <span class="visible-xs pull-left write-msg-icons">
                           <span ng-repeat="i in iconCount(newMessage.rating) track by $index" class="write-msg-icon glyphicon glyphicon-thumbs-up mar-left5" ng-class="[iconStyle(newMessage.rating), iconClass(newMessage.rating)]"></span>
                         </span>
-                        <button type="submit" class="pull-right ladda-button btn btn-primary" data-style="zoom-out"><span class="ladda-label"><span class="fa fa-edit m"></span> Publish</span><span class="ladda-spinner"></span></button>
+                        <button type="submit" class="pull-right btn btn-primary" data-style="zoom-out"><span><span class="fa fa-edit"></span> Publish</span><span></span></button>
                       </div>
                     </div>
                   </form>
@@ -293,11 +299,12 @@
                             <small ng-bind="id.name"></small>
                           </div>
                           <div>
-                            <a style="min-width:45px" class="pull-left btn btn-lg btn-social-icon mar-right15" ng-class="id.btnStyle" ng-href="{{id.link}}">
+                            <a ng-hide="id.name === 'keyID' || id.name === 'uuid'" style="min-width:45px" class="pull-left btn btn-lg btn-social-icon mar-right15" ng-class="id.btnStyle" ng-href="{{id.link}}">
                               <span ng-class="id.iconStyle"></span>
                               <span ng-if="id.iconStyle&&!id.link" class="pull-left btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}">
                               <span ng-class="id.iconStyle"></span>
                             </a>
+                            <identicon identity="id.attr" ng-show="id.attr && (id.name === 'keyID' || id.name === 'uuid')" width="45"></identicon>
                             <div class="hidden-xs pull-left">
                               <a ui-sref="identities.show({ type: id.name, value: id.val })" ng-bind="id.linkName || id.val" class="id-link"></a>
                               <br>
@@ -307,10 +314,10 @@
                               <input class="form-control linkedComment" type="text" placeholder="comment" disabled>
                             -->
                             <div class="pull-right" ng-if="!id.isCurrent">
-                              <button autocomplete="off" name="confirm" class="ladda-button btn btn-default btn-confirm" ng-click="createMessage($event, { type: 'verify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out">
+                              <button autocomplete="off" name="confirm" class="btn btn-default btn-confirm" ng-click="createMessage($event, { type: 'verify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out">
                                 <span class="positive glyphicon glyphicon-ok"></span> {{id.conf}}
                               </button>
-                              <button autocomplete="off" name="unverify" class="ladda-button btn btn-default btn-unverify" ng-click="createMessage($event, { type: 'unverify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out">
+                              <button autocomplete="off" name="unverify" class="btn btn-default btn-unverify" ng-click="createMessage($event, { type: 'unverify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out">
                                 <span class="negative glyphicon glyphicon-remove"></span> {{id.ref}}
                               </button>
                             </div>
@@ -319,7 +326,7 @@
                         </td>
                       </tr>
                       <tr ng-repeat-end ng-if="!id.isCurrent" class="active connectingmsgs">
-                        <td class="connectingmsgs ladda-button" data-style="zoom-in" data-spinner-color="#000">
+                        <td class="connectingmsgs" data-style="zoom-in" data-spinner-color="#000">
                           <div uib-collapse="!id.collapse">
                             <div ng-repeat="msg in id.connecting_msgs" ng-click="openMessage($event, msg, 'lg')" class="confirmation-panel">
                                 <span ng-if="msg.data.type === 'verify_identity'">
@@ -346,7 +353,7 @@
                           <input id="addValue" ng-change="guessAttributeType()" ng-model="newVerification.value" class="form-control" name="linkedValue" type="text" placeholder="value (e.g. alice@example.com)" ng-disabled="!authentication.user">
                           <input id="addType" ng-model="newVerification.type" class="form-control" name="linkedType" type="text" placeholder="type (e.g. email)" ng-disabled="!authentication.user">
                         <!--<td><input id="addComment" class="form-control" name="linkedComment" type="text" placeholder="comment" disabled></td> -->
-                          <button autocomplete="off" id="addButton" ng-click="createMessage($event, { type: 'verify_identity', recipient: [[idType, idValue], [newVerification.type, newVerification.value]] }, { conf: 0, ref: 0, name: newVerification.type, val: newVerification.value })" class="ladda-button btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user || !(newVerification.type && newVerification.value)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                          <button autocomplete="off" id="addButton" ng-click="createMessage($event, { type: 'verify_identity', recipient: [[idType, idValue], [newVerification.type, newVerification.value]] }, { conf: 0, ref: 0, name: newVerification.type, val: newVerification.value })" class="btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user || !(newVerification.type && newVerification.value)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                         </td>
                       </tr>
                   </tbody>

@@ -85,7 +85,8 @@ angular.module('identifiAngular').controller 'MessagesController', [
           $scope.setMsgRawData($scope.message)
           $scope.message.signerKeyID = $scope.message.getSignerKeyID()
           $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
-
+          $scope.setIdentityNames($scope.message.verifiedBy, true)
+          $scope.message.verifiedByAttr = new $window.identifiLib.Attribute(['keyID', $scope.message.signerKeyID])
         $scope.$watch 'apiReady', (isReady) ->
           if isReady
             if hash.match /^Qm[1-9A-Za-z]{40,50}$/ # looks like an ipfs address

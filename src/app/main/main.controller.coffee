@@ -372,6 +372,7 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.$apply -> $scope.message.recipient_name = mva.nickname.attribute.val
       $scope.message.signerKeyID = $scope.message.getSignerKeyID()
       $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
+      $scope.message.verifiedByAttr = new $window.identifiLib.Attribute(['keyID', $scope.message.signerKeyID])
       $scope.messageModal = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/messages/show.modal.html'

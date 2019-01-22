@@ -102,6 +102,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.connections = Object.values(connections).sort (a, b) ->
           (b.conf - 2 * b.ref) - (a.conf - 2 * a.ref)
         for conn in $scope.connections
+          conn.attr = new $window.identifiLib.Attribute([conn.name, conn.val])
           conn.isCurrent = conn.name == $scope.idType and conn.val == $scope.idValue
           switch conn.name
             when 'email'
@@ -332,6 +333,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.findOne = ->
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
+      $scope.idAttr = new $window.identifiLib.Attribute([$scope.idType, $scope.idValue])
       if $window.location.hostname.indexOf('.') > -1 # differentiate between localhost / chrome plugin uri and DNS name
         $scope.idUrl = $state.href('identities.show', {type: $scope.idType, value: $scope.idValue}, {absolute: true})
       else
