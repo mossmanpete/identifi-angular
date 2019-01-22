@@ -1,6 +1,6 @@
 {
   "name": "identifi-angular",
-  "version": "1.22.7",
+  "version": "1.22.8",
   "main": "electron.js",
   "dependencies": {
     "elliptic": "^6.4.0"

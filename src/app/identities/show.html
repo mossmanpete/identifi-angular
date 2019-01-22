@@ -76,21 +76,28 @@
             <div class="row">
               <div class="col-xs-12">
                 <h4>
-                  <span class="visible-xs visible-sm" ng-if="!(identity.data.mostVerifiedAttributes.name||identity.data.mostVerifiedAttributes.nickname)">
-                    <span ng-bind="idValue" class="idValue"></span>
-                    <small class="text-muted">
-                      <span ng-hide="idType === 'url'" ng-bind="idType" class="idType"></span>
-                      <a ng-href="{{idValue}}" ng-show="idType === 'url'" ng-bind="idType" class="idType"></a>
-                    </small>
-                    <button class="btn btn-default mar-left15" ng-click="openShareModal()">
-                      <span class="glyphicon glyphicon-share"></span>
-                    </button>
+                  <span class="visible-xs-inline-block visible-sm-inline-block mar-right15">
+                    <span ng-show="idType === 'keyID' || idType === 'uuid'">
+                      <identicon identity="idAttr" width=35></identicon>
+                    </span>
+                    <span ng-hide="idType === 'keyID' || idType === 'uuid'">
+                      <span ng-if="!(identity.data.mostVerifiedAttributes.name||identity.data.mostVerifiedAttributes.nickname)">
+                        <span ng-bind="idValue" class="idValue"></span>
+                        <small class="text-muted">
+                          <span ng-hide="idType === 'url'" ng-bind="idType" class="idType"></span>
+                          <a ng-href="{{idValue}}" ng-show="idType === 'url'" ng-bind="idType" class="idType"></a>
+                        </small>
+                      </span>
+                    </span>
                   </span>
                   <span ng-bind="identity.primaryName"></span>
                   <span class="glyphicon glyphicon-ok-sign" style="color:#337ab7" uib-tooltip="Verified by a trusted verifier" ng-if="identity.verified"></span>
                   <span ng-hide="!identity.data.mostVerifiedAttributes.nickname || identity.data.mostVerifiedAttributes.nickname == identity.data.mostVerifiedAttributes.primaryName">
                     (<span class="text-muted" ng-bind="identity.nickname"></span>)
                   </span>
+                  <button class="mar-left15 visible-xs-inline-block visible-sm-inline-block btn btn-default" ng-click="openShareModal()">
+                    <span class="glyphicon glyphicon-share"></span>
+                  </button>
                   <span ng-if="identity.data.trustDistance == 0" class="label label-default pull-right">viewpoint</span>
                   <span ng-if="identity.data.trustDistance > 0 && identity.data.trustDistance < 1000" ng-bind="identity.data.trustDistance | ordinal" class="label label-default pull-right"></span>
                 </h4>
