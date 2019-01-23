@@ -2,9 +2,7 @@
   "name": "identifi-angular",
   "version": "1.22.8",
   "main": "electron.js",
-  "dependencies": {
-    "elliptic": "^6.4.0"
-  },
+  "dependencies": {},
   "files": "dist",
   "scripts": {
     "test": "gulp test",
