@@ -224,6 +224,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.getSentMsgs = ->
       return unless $scope.identity
+      $scope.sent = []
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       resultFound = (msg) ->
         $scope.processMessages [msg], { authorIsSelf: true }
@@ -233,6 +234,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.getReceivedMsgs = ->
       return unless $scope.identity
+      $scope.received = []
       cursor = if $scope.received.length then $scope.received[$scope.received.length - 1].cursor else ''
       resultFound = (msg) ->
         $scope.processMessages [msg], { recipientIsSelf: true }
@@ -327,9 +329,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.identity.gun.get('attrs').on ->
           $scope.getConnections()
         $scope.identity.gun.get('sent').on ->
-          $scope.getSentMsgs(0)
+          $scope.getSentMsgs()
         $scope.identity.gun.get('received').on ->
-          $scope.getReceivedMsgs(0)
+          $scope.getReceivedMsgs()
         $scope.identity.gun.get('scores').open (scores) ->
           $scope.scores = scores
 
