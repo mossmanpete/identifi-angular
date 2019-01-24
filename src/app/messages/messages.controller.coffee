@@ -18,14 +18,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.filters.type = 'rating'
 
-    $scope.resetMsgs = ->
-      msgs = {}
-      $scope.msgs =
-        loading: false
-        finished: false
-        list: (value for own prop, value of msgs)
-    $scope.resetMsgs()
-
     $scope.iconCount = (rating) ->
       new Array(Math.max(1, Math.abs(rating)))
 
@@ -47,22 +39,18 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.collapseFilters = $window.innerWidth < 992
 
-    $scope.find = ->
-      if $scope.msgs.list.length
-        cursor = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
-      limit = 50 or $scope.filters.limit
-      if $state.is('messages.list') && $scope.query && $scope.query.term == ''
-        $scope.msgs.list = []
-        resultFound = (msg) ->
-          $scope.processMessages [msg]
-          $scope.$apply ->
-            $scope.msgs.list.push msg
-        $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
+    if $state.is('messages.list') && !$scope.msgs.list.length
+      limit = 80
+      cursor = null
+      $scope.msgs.list = []
+      resultFound = (msg) ->
+        $scope.processMessages [msg]
+        $scope.$apply ->
+          $scope.msgs.list.push msg
+      $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
-      $scope.resetMsgs()
-      $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
     # Find existing Message
     $scope.findOne = ->
@@ -76,18 +64,16 @@ angular.module('identifiAngular').controller 'MessagesController', [
           $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
           $scope.setIdentityNames($scope.message.verifiedBy, true)
           $scope.message.verifiedByAttr = new $window.identifiLib.Attribute(['keyID', $scope.message.signerKeyID])
-        $scope.$watch 'apiReady', (isReady) ->
-          if isReady
-            if hash.match /^Qm[1-9A-Za-z]{40,50}$/ # looks like an ipfs address
-              $scope.ipfsGet(hash).then (res) ->
-                s = JSON.parse(res.toString())
-                console.log 'msg from ipfs', res, s
-                $window.identifiLib.Message.fromSig(s).then (r) ->
-                  $scope.message = r
-                  $scope.message.ipfsUri = hash
-                  processResponse()
-              .catch (e) ->
-                console.log e
+        if hash.match /^Qm[1-9A-Za-z]{40,50}$/ # looks like an ipfs address
+          $scope.ipfsGet(hash).then (res) ->
+            s = JSON.parse(res.toString())
+            console.log 'msg from ipfs', res, s
+            $window.identifiLib.Message.fromSig(s).then (r) ->
+              $scope.message = r
+              $scope.message.ipfsUri = hash
+              processResponse()
+          .catch (e) ->
+            console.log e
 
     return
 ]

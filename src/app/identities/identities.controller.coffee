@@ -223,8 +223,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           id.collapse = !id.collapse
 
     $scope.getSentMsgs = ->
-      return if $scope.sent.loading or not $scope.identity
-      $scope.sent.loading = true
+      return unless $scope.identity
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       resultFound = (msg) ->
         $scope.processMessages [msg], { authorIsSelf: true }
@@ -233,8 +232,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.identifiIndex.getSentMsgs($scope.identity, resultFound, $scope.filters.limit)
 
     $scope.getReceivedMsgs = ->
-      return if $scope.received.loading or not $scope.identity
-      $scope.received.loading = true
+      return unless $scope.identity
       cursor = if $scope.received.length then $scope.received[$scope.received.length - 1].cursor else ''
       resultFound = (msg) ->
         $scope.processMessages [msg], { recipientIsSelf: true }
@@ -253,9 +251,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
-      $scope.sent = []
-      $scope.received = []
-      $timeout -> $rootScope.$broadcast 'msgScrollCheck'
 
     $scope.uploadProfilePhoto = (blob, identity) ->
       $scope.uploadFile(blob).then (files) ->
@@ -324,21 +319,19 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $state.go 'identities.list', { search: $scope.idValue }
         $scope.tabs[2].active = true if $scope.tabs
       $scope.setPageTitle $scope.idValue
-      $scope.$watch 'apiReady', (isReady) ->
-        if isReady
-          $scope.identity = $scope.identifiIndex.get($scope.idValue, $scope.idType)
-          $scope.setIdentityNames($scope.identity, false, true)
-          if $scope.identity.gun
-            $scope.identity.gun.on (data) ->
-              $scope.identity.data = data
-            $scope.identity.gun.get('attrs').on ->
-              $scope.getConnections()
-            $scope.identity.gun.get('sent').on ->
-              $scope.getSentMsgs(0)
-            $scope.identity.gun.get('received').on ->
-              $scope.getReceivedMsgs(0)
-            $scope.identity.gun.get('scores').open (scores) ->
-              $scope.scores = scores
+      $scope.identity = $scope.identifiIndex.get($scope.idValue, $scope.idType)
+      $scope.setIdentityNames($scope.identity, false, true)
+      if $scope.identity.gun
+        $scope.identity.gun.on (data) ->
+          $scope.identity.data = data
+        $scope.identity.gun.get('attrs').on ->
+          $scope.getConnections()
+        $scope.identity.gun.get('sent').on ->
+          $scope.getSentMsgs(0)
+        $scope.identity.gun.get('received').on ->
+          $scope.getReceivedMsgs(0)
+        $scope.identity.gun.get('scores').open (scores) ->
+          $scope.scores = scores
 
     if $state.is 'identities.show'
       $scope.findOne()
@@ -346,6 +339,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     if $state.is 'identities.create'
       focus('idNameFocus')
       $scope.newEntry.name = $scope.capitalizeWords($scope.query.term)
+
+    if $state.is('identities.list') && !$scope.ids.list.length && $scope.query && $scope.query.term == ''
+      $scope.search()
 
     $scope.qrScanSuccess = (data) ->
       a = data.split('/')

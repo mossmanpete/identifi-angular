@@ -36,7 +36,10 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.query = {}
     $scope.query.term = ''
     $scope.previousSearchKey = ''
-    $scope.ids = { list: [] }
+    $scope.ids =
+      list: []
+    $scope.msgs =
+      list: []
     $scope.phoneRegex = /^\+?\d+$/
 
     $scope.ipfs = new Ipfs(
@@ -56,12 +59,11 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.searchRequest = null
     $scope.search = (query, limit) ->
-      $scope.ids.loading = true
+      console.log 'search'
       searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
       $scope.searchKey = searchKey
       if searchKey != $scope.previousSearchKey
         $scope.ids.list = []
-        $scope.ids.finished = false
       $scope.previousSearchKey = searchKey
       limit = limit or 15
       cursor = false
@@ -83,21 +85,14 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.identifiIndex.search(searchKey, undefined, resultFound, limit, cursor)
 
     setIndex = (results) ->
-      $scope.apiReady = false
       $scope.query.term = '' if $scope.query.term != ''
       $scope.ids.list = []
-      $scope.ids.finished = false
       $scope.identifiIndex = results
       console.log 'Got index', $scope.identifiIndex
       $scope.viewpoint.identity = $scope.identifiIndex.get($scope.viewpoint.val, $scope.viewpoint.name)
       $scope.viewpoint.identity.gun.get('attrs').open (attrs) ->
         $scope.viewpoint.attrs = attrs
         $scope.viewpoint.mostVerifiedAttributes = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
-      $scope.identifiIndex.gun.get('identitiesBySearchKey').on (a) ->
-        console.log 'identitiesBySearchKey changed'
-        $scope.apiReady = true if a
-        if $state.is('identities.list') && $scope.query && $scope.query.term == ''
-          $scope.search()
 
     $scope.loadDefaultIndex = ->
       $scope.viewpoint = {name: 'keyID', val: $scope.defaultIndexKeyID}
@@ -113,8 +108,8 @@ angular.module('identifiAngular').controller 'MainController', [
       keyID = $window.identifiLib.Key.getId($scope.privateKey)
       $scope.viewpoint = {name: 'keyID', val: keyID}
       $window.identifiLib.Index.create($scope.gun, $scope.privateKey).then (i) ->
-        setIndex(i).then ->
-          $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
+        setIndex(i)
+        $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
 
     privateKey = localStorageService.get('identifiKey')
     if privateKey
@@ -321,9 +316,9 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.query.term = ''
           $scope.search()
       else
-        $scope.query.term = ''
-        $scope.ids.list = []
-        $scope.ids.finished = false
+        if $scope.query.term != ''
+          $scope.query.term = ''
+          $scope.ids.list = []
         $state.go 'identities.list'
 
     $scope.setMsgRawData = (msg) ->

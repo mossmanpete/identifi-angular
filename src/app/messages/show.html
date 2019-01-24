@@ -3,7 +3,11 @@
     <message ipfs="ipfs" show-recipient="true" msg-data="msg" page-info="info" ng-repeat="msg in [message]"></message>
     <div class="panel panel-info">
       <div class="panel-heading">
-        Message origin verified by:
+        Message origin verified by
+        <span ng-show="message.verifiedByAttr">
+          <identicon identity="message.verifiedByAttr" class="mar-right5" border="3" width="35"></identicon>
+        </span>
+        which is associated with
         <a ng-if="false" ng-bind="message.signerName||message.signerKeyID" ui-sref="identities.show({type: 'keyID', value: message.signerKeyID })"></a>
         <strong>
           <a ui-sref="identities.show({ type: 'keyID', value: message.signerKeyID })" class="id-link">
@@ -11,10 +15,6 @@
             <span ng-bind="message.verifiedBy.primaryName"></span>
           </a>
         </strong>
-        <span ng-show="message.verifiedByAttr">
-        with key:
-          <identicon identity="message.verifiedByAttr" class="mar-right5" border="3" width="35"></identicon>
-        </span>
       </div>
     </div>
     <p ng-if="message.data.context"><small>Context: {{message.data.context}}</small></p>
