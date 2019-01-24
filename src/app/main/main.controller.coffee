@@ -67,39 +67,20 @@ angular.module('identifiAngular').controller 'MainController', [
       cursor = false
       if $scope.ids.list.length
         cursor = $scope.ids.list[$scope.ids.list.length - 1].cursor
-      $scope.searchRequest = $scope.identifiIndex.search(searchKey, undefined, limit, cursor)
-      .then (identities) -> {identities, searchKey}
-      $scope.searchRequest = $scope.searchRequest.then (res) ->
-        return if res.searchKey != $scope.searchKey
-        identities = res.identities
-        console.log identities
-        identities.splice(limit) if limit
-        identities.forEach (i) ->
-          i.gun.on (data) ->
-            i.data = data
-            i.gun.get('linkTo').on (linkTo) ->
-              return if i.linkTo or !linkTo
-              $scope.$apply ->
-                i.linkTo = linkTo
-          $scope.setIdentityNames(i, true)
-        searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
-        if searchKey != $scope.previousSearchKey
-          return # search key changed
-        $scope.ids.list = $scope.ids.list or []
-        if identities.length < limit
-          $scope.ids.finished = true
-        if identities.length && $scope.ids.list.length &&
-        $scope.getIdKey(identities[0].linkTo) == $scope.getIdKey($scope.ids.list[$scope.ids.list.length - 1].linkTo)
-          identities.shift() # Prevent duplicate
-        $scope.ids.list = $scope.ids.list.concat(identities)
-        if identities.length > 0 && $scope.ids.list.length == identities.length
-          $scope.ids.activeKey = 0
-          $scope.ids.list[0].active = true
-        else
-          $scope.ids.activeKey = -1
-        $scope.$apply -> $scope.ids.loading = false
-        $scope.ids.list
-      return $scope.searchRequest
+
+      resultFound = (i) ->
+        return if searchKey != $scope.searchKey
+        console.log 'i', i
+        i.gun.on (data) ->
+          i.data = data
+          i.gun.get('linkTo').on (linkTo) ->
+            return if i.linkTo or !linkTo
+            $scope.$apply ->
+              i.linkTo = linkTo
+        $scope.setIdentityNames(i, true)
+        $scope.ids.list.push i
+
+      $scope.identifiIndex.search(searchKey, undefined, resultFound, limit, cursor)
 
     setIndex = (results) ->
       $scope.apiReady = false
@@ -115,12 +96,8 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.identifiIndex.gun.get('identitiesBySearchKey').on (a) ->
         console.log 'identitiesBySearchKey changed'
         $scope.apiReady = true if a
-        doSearch = ->
-          if $state.is('identities.list') && $scope.query && $scope.query.term == ''
-            $scope.search().then (res) ->
-              if res.length <= 1
-                setTimeout doSearch, 1000 # TODO: redo search until we get results
-        doSearch()
+        if $state.is('identities.list') && $scope.query && $scope.query.term == ''
+          $scope.search()
 
     $scope.loadDefaultIndex = ->
       $scope.viewpoint = {name: 'keyID', val: $scope.defaultIndexKeyID}

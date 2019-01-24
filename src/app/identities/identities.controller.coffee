@@ -226,53 +226,30 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       return if $scope.sent.loading or not $scope.identity
       $scope.sent.loading = true
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
-      doSearch = ->
-        $scope.identifiIndex.getSentMsgs($scope.identity, $scope.filters.limit, cursor)
-        .then (sent) ->
-          if sent.length == 0
-            setTimeout doSearch, 1000
-          else
-            $scope.processMessages sent, { authorIsSelf: true }
-            $scope.$apply ->
-              Array.prototype.push.apply($scope.sent, sent)
-              $scope.sent.loading = false
-              if sent.length < $scope.filters.limit - 1
-                $scope.sent.finished = true
-        .catch (error) ->
-          console.log 'error loading sent messages', error
-          $scope.sent.finished = true
-      doSearch()
+      resultFound = (msg) ->
+        $scope.processMessages [msg], { authorIsSelf: true }
+        $scope.sent.push msg
+
+      $scope.identifiIndex.getSentMsgs($scope.identity, resultFound, $scope.filters.limit)
 
     $scope.getReceivedMsgs = ->
       return if $scope.received.loading or not $scope.identity
       $scope.received.loading = true
       cursor = if $scope.received.length then $scope.received[$scope.received.length - 1].cursor else ''
-      doSearch = ->
-        $scope.identifiIndex.getReceivedMsgs($scope.identity, $scope.filters.limit, cursor)
-        .then (received) ->
-          if received.length == 0
-            setTimeout doSearch, 1000
-          else
-            $scope.processMessages received, { recipientIsSelf: true }
-            $scope.$apply ->
-              Array.prototype.push.apply($scope.received, received)
-              $scope.received.loading = false
-              if received.length < $scope.filters.limit - 1
-                $scope.received.finished = true
-              received.forEach (msg) ->
-                if msg.isPositive()
-                  if $scope.thumbsUp.length < 12 and not thumbsUpObj[JSON.stringify(msg.signedData.author)]
-                    thumbsUpObj[JSON.stringify(msg.signedData.author)] = true
-                    $scope.thumbsUp.push msg
-                    $scope.hasThumbsUp = true
-                else if msg.isNegative() and $scope.thumbsDown.length < 12 and not thumbsDownObj[JSON.stringify(msg.signedData.author)]
-                  thumbsDownObj[JSON.stringify(msg.signedData.author)] = true
-                  $scope.thumbsDown.push msg
-                  $scope.hasThumbsDown = true
-        .catch (error) ->
-          console.log 'error loading received messages', error
-          $scope.received.finished = true
-      doSearch()
+      resultFound = (msg) ->
+        $scope.processMessages [msg], { recipientIsSelf: true }
+        $scope.$apply ->
+          if msg.isPositive()
+            if $scope.thumbsUp.length < 12 and not thumbsUpObj[JSON.stringify(msg.signedData.author)]
+              thumbsUpObj[JSON.stringify(msg.signedData.author)] = true
+              $scope.thumbsUp.push msg
+              $scope.hasThumbsUp = true
+          else if msg.isNegative() and $scope.thumbsDown.length < 12 and not thumbsDownObj[JSON.stringify(msg.signedData.author)]
+            thumbsDownObj[JSON.stringify(msg.signedData.author)] = true
+            $scope.thumbsDown.push msg
+            $scope.hasThumbsDown = true
+          $scope.received.push msg
+      $scope.identifiIndex.getReceivedMsgs($scope.identity, resultFound, $scope.filters.limit, cursor)
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters

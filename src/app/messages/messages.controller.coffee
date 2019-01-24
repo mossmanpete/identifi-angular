@@ -48,27 +48,16 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.collapseFilters = $window.innerWidth < 992
 
     $scope.find = ->
-      return if $scope.msgs.loading
-      $scope.msgs.loading = true
-      # Get latest messages from ipfs index
       if $scope.msgs.list.length
         cursor = $scope.msgs.list[$scope.msgs.list.length - 1].searchKey
-      doSearch = ->
-        limit = 50 or $scope.filters.limit
-        if $state.is('messages.list') && $scope.query && $scope.query.term == ''
-          $scope.identifiIndex.getMessagesByTimestamp(limit, cursor)
-          .then (messages) ->
-            if messages.length == 0
-              setTimeout doSearch, 1000 # TODO: redo search until we get results
-            else
-              $scope.processMessages messages
-              $scope.$apply ->
-                $scope.msgs.list = messages
-                # Array.prototype.push.apply($scope.msgs.list, messages)
-              $scope.$apply -> $scope.msgs.loading = false
-              $scope.msgs.finished = true if messages.length < limit
-
-      doSearch()
+      limit = 50 or $scope.filters.limit
+      if $state.is('messages.list') && $scope.query && $scope.query.term == ''
+        $scope.msgs.list = []
+        resultFound = (msg) ->
+          $scope.processMessages [msg]
+          $scope.$apply ->
+            $scope.msgs.list.push msg
+        $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
