@@ -41,7 +41,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
 
     load = ->
-      if $state.is('messages.list') && !$scope.msgs.list.length
+      if $state.is('messages.list')
         limit = 80
         cursor = null
         $scope.msgs.list = []
