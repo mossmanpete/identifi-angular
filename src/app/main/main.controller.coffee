@@ -87,6 +87,7 @@ angular.module('identifiAngular').controller 'MainController', [
     setIndex = (results) ->
       $scope.query.term = '' if $scope.query.term != ''
       $scope.ids.list = []
+      $scope.msgs.list = []
       $scope.identifiIndex = results
       console.log 'Got index', $scope.identifiIndex
       $scope.viewpoint.identity = $scope.identifiIndex.get($scope.viewpoint.val, $scope.viewpoint.name)
@@ -240,9 +241,9 @@ angular.module('identifiAngular').controller 'MainController', [
         recipient = [['keyID', $window.identifiLib.Key.getId($scope.privateKey)], ['name', name]]
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
       .then (msg) ->
-        $scope.identifiIndex.addMessage(msg, $scope.ipfs)
-      .then ->
-        $scope.search()
+        $scope.identifiIndex.gun.get('identitiesBySearchKey').then ->
+          console.log 'adding'
+          $scope.identifiIndex.addMessage(msg, $scope.ipfs)
 
     $scope.generateKey = ->
       $window.identifiLib.Key.generate().then (key) ->

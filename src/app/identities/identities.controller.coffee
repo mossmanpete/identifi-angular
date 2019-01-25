@@ -323,27 +323,24 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.setPageTitle $scope.idValue
       $scope.identity = $scope.identifiIndex.get($scope.idValue, $scope.idType)
       $scope.setIdentityNames($scope.identity, false, true)
-      if $scope.identity.gun
-        $scope.identity.gun.on (data) ->
-          $scope.identity.data = data
-        $scope.identity.gun.get('attrs').on ->
-          $scope.getConnections()
-        $scope.identity.gun.get('sent').on ->
-          $scope.getSentMsgs()
-        $scope.identity.gun.get('received').on ->
-          $scope.getReceivedMsgs()
-        $scope.identity.gun.get('scores').open (scores) ->
-          $scope.scores = scores
+      $scope.identity.gun.on (data) ->
+        $scope.identity.data = data
+      $scope.getConnections()
+      $scope.getSentMsgs()
+      $scope.getReceivedMsgs()
+      $scope.identity.gun.get('scores').open (scores) ->
+        $scope.scores = scores
 
-    if $state.is 'identities.show'
-      $scope.findOne()
+    $scope.$watch 'identifiIndex', ->
+      if $state.is 'identities.show'
+        $scope.findOne()
 
-    if $state.is 'identities.create'
-      focus('idNameFocus')
-      $scope.newEntry.name = $scope.capitalizeWords($scope.query.term)
+      if $state.is 'identities.create'
+        focus('idNameFocus')
+        $scope.newEntry.name = $scope.capitalizeWords($scope.query.term)
 
-    if $state.is('identities.list') && !$scope.ids.list.length && $scope.query && $scope.query.term == ''
-      $scope.search()
+      if $state.is('identities.list') && !$scope.ids.list.length && $scope.query && $scope.query.term == ''
+        $scope.search()
 
     $scope.qrScanSuccess = (data) ->
       a = data.split('/')

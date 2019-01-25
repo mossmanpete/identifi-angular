@@ -39,15 +39,19 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.collapseFilters = $window.innerWidth < 992
 
-    if $state.is('messages.list') && !$scope.msgs.list.length
-      limit = 80
-      cursor = null
-      $scope.msgs.list = []
-      resultFound = (msg) ->
-        $scope.processMessages [msg]
-        $scope.$apply ->
-          $scope.msgs.list.push msg
-      $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
+
+    load = ->
+      if $state.is('messages.list') && !$scope.msgs.list.length
+        limit = 80
+        cursor = null
+        $scope.msgs.list = []
+        resultFound = (msg) ->
+          $scope.processMessages [msg]
+          $scope.$apply ->
+            $scope.msgs.list.push msg
+        $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
+    load() if $scope.identifiIndex
+    $scope.$watch 'identifiIndex', load
 
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
