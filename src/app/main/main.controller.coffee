@@ -57,13 +57,12 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.copyToClipboard = (text) ->
       clipboard.copyText text
 
-    $scope.searchRequest = null
     $scope.search = (query, limit) ->
+      return unless $scope.identifiIndex
+      $scope.ids.list = []
       console.log 'search'
       searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
       $scope.searchKey = searchKey
-      if searchKey != $scope.previousSearchKey
-        $scope.ids.list = []
       $scope.previousSearchKey = searchKey
       limit = limit or 15
       cursor = false
@@ -241,8 +240,11 @@ angular.module('identifiAngular').controller 'MainController', [
         recipient = [['keyID', $window.identifiLib.Key.getId($scope.privateKey)], ['name', name]]
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
       .then (msg) ->
-        $scope.identifiIndex.gun.get('identitiesBySearchKey').then ->
-          console.log 'adding'
+        added = false
+        $scope.$watch 'identifiIndex', () ->
+          return if added
+          added = true
+          console.log 'msg', msg
           $scope.identifiIndex.addMessage(msg, $scope.ipfs)
 
     $scope.generateKey = ->

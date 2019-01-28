@@ -8,9 +8,9 @@
         </label>
       </div>-->
       <h3>New user</h3>
-      <form>
+      <form ng-submit="createUser(newUserName)">
         <input focus-on="newUser" type="text" class="form-control" ng-model="newUserName" placeholder="Your name"><br>
-        <button class="btn btn-primary" ng-disabled="!newUserName" ng-click="createUser(newUserName)">Create user</button>
+        <input type="submit" value="Create user" class="btn btn-primary" ng-disabled="!newUserName">
       </form>
       <br>
       <h3>Existing user</h3>

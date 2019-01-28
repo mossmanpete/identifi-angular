@@ -223,7 +223,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           id.collapse = !id.collapse
 
     $scope.getSentMsgs = ->
-      return unless $scope.identity
+      return unless $scope.identity and $scope.identifiIndex
       $scope.sent = []
       cursor = if $scope.sent.length then $scope.sent[$scope.sent.length - 1].cursor else ''
       resultFound = (msg) ->
@@ -233,7 +233,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.identifiIndex.getSentMsgs($scope.identity, resultFound, $scope.filters.limit)
 
     $scope.getReceivedMsgs = ->
-      return unless $scope.identity
+      return unless $scope.identity and $scope.identifiIndex
       $scope.received = []
       cursor = if $scope.received.length then $scope.received[$scope.received.length - 1].cursor else ''
       resultFound = (msg) ->
@@ -305,6 +305,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.openUploadModal($scope.uploadCoverPhoto, 'Upload cover photo', false)
 
     $scope.findOne = ->
+      return unless $scope.identifiIndex
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
       $scope.idAttr = new $window.identifiLib.Attribute([$scope.idType, $scope.idValue])
@@ -331,16 +332,18 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.identity.gun.get('scores').open (scores) ->
         $scope.scores = scores
 
-    $scope.$watch 'identifiIndex', ->
-      if $state.is 'identities.show'
-        $scope.findOne()
+    load = ->
+      if $scope.identifiIndex
+        if $state.is 'identities.show'
+          $scope.findOne()
 
-      if $state.is 'identities.create'
-        focus('idNameFocus')
-        $scope.newEntry.name = $scope.capitalizeWords($scope.query.term)
+        if $state.is 'identities.create'
+          focus('idNameFocus')
+          $scope.newEntry.name = $scope.capitalizeWords($scope.query.term)
 
-      if $state.is('identities.list') && $scope.query && $scope.query.term == ''
-        $scope.search()
+        if $state.is('identities.list') && $scope.query && $scope.query.term == ''
+          $scope.search()
+    $scope.$watch 'identifiIndex', load
 
     $scope.qrScanSuccess = (data) ->
       a = data.split('/')

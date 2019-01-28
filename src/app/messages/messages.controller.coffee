@@ -41,6 +41,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
 
     load = ->
+      return unless $scope.identifiIndex
       if $state.is('messages.list')
         limit = 80
         cursor = null
@@ -50,7 +51,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
           $scope.$apply ->
             $scope.msgs.list.push msg
         $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
-    load() if $scope.identifiIndex
     $scope.$watch 'identifiIndex', load
 
     $scope.setFilters = (filters) ->
