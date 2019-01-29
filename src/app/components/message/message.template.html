@@ -1,4 +1,4 @@
-<div class="panel msg" ng-class="{'panel-info':$ctrl.msgData.isVerification}" style="{{$ctrl.msgData.bgColor}}" ng-if="$ctrl.msgData.data">
+<div class="panel msg" ng-class="{'panel-info':$ctrl.msgData.isVerification, 'panel-default':$ctrl.msgData.isPost}" style="{{$ctrl.msgData.bgColor}}" ng-if="$ctrl.msgData.data">
   <div class="message-panel" ng-class="{ 'panel-body': !$ctrl.msgData.isVerification, 'panel-heading': $ctrl.msgData.isVerification || $ctrl.msgData.isUnverification }">
     <p class="">
       <span class="mar-left5 pull-right" ng-class="$ctrl.msgData.iconStyle" ng-repeat="n in $ctrl.msgData.iconCount track by $index"></span>
