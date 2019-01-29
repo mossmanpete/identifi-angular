@@ -421,6 +421,8 @@ angular.module('identifiAngular').controller 'MainController', [
             else if !msg.recipient_name and msg.data.recipient[i][0] in ['name', 'nickname']
               msg.recipient_name = msg.data.recipient[i][1]
             i++
+          if msg.linkToAuthor[0] == msg.linkToRecipient[0] and msg.linkToAuthor[1] == msg.linkToRecipient[1]
+            msg.sameAuthorAndRecipient = true
           signedData = msg.data
           alpha = undefined
           msg.iconStyle = ''
