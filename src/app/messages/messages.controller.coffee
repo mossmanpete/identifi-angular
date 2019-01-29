@@ -37,7 +37,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.collapseFilters = $window.innerWidth < 992
 
-
     load = ->
       return unless $scope.identifiIndex
       if $state.is('messages.list')
