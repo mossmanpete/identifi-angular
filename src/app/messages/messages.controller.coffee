@@ -16,8 +16,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
     $scope.idType = $stateParams.type
     $scope.idValue = $stateParams.value
 
-    $scope.filters.type = 'rating'
-
     $scope.iconCount = (rating) ->
       new Array(Math.max(1, Math.abs(rating)))
 
