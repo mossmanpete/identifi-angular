@@ -5,6 +5,7 @@
         <div ng-include="'app/messages/filters.partial.html'"></div>
       </div>
       <div class="col-md-8">
+        <div ng-include="'app/messages/create.partial.html'"></div>
         <div infinite-scroll="find()" infinite-scroll-distance="1" infinite-scroll-disabled="true">
           <message ng-repeat="msg in msgs.list | filter:msgFilter" ipfs="ipfs" msg-data="msg" ng-click="openMessage($event, msg, 'lg')"></message>
         </div>

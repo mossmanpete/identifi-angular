@@ -23,6 +23,7 @@ angular.module('identifiAngular').controller 'MainController', [
     else
       $scope.gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun'])
 
+    # TODO: move everything to main controller?
     # set authentication
     $scope.authentication = {} # Authentication
 
@@ -107,6 +108,8 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.loginModal.close() if $scope.loginModal
       keyID = $window.identifiLib.Key.getId($scope.privateKey)
       $scope.viewpoint = {name: 'keyID', val: keyID}
+      $scope.ids.list = []
+      $scope.msgs.list = []
       $window.identifiLib.Index.create($scope.gun, $scope.privateKey).then (i) ->
         setIndex(i)
         $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
@@ -151,12 +154,14 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.ipfs.on 'ready', ->
             go()
 
-    $scope.newMessage =
-      rating: 1
-      comment: ''
-    $scope.newVerification =
-      type: ''
-      value: ''
+    $scope.resetMsg = ->
+      $scope.newMessage =
+        rating: 1
+        comment: ''
+      $scope.newVerification =
+        type: ''
+        value: ''
+    $scope.resetMsg()
     # Create new Message
     $scope.createMessage = (event, params, id) ->
       event.stopPropagation() if event
@@ -166,14 +171,18 @@ angular.module('identifiAngular').controller 'MainController', [
         params.maxRating |= 3
         params.minRating |= -3
         message = $window.identifiLib.Message.createRating(params, $scope.privateKey)
-      else
+      else if params.type == 'verification'
         message = $window.identifiLib.Message.createVerification(params, $scope.privateKey)
+      else
+        message = $window.identifiLib.Message.create(params, $scope.privateKey)
       options = {}
 
       message.then (m) ->
         console.log m
         $scope.identifiIndex.addMessage(m, $scope.ipfs)
-        $scope.filters.type = 'rating'
+        if $scope.filters.type not in [params.type, null]
+          $scope.filters.type = params.type
+        $scope.resetMsg()
       .catch (e) ->
         console.error(e)
         $scope.error = e
@@ -415,19 +424,18 @@ angular.module('identifiAngular').controller 'MainController', [
           signedData = msg.data
           alpha = undefined
           msg.iconStyle = ''
-          msg.hasSuccess = ''
           msg.bgColor = ''
           msg.iconCount = new Array(1)
           switch signedData.type
             when 'verify_identity', 'verification'
               msg.iconStyle = 'glyphicon glyphicon-ok-sign'
-              msg.hasSuccess = 'has-success'
               msg.isVerification = true
             when 'unverify_identity', 'unverification'
               msg.iconStyle = 'glyphicon glyphicon-remove negative'
-              msg.hasSuccess = 'has-error'
               msg.bgColor = 'background-color: #FFF0DE;border-color:#FFE2C6;'
               msg.isUnverification = true
+            when 'post'
+              msg.iconStyle = 'fa fa-edit'
             when 'rating'
               rating = signedData.rating
               neutralRating = (signedData.minRating + signedData.maxRating) / 2
