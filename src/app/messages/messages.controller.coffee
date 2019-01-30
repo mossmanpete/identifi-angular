@@ -45,7 +45,7 @@ angular.module('identifiAngular').controller 'MessagesController', [
       if $stateParams.id
         hash = $stateParams.id
         processResponse = ->
-          $scope.processMessages([$scope.message], {}, true)
+          $scope.processMessages([$scope.message], {})
           $scope.setPageTitle 'Message ' + hash
           $scope.setMsgRawData($scope.message)
           $scope.message.signerKeyID = $scope.message.getSignerKeyID()

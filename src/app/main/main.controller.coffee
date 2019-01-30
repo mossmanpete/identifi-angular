@@ -376,7 +376,7 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.toggleCollapsibleMenu = ->
       $scope.isCollapsed = !$scope.isCollapsed
 
-    $scope.processMessages = (messages, msgOptions, findRecipient) ->
+    $scope.processMessages = (messages, msgOptions) ->
       processMessage = (msg) ->
         msg.data = msg.signedData
         msg.author = msg.getAuthor($scope.identifiIndex)
@@ -387,14 +387,13 @@ angular.module('identifiAngular').controller 'MainController', [
             $scope.$apply -> msg.author_name = mva.name.attribute.val
           else if mva.nickname
             $scope.$apply -> msg.author_name = mva.nickname.attribute.val
-        if findRecipient
-          msg.recipient = msg.getRecipient($scope.identifiIndex)
-          msg.recipient.gun.get('attrs').open (d) ->
-            mva = $window.identifiLib.Identity.getMostVerifiedAttributes(d)
-            if mva.name
-              $scope.$apply -> msg.recipient_name = mva.name.attribute.val
-            else if mva.nickname
-              $scope.$apply -> msg.recipient_name = mva.nickname.attribute.val
+        msg.recipient = msg.getRecipient($scope.identifiIndex)
+        msg.recipient.gun.get('attrs').open (d) ->
+          mva = $window.identifiLib.Identity.getMostVerifiedAttributes(d)
+          if mva.name
+            $scope.$apply -> msg.recipient_name = mva.name.attribute.val
+          else if mva.nickname
+            $scope.$apply -> msg.recipient_name = mva.nickname.attribute.val
         $scope.$apply ->
           # TODO: make sure message signature is checked
 
