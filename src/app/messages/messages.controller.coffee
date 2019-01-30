@@ -37,19 +37,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     $scope.collapseFilters = $window.innerWidth < 992
 
-    load = ->
-      return unless $scope.identifiIndex
-      if $state.is('messages.list')
-        limit = 80
-        cursor = null
-        $scope.msgs.list = []
-        resultFound = (msg) ->
-          $scope.processMessages [msg]
-          $scope.$apply ->
-            $scope.msgs.list.push msg
-        $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
-    $scope.$watch 'identifiIndex', load
-
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
 
@@ -76,5 +63,18 @@ angular.module('identifiAngular').controller 'MessagesController', [
           .catch (e) ->
             console.log e
 
-    return
+    load = ->
+      return unless $scope.identifiIndex
+      if $state.is('messages.list')
+        limit = 80
+        cursor = null
+        $scope.msgs.list = []
+        resultFound = (msg) ->
+          $scope.processMessages [msg]
+          $scope.$apply ->
+            $scope.msgs.list.push msg
+        $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
+      if $state.is('messages.show')
+        $scope.findOne()
+    $scope.$watch 'identifiIndex', load
 ]
