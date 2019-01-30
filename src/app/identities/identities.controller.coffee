@@ -18,7 +18,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
   ($scope, $state, $rootScope, $window, $stateParams, $location, $http, $q, $timeout, $uibModal, config,
   localStorageService, focus) -> #, Authentication
     $scope.newEntry = {}
-    $scope.activeTab = 0
+    $scope.activeTab = 1
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.sent = []
     $scope.received = []
@@ -102,6 +102,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.connections = Object.values(connections).sort (a, b) ->
           (b.conf - 2 * b.ref) - (a.conf - 2 * a.ref)
         for conn in $scope.connections
+          return unless conn.name and conn.val
           conn.attr = new $window.identifiLib.Attribute([conn.name, conn.val])
           conn.isCurrent = conn.name == $scope.idType and conn.val == $scope.idValue
           switch conn.name

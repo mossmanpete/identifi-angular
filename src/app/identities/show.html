@@ -25,13 +25,13 @@
       <div class="col-md-9 col-md-offset-3">
         <ul class="list-inline tab-list">
           <li ng-if="isUniqueType">
-            <a href="" ng-class="{ active: activeTab == 0 }" ng-click="activateTab(0)"><span class="hidden-xs">Received </span>({{0+identity.data.receivedPositive+identity.data.receivedNeutral+identity.data.receivedNegative || received.length}})</a>
+            <a href="" ng-class="{ active: activeTab == 1 }" ng-click="activateTab(1)"><span class="hidden-xs">Received </span>({{0+identity.data.receivedPositive+identity.data.receivedNeutral+identity.data.receivedNegative || received.length}})</a>
           </li>
           <li ng-if="isUniqueType">
-            <a href="" ng-class="{ active: activeTab == 1 }" ng-click="activateTab(1)"><span class="hidden-xs">Sent </span>({{0+identity.data.sentPositive+identity.data.sentNeutral+identity.data.sentNegative || sent.length}})</a>
+            <a href="" ng-class="{ active: activeTab == 2 }" ng-click="activateTab(2)"><span class="hidden-xs">Sent </span>({{0+identity.data.sentPositive+identity.data.sentNeutral+identity.data.sentNegative || sent.length}})</a>
           </li>
           <li>
-            <a href="" ng-class="{ active: activeTab == 2 }" ng-click="activateTab(2)"><span class="hidden-xs">Identity </span>(<span ng-bind="connectionsLength || 0"></span>)</a>
+            <a href="" ng-class="{ active: activeTab == 3 }" ng-click="activateTab(3)"><span class="hidden-xs">Identity </span>(<span ng-bind="connectionsLength || 0"></span>)</a>
           </li>
         </ul>
       </div>
@@ -201,7 +201,7 @@
         <div class="col-md-8 id-right-column">
           <!-- Nav tabs -->
           <uib-tabset active="activeTab">
-            <uib-tab ng-if="isUniqueType">
+            <uib-tab index="1" ng-if="isUniqueType">
               <uib-tab-heading>
                 <span class="hidden-xs">Received ({{0+identity.data.receivedPositive+identity.data.receivedNeutral+identity.data.receivedNegative}})</span>
                 <span class="visible-xs">Recv ({{0+identity.data.receivedPositive+identity.data.receivedNeutral+identity.data.receivedNegative}})</span>
@@ -232,7 +232,7 @@
                 </div>
               </div>
 
-              <div infinite-scroll="getReceivedMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="true || !identity || activeTab != 0">
+              <div infinite-scroll="getReceivedMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="true || !identity || activeTab != 1">
                 <div class="panel" ng-class="{'mar-bot5': (filters.type.indexOf('rating') === 0)}">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
@@ -264,9 +264,9 @@
                 <div class="mar-top20"><qrcode data="{{idUrl}}" size="240"></qrcode></div>
               </div>
             </uib-tab>
-            <uib-tab ng-if="isUniqueType">
+            <uib-tab index="2" ng-if="isUniqueType">
               <uib-tab-heading>Sent ({{0+identity.data.sentPositive+identity.data.sentNeutral+identity.data.sentNegative}})</uib-tab-heading>
-              <div infinite-scroll="getSentMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="true || !identity || activeTab != 1">
+              <div infinite-scroll="getSentMsgs()" infinite-scroll-distance="2" infinite-scroll-disabled="true || !identity || activeTab != 2">
                 <div class="panel" ng-class="{'mar-bot5': (filters.type.indexOf('rating') === 0)}">
                   <div class="filters">
                     <ul class="nav nav-pills msg-type-filter">
@@ -290,7 +290,7 @@
               </div>
               <div ng-if="sentFiltered.length == 0" class="alert alert-info text-center">No messages to show</div>
             </uib-tab>
-            <uib-tab ng-if="true">
+            <uib-tab index="3">
                 <uib-tab-heading>Id<span class="hidden-xs">entity</span> (<span ng-bind="connectionsLength || 0"></span>)</uib-tab-heading>
                 <div id="connections">
                   <!-- <input id="authenticity_token" name="authenticity_token" type="hidden" value="z1JM7ffnFK7gOv6S3yzG9UFyakukYHikAU94/3TcT2o="> -->
