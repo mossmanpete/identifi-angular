@@ -18,14 +18,22 @@ angular.module('identifiAngular').controller 'MainController', [
   #'Persona'
   ($scope, $rootScope, $location, $http, $state, config,
   localStorageService, clipboard, $uibModal, $window, $q, focus) -> # Authentication, Menus, Persona
+    hosts = ['https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun', 'https://node1.identi.fi/gun']
     if $window.location.protocol == "https:"
-      $scope.gun = new Gun(['https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun'])
+      $scope.gun = new Gun(hosts)
     else
-      $scope.gun = new Gun(['http://localhost:8765/gun', 'https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun'])
+      hosts.push('http://localhost:8765/gun')
+      $scope.gun = new Gun(hosts)
 
     # TODO: move everything to main controller?
     # set authentication
     $scope.authentication = {} # Authentication
+
+    $scope.getIdUrl = (type, value) ->
+      if $window.location.hostname.indexOf('.') > -1 # differentiate between localhost / chrome plugin uri and DNS name
+        return $state.href('identities.show', {type, value}, {absolute: true})
+      else
+        return 'https://identi.fi/' + $state.href('identities.show', {type, value})
 
     $scope.getIdKey = (id) ->
       if Array.isArray(id)
@@ -65,7 +73,7 @@ angular.module('identifiAngular').controller 'MainController', [
       searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
       $scope.searchKey = searchKey
       $scope.previousSearchKey = searchKey
-      limit = limit or 15
+      limit = limit or 10
       cursor = false
       if $scope.ids.list.length
         cursor = $scope.ids.list[$scope.ids.list.length - 1].cursor
@@ -105,6 +113,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.authentication.user =
         idType: 'keyID'
         idValue: $window.identifiLib.Key.getId($scope.privateKey)
+      $scope.authentication.user.url = $scope.getIdUrl 'keyID', $scope.authentication.user.idValue
       $scope.loginModal.close() if $scope.loginModal
       keyID = $window.identifiLib.Key.getId($scope.privateKey)
       $scope.viewpoint = {name: 'keyID', val: keyID}
@@ -224,6 +233,22 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.$on '$stateChangeStart', ->
       $scope.filters.type = null
 
+    loadMsgs = ->
+      limit = 40
+      cursor = null
+      $scope.msgs.list = []
+      resultFound = (msg) ->
+        console.log 'got msg', msg
+        $scope.processMessages [msg]
+        $scope.$apply ->
+          $scope.msgs.list.push msg
+      $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
+
+    $scope.$watch 'identifiIndex', ->
+      return unless $scope.identifiIndex
+      loadMsgs()
+      $scope.search()
+
     $scope.uploadFile = (blob) ->
       return new Promise (resolve, reject) ->
         console.log 'uploading', blob
@@ -311,6 +336,9 @@ angular.module('identifiAngular').controller 'MainController', [
             return false
         else if data.type != $scope.filters.type
           return false
+      else
+        if data.type in ['verification', 'unverification']
+          return false
       if $scope.filters.max_distance
         if $scope.filters.max_distance == 0 and typeof value.authorTrustDistance != 'number'
           return false
@@ -320,18 +348,6 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.removeFocus = (event) ->
       event.currentTarget.blur()
-
-    $scope.logoClicked = ->
-      focus('searchFocus')
-      if $state.is 'identities.list'
-        if $scope.query.term != ''
-          $scope.query.term = ''
-          $scope.search()
-      else
-        if $scope.query.term != ''
-          $scope.query.term = ''
-          $scope.ids.list = []
-        $state.go 'identities.list'
 
     $scope.setMsgRawData = (msg) ->
       showRawData =

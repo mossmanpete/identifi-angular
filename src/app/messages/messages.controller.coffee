@@ -65,15 +65,6 @@ angular.module('identifiAngular').controller 'MessagesController', [
 
     load = ->
       return unless $scope.identifiIndex
-      if $state.is('messages.list')
-        limit = 80
-        cursor = null
-        $scope.msgs.list = []
-        resultFound = (msg) ->
-          $scope.processMessages [msg]
-          $scope.$apply ->
-            $scope.msgs.list.push msg
-        $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
       if $state.is('messages.show')
         $scope.findOne()
     $scope.$watch 'identifiIndex', load
