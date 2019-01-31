@@ -3,7 +3,7 @@ angular.module 'identifiAngular'
     'ngInject'
     $stateProvider
       .state 'identities',
-        url: ''
+        url: '/contacts'
         template: "<ui-view/>"
         abstract: true
       .state 'identities.list',
@@ -15,17 +15,17 @@ angular.module 'identifiAngular'
           search: ''
         title: 'Identifi - Global Address Book'
       .state 'identities.create',
-        url: '/identities/create'
+        url: '/create'
         templateUrl: 'app/identities/create.html'
         controller: 'IdentitiesController'
         controllerAs: 'identities'
       .state 'identities.show',
-        url: '/identities/:type/:value'
+        url: '/:type/:value'
         templateUrl: 'app/identities/show.html'
         controller: 'IdentitiesController'
         controllerAs: 'identities'
       .state 'messages',
-        url: '/messages'
+        url: ''
         template: "<ui-view/>"
         abstract: true
       .state 'messages.list',
@@ -35,7 +35,7 @@ angular.module 'identifiAngular'
         controllerAs: 'messages'
         title: 'Identifi - Latest messages'
       .state 'messages.show',
-        url: '/:id'
+        url: '/message/:id'
         templateUrl: 'app/messages/show.html'
         controller: 'MessagesController'
         controllerAs: 'messages'

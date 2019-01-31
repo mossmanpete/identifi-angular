@@ -321,18 +321,6 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.removeFocus = (event) ->
       event.currentTarget.blur()
 
-    $scope.logoClicked = ->
-      focus('searchFocus')
-      if $state.is 'identities.list'
-        if $scope.query.term != ''
-          $scope.query.term = ''
-          $scope.search()
-      else
-        if $scope.query.term != ''
-          $scope.query.term = ''
-          $scope.ids.list = []
-        $state.go 'identities.list'
-
     $scope.setMsgRawData = (msg) ->
       showRawData =
         hash: msg.hash
