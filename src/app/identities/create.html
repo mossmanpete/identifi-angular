@@ -1,7 +1,7 @@
 <div class="container mar-bot30" ng-controller="IdentitiesController">
   <div class="row">
     <div class="col-xs-8 col-sm-6 col-sm-offset-2">
-      <h3>Add entry</h3>
+      <h3>Add contact</h3>
     </div>
     <div class="col-xs-4 col-sm-2">
       <button ng-click="openReadQRModal()" class="btn btn-default pull-right">
@@ -16,7 +16,7 @@
         <div class="panel-heading" ng-bind="error"></div>
       </div>
       <div class="panel panel-info" ng-hide="authentication.user">
-        <div class="panel-heading">Please log in to add entries.</div>
+        <div class="panel-heading">Please log in to add contacts.</div>
       </div>
       <form class="form" name="addEntryForm" ng-submit="addEntry($event, newEntry)">
         <div class="form-group">
@@ -48,7 +48,7 @@
         </div>
         <button class="btn btn-primary"
         ng-disabled="!(authentication.user && !(addEntryForm.idName.$invalid || addEntryForm.idEmail.$invalid || addEntryForm.idPhone.$invalid || addEntryForm.idUrl.$invalid))">
-          Add public entry</button>
+          Add public contact</button>
         <p class="help-block">More details can be added afterwards.</p>
       </form>
     </div>

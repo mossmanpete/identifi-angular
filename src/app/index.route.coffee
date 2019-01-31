@@ -35,7 +35,7 @@ angular.module 'identifiAngular'
         controllerAs: 'messages'
         title: 'Identifi - Latest messages'
       .state 'messages.show',
-        url: '/message/:id'
+        url: '/messages/:id'
         templateUrl: 'app/messages/show.html'
         controller: 'MessagesController'
         controllerAs: 'messages'

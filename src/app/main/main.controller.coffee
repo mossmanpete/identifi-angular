@@ -65,7 +65,7 @@ angular.module('identifiAngular').controller 'MainController', [
       searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
       $scope.searchKey = searchKey
       $scope.previousSearchKey = searchKey
-      limit = limit or 15
+      limit = limit or 10
       cursor = false
       if $scope.ids.list.length
         cursor = $scope.ids.list[$scope.ids.list.length - 1].cursor
@@ -224,6 +224,21 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.$on '$stateChangeStart', ->
       $scope.filters.type = null
 
+    loadMsgs = ->
+      limit = 40
+      cursor = null
+      $scope.msgs.list = []
+      resultFound = (msg) ->
+        $scope.processMessages [msg]
+        $scope.$apply ->
+          $scope.msgs.list.push msg
+      $scope.identifiIndex.getMessagesByTimestamp(resultFound, limit, cursor)
+
+    $scope.$watch 'identifiIndex', ->
+      return unless $scope.identifiIndex
+      loadMsgs()
+      $scope.search()
+
     $scope.uploadFile = (blob) ->
       return new Promise (resolve, reject) ->
         console.log 'uploading', blob
@@ -310,6 +325,9 @@ angular.module('identifiAngular').controller 'MainController', [
           else if $scope.filters.type == 'rating:neutral' and data.rating != neutralRating
             return false
         else if data.type != $scope.filters.type
+          return false
+      else
+        if data.type in ['verification', 'unverification']
           return false
       if $scope.filters.max_distance
         if $scope.filters.max_distance == 0 and typeof value.authorTrustDistance != 'number'

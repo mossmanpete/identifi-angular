@@ -341,9 +341,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         if $state.is 'identities.create'
           focus('idNameFocus')
           $scope.newEntry.name = $scope.capitalizeWords($scope.query.term)
-
-        if $state.is('identities.list') && $scope.query && $scope.query.term == ''
-          $scope.search()
     $scope.$watch 'identifiIndex', load
 
     $scope.qrScanSuccess = (data) ->

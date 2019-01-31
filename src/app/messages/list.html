@@ -4,7 +4,7 @@
       <div class="align-center"><h1>Social networking freedom</h1></div>
 
       <div class="row">
-        <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-download fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-download"></i> All content is stored and indexed on users' devices &mdash; no corporate gatekeepers.</p></div></div>
+        <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-download fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-download"></i> Everything is stored on users' devices &mdash; no corporate gatekeepers.</p></div></div>
         <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-thumbs-up fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-thumbs-up"></i> Filter all content using your web of trust.</p></div></div>
         <div class="col-sm-4"><div class="align-center"><i class="hidden-xs fa fa-check fa-5x mar-bot20"></i><p><i class="hidden-sm hidden-md hidden-lg fa fa-check"></i> Keep your contacts and trusted online identity up-to-date.</p></div></div>
       </div>
@@ -13,8 +13,9 @@
     </div>
 
     <div id="messages" class="row">
+      <div class="mar-top25-xs"></div>
       <div class="col-md-4">
-        <div ng-include="'app/messages/filters.partial.html'"></div>
+        <div class="hidden-xs" ng-include="'app/messages/filters.partial.html'"></div>
       </div>
       <div class="col-md-8">
         <div class="panel panel-default" ng-if="!authentication.user">
@@ -22,21 +23,23 @@
             <form class="form-inline" ng-submit="createUser(newUserName)">
               <div class="form-group">
                 <label for="newUserName" class="mar-right5">Get started</label>
-                <input focus-on="newUser" type="text" id="newUserName" class="form-control" ng-model="newUserName" placeholder="Your name">
+                <input autofocus focus-on="newUser" style="min-width:200px" type="text" id="newUserName" class="form-control" ng-model="newUserName" placeholder="Your name is all we ask">
               </div>
               <button type="submit" class="btn btn-primary" ng-disabled="!newUserName">Create user</button>
-              <div class="form-group mar-left15">
+              <i class="mar-left15 hidden-xs"></i>
+              <i class="mar-top5 visible-xs"></i>
+              <div class="form-group">
                 or <a ng-click="openLoginModal()" href="">Log in</a>
               </div>
             </form>
           </div>
         </div>
         <div ng-include="'app/messages/create.partial.html'"></div>
+        <div class="visible-xs" ng-include="'app/messages/filters.partial.html'"></div>
         <div infinite-scroll="find()" infinite-scroll-distance="1" infinite-scroll-disabled="true">
-          <message ng-repeat="msg in msgs.list | filter:msgFilter | orderBy:'data.timestamp' : true" ipfs="ipfs" msg-data="msg" ng-click="openMessage($event, msg, 'lg')"></message>
+          <message ng-repeat="msg in msgs.list | filter:msgFilter | orderBy:'data.timestamp' : true as filteredMsgs" ipfs="ipfs" msg-data="msg" ng-click="openMessage($event, msg, 'lg')"></message>
         </div>
-        <div us-spinner ng-if="!messages.$resolved" style="position:relative;padding:20px"></div>
-        <div class="alert alert-info text-center" ng-if="!msgs.loading && !msgs.list.length">
+        <div class="alert alert-info text-center" ng-if="!filteredMsgs.length">
           No messages to show
         </div>
       </div>

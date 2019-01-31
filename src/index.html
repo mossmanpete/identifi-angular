@@ -61,7 +61,7 @@
             <div class="inner-addon right-addon">
               <i class="fa fa-search"></i>
               <input type="text" ng-model="query.term"
-              placeholder="Search"
+              placeholder="Search contacts"
               uib-typeahead="identity for identity in search($viewValue, 5)"
               typeahead-no-results="noResults" class="form-control nav-search-field"
               typeahead-on-select="dropdownSearchSelect($item);query.term=''"
@@ -73,7 +73,7 @@
                 <li>
                   <a class="search-result-row" ui-sref="identities.create">
                     <span style="line-height:46px" class="glyphicon glyphicon-plus"></span>
-                    Add entry<span ng-if="query.term">: <span ng-bind="capitalizeWords(query.term)"></span></span>
+                    Add contact<span ng-if="query.term">: <span ng-bind="capitalizeWords(query.term)"></span></span>
                   </a>
                 </li>
               </ul>
