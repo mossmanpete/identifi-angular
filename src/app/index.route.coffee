@@ -13,7 +13,7 @@ angular.module 'identifiAngular'
         controllerAs: 'identities'
         params:
           search: ''
-        title: 'Identifi - Global Address Book'
+        title: 'Identifi - Contacts'
       .state 'identities.create',
         url: '/create'
         templateUrl: 'app/identities/create.html'
@@ -33,7 +33,7 @@ angular.module 'identifiAngular'
         templateUrl: 'app/messages/list.html'
         controller: 'MessagesController'
         controllerAs: 'messages'
-        title: 'Identifi - Latest messages'
+        title: 'Identifi'
       .state 'messages.show',
         url: '/messages/:id'
         templateUrl: 'app/messages/show.html'

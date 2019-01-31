@@ -310,10 +310,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
       $scope.idAttr = new $window.identifiLib.Attribute([$scope.idType, $scope.idValue])
-      if $window.location.hostname.indexOf('.') > -1 # differentiate between localhost / chrome plugin uri and DNS name
-        $scope.idUrl = $state.href('identities.show', {type: $scope.idType, value: $scope.idValue}, {absolute: true})
-      else
-        $scope.idUrl = 'https://identi.fi/' + $state.href('identities.show', {type: $scope.idType, value: $scope.idValue})
+      $scope.idUrl = $scope.getIdUrl($scope.idType, $scope.idValue)
       $scope.isCurrentUser = $scope.authentication and
         $scope.authentication.user and
         $scope.idType == $scope.authentication.user.idType and

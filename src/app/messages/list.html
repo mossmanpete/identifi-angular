@@ -11,11 +11,11 @@
 
       <p class="align-center mar-top15" style="margin-bottom:0"><a ui-sref="about">Read more</a></p>
     </div>
+    <div ng-if="!authentication.user" class="mar-top25-xs"></div>
 
     <div id="messages" class="row">
-      <div class="mar-top25-xs"></div>
       <div class="col-md-4">
-        <div class="hidden-xs" ng-include="'app/messages/filters.partial.html'"></div>
+        <div class="hidden-xs hidden-sm" ng-include="'app/messages/filters.partial.html'"></div>
       </div>
       <div class="col-md-8">
         <div class="panel panel-default" ng-if="!authentication.user">
@@ -34,13 +34,23 @@
             </form>
           </div>
         </div>
+
+        <div ng-if="authentication.user" class="alert alert-info text-center">
+          <p><b>Welcome to social networking freedom!</b></p>
+          <p>Please ask your friends to upvote your account, so they and others will see your messages.</p>
+          <p>If you have an existing trusted account, you can connect it to this account or ask your friends to verify the connection.</p>
+          <p><button ng-click="copyToClipboard(authentication.user.url)" class="btn btn-primary mar-top10">Copy link to your profile</button></p>
+          <p>Or show them your QR code:</p>
+          <div class="mar-top20"><qrcode data="{{authentication.user.url}}" size="240"></qrcode></div>
+        </div>
+
         <div ng-include="'app/messages/create.partial.html'"></div>
-        <div class="visible-xs" ng-include="'app/messages/filters.partial.html'"></div>
+        <div class="visible-xs visible-sm" ng-include="'app/messages/filters.partial.html'"></div>
         <div infinite-scroll="find()" infinite-scroll-distance="1" infinite-scroll-disabled="true">
           <message ng-repeat="msg in msgs.list | filter:msgFilter | orderBy:'data.timestamp' : true as filteredMsgs" ipfs="ipfs" msg-data="msg" ng-click="openMessage($event, msg, 'lg')"></message>
         </div>
         <div class="alert alert-info text-center" ng-if="!filteredMsgs.length">
-          No messages to show
+          No messages yet
         </div>
       </div>
     </div>
