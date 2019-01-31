@@ -238,6 +238,7 @@ angular.module('identifiAngular').controller 'MainController', [
       cursor = null
       $scope.msgs.list = []
       resultFound = (msg) ->
+        console.log 'got msg', msg
         $scope.processMessages [msg]
         $scope.$apply ->
           $scope.msgs.list.push msg
