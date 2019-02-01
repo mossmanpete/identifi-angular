@@ -68,6 +68,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.search = (query, limit) ->
       return unless $scope.identifiIndex
+      $scope.ids.activeKey = -1
       $scope.ids.list = []
       console.log 'search'
       searchKey = encodeURIComponent((query or $scope.query.term or '').toLowerCase())
