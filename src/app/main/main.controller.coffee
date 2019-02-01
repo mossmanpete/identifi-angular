@@ -127,6 +127,11 @@ angular.module('identifiAngular').controller 'MainController', [
       $window.identifiLib.Index.create($scope.gun, $scope.privateKey).then (i) ->
         setIndex(i)
         $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
+        $scope.authentication.identity.gun.on (data) ->
+          if data.receivedPositive and $scope.authentication.identity.data and not $scope.authentication.identity.data.receivedPositive
+            console.log 'great, you got your first upvote!'
+            # TODO: notification
+          $scope.authentication.identity.data = data
 
     privateKey = localStorageService.get('identifiKey')
     if privateKey

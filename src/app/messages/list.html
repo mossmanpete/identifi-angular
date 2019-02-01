@@ -36,14 +36,7 @@
           </div>
         </div>
 
-        <div ng-if="authentication.user" class="alert alert-info text-center">
-          <p class="h3" style="margin-bottom:15px">Welcome to social networking freedom!</p>
-          <p>Please <b>ask your friends to upvote your account</b>, so they and others will see your messages.</p>
-          <p>If you have an existing trusted account, you can use it to connect this account, or ask your friends to verify the connection.</p>
-          <p><button ng-click="copyToClipboard(authentication.user.url)" class="btn btn-primary mar-top10">Copy link to your profile</button></p>
-          <p>Or show them your QR code:</p>
-          <div class="mar-top20"><qrcode data="{{authentication.user.url}}" size="240"></qrcode></div>
-        </div>
+        <div ng-include="'app/main/getstarted.partial.html'"></div>
 
         <div ng-include="'app/messages/create.partial.html'"></div>
         <div class="visible-xs visible-sm" ng-include="'app/messages/filters.partial.html'"></div>

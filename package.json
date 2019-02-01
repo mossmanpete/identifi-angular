@@ -1,6 +1,6 @@
 {
   "name": "identifi-angular",
-  "version": "1.22.21",
+  "version": "1.22.22",
   "main": "electron.js",
   "dependencies": {},
   "files": "dist",
