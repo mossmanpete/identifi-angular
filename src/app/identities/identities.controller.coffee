@@ -255,16 +255,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.setFilters = (filters) ->
       angular.extend $scope.filters, filters
 
-    $scope.uploadProfilePhoto = (blob, identity) ->
-      $scope.uploadFile(blob).then (files) ->
-        console.log files, $scope.identity
-        recipient = [[$scope.idType, $scope.idValue], ['profilePhoto', '/ipfs/' + files[0].path]]
-        $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
-          $scope.hideProfilePhoto = true # There's a weird bug where the profile identicon doesn't update
-          $scope.identifiIndex.addMessage(m, $scope.ipfs).then ->
-            $scope.hideProfilePhoto = false
-          $scope.uploadModal.close()
-
     $scope.uploadCoverPhoto = (blob, identity) ->
       $scope.uploadFile(blob).then (files) ->
         console.log files, $scope.identity
@@ -296,10 +286,6 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         document.activeElement.blur()
       $scope.$on '$stateChangeStart', ->
         $scope.readQRModal.close()
-
-    $scope.openProfilePhotoUploadModal = ->
-      return unless $scope.authentication.identity
-      $scope.openUploadModal($scope.uploadProfilePhoto, 'Upload profile photo', true)
 
     $scope.openCoverPhotoUploadModal = ->
       return unless $scope.authentication.identity

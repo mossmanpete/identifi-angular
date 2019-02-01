@@ -2,13 +2,27 @@
   <p class="h3" style="margin-bottom:15px">Welcome to social networking freedom!</p>
   <p>Start by upvoting your friends: ask for their profile links or scan their QR codes (<b><a ui-sref="identities.create">Add contact</a></b>). That makes their posts visible to you.</p>
   <p>Alternatively, you can upvote this Identifi distribution's <b><a ui-sref="identities.show({type:'keyID', value:defaultIndexKeyID})">default address book</a></b> as a starting point.</p>
+  <br>
 </div>
 
 <div ng-if="authentication.user && authentication.identity.data && authentication.identity.data.sentPositive && !authentication.identity.data.receivedPositive" class="alert alert-info text-center">
   <p class="h3" style="margin-bottom:15px">Great, you have trusted contacts!</p>
-  <p>Next you should <b>ask your friends to upvote your account</b>, so they and others will see your messages.</p>
+  <p>Next you should <b>ask your friends to upvote your account</b>, so they and their network will see your messages.</p>
   <p>If you have an existing trusted account, you can use it to connect this account, or ask your friends to verify the connection.</p>
   <p><button ng-click="copyToClipboard(authentication.user.url)" class="btn btn-primary mar-top10">Copy link to your profile</button></p>
   <p>Or show them your QR code:</p>
   <div class="mar-top20"><qrcode data="{{authentication.user.url}}" size="240"></qrcode></div>
+  <br>
+</div>
+
+<div ng-if="authentication.user && authentication.identity.data && authentication.identity.data.sentPositive && authentication.identity.data.receivedPositive && localSettings && !localSettings.profileUploadNotificationClosed && authentication.identity.mva && !authentication.identity.mva.profilePhoto" class="alert alert-info text-center">
+  <p class="h3" style="margin-bottom:15px">You're good to go!</p>
+  <p style="margin-bottom: 15px">
+    Set a profile picture?
+  </p>
+  <p>
+    <button class="btn btn-primary mar-right15" ng-click="openProfilePhotoUploadModal()">Yes</button>
+    <button class="btn btn-default" ng-click="closeProfileUploadNotification()">Not now</button>
+  </p>
+  <br>
 </div>

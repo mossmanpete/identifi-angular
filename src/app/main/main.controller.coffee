@@ -10,6 +10,7 @@ angular.module('identifiAngular').controller 'MainController', [
   'clipboard'
   '$uibModal'
   '$window'
+  '$stateParams'
   '$q'
   'focus'
 
@@ -17,7 +18,7 @@ angular.module('identifiAngular').controller 'MainController', [
   #'Menus'
   #'Persona'
   ($scope, $rootScope, $location, $http, $state, config,
-  localStorageService, clipboard, $uibModal, $window, $q, focus) -> # Authentication, Menus, Persona
+  localStorageService, clipboard, $uibModal, $window, $stateParams, $q, focus) -> # Authentication, Menus, Persona
     hosts = ['https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun']
     if $window.location.protocol == "https:"
       $scope.gun = new Gun(hosts)
@@ -127,6 +128,10 @@ angular.module('identifiAngular').controller 'MainController', [
       $window.identifiLib.Index.create($scope.gun, $scope.privateKey).then (i) ->
         setIndex(i)
         $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
+        $scope.authentication.identity.gun.get('attrs').open (val, key, msg, eve) ->
+          mva = $window.identifiLib.Identity.getMostVerifiedAttributes(val)
+          $scope.authentication.identity.mva = mva
+          eve.off() if mva.profilePhoto
         $scope.authentication.identity.gun.on (data) ->
           if data.receivedPositive and $scope.authentication.identity.data and not $scope.authentication.identity.data.receivedPositive
             console.log 'great, you got your first upvote!'
@@ -152,6 +157,33 @@ angular.module('identifiAngular').controller 'MainController', [
       $window.ipfs = $scope.ipfs
       $scope.updateIpfsPeers()
       setInterval $scope.updateIpfsPeers, 5000
+
+    $scope.localSettings = localStorageService.get('localSettings') || {}
+    $scope.closeProfileUploadNotification = ->
+      $scope.localSettings.profileUploadNotificationClosed = true
+      localStorageService.set('localSettings', $scope.localSettings)
+
+    $scope.openProfilePhotoUploadModal = ->
+      return unless $scope.authentication.identity
+      $scope.openUploadModal($scope.uploadProfilePhoto, 'Upload profile photo', true)
+
+    $scope.uploadProfilePhoto = (blob, identity) ->
+      $scope.uploadFile(blob).then (files) ->
+        console.log files, $scope.identity
+        if $state.is 'identities.show'
+          attr = [$stateParams.type, $stateParams.value]
+        else
+          id = $scope.authentication.user
+          attr = [id.idType, id.idValue]
+          $scope.closeProfileUploadNotification()
+        recipient = [attr, ['profilePhoto', '/ipfs/' + files[0].path]]
+        $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
+          $scope.hideProfilePhoto = true # There's a weird bug where the profile identicon doesn't update
+          $scope.identifiIndex.addMessage(m, $scope.ipfs).then ->
+            $scope.hideProfilePhoto = false
+            if !$state.is 'identities.show'
+              $state.go 'identities.show', { type: id.idType, value: id.idValue }
+          $scope.uploadModal.close()
 
     $scope.setPageTitle = (title) ->
       $rootScope.pageTitle = 'Identifi'
@@ -330,6 +362,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.publicKey = null
       $scope.logoutModal.close()
       $scope.loadDefaultIndex()
+      $scope.localSettings = {}
 
     $scope.msgFilter = (value, index, array) ->
       data = value.data or value.signedData
