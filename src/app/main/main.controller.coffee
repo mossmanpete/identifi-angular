@@ -18,7 +18,7 @@ angular.module('identifiAngular').controller 'MainController', [
   #'Persona'
   ($scope, $rootScope, $location, $http, $state, config,
   localStorageService, clipboard, $uibModal, $window, $q, focus) -> # Authentication, Menus, Persona
-    hosts = ['https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun', 'https://node1.identi.fi/gun']
+    hosts = ['https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun']
     if $window.location.protocol == "https:"
       $scope.gun = new Gun(hosts)
     else
@@ -91,6 +91,10 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.ids.list.push i
 
       $scope.identifiIndex.search(searchKey, undefined, resultFound, limit, cursor)
+      return new Promise (resolve) -> # TODO: uib-typeahead is limited, but something better pls
+        setTimeout ->
+          resolve($scope.ids.list)
+        , 1000
 
     setIndex = (results) ->
       $scope.query.term = '' if $scope.query.term != ''
