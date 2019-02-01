@@ -6,7 +6,7 @@
         <h4 ng-show="idType === 'keyID' || idType === 'uuid'">
           <identicon identity="idAttr" width=35></identicon>
           <button class="btn btn-default mar-left15" ng-click="openShareModal()">
-            <span class="glyphicon glyphicon-share mar-right5"></span> Share
+            <span class="glyphicon glyphicon-qrcode mar-right5"></span> Share
           </button>
         </h4>
         <h4 ng-hide="idType === 'keyID' || idType === 'uuid'">
@@ -16,7 +16,7 @@
             <a ng-href="{{idValue}}" ng-show="idType === 'url'" ng-bind="idType" class="idType"></a>
           </small>
           <button class="btn btn-default mar-left15" ng-click="openShareModal()">
-            <span class="glyphicon glyphicon-share mar-right5"></span> Share
+            <span class="glyphicon glyphicon-qrcode mar-right5"></span> Share
           </button>
         </h4>
       </div>
