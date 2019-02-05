@@ -32,9 +32,9 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.getIdUrl = (type, value) ->
       if $window.location.hostname.indexOf('.') > -1 # differentiate between localhost / chrome plugin uri and DNS name
-        return $state.href('identities.show', {type, value}, {absolute: true})
+        return $state.href('identities.show', {type, value}, {absolute: true}) + '?share'
       else
-        return 'https://identi.fi/' + $state.href('identities.show', {type, value})
+        return 'https://identi.fi/' + $state.href('identities.show', {type, value}) + '?share'
 
     $scope.getIdKey = (id) ->
       if Array.isArray(id)

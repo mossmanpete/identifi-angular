@@ -42,6 +42,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         hidePointerLabels: true
         hideLimitLabels: true
 
+    $scope.share = true if $location.search().share
+
     $scope.$on 'MessageAdded', (event, args) ->
       $state.reload()
 
