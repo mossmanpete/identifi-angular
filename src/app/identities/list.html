@@ -1,7 +1,7 @@
 <div class="container no-padding-xs">
   <section>
     <div class="mar-top25-xs"></div>
-    <div ng-include="'app/main/getstarted.partial.html'"></div>
+    <div ng-if="!query.term" ng-include="'app/main/getstarted.partial.html'"></div>
 
     <table id="search-results" class="table table-hover" infinite-scroll="search(query.term)" infinite-scroll-distance="1" infinite-scroll-disabled="true">
       <tbody>

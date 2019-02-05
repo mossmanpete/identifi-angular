@@ -200,12 +200,20 @@
     </div>
         <div class="col-md-8 id-right-column">
           <!-- Nav tabs -->
+          <div ng-include="'app/main/createuser.partial.html'"></div>
+
           <uib-tabset active="activeTab">
             <uib-tab index="1" ng-if="isUniqueType">
               <uib-tab-heading>
                 <span class="hidden-xs">Received ({{0+identity.data.receivedPositive+identity.data.receivedNeutral+identity.data.receivedNegative}})</span>
                 <span class="visible-xs">Recv ({{0+identity.data.receivedPositive+identity.data.receivedNeutral+identity.data.receivedNegative}})</span>
               </uib-tab-heading>
+
+              <div class="panel panel-info" ng-if="authentication.user && authentication.identity.data && !authentication.identity.data.sentPositive">
+                <div class="panel-heading">
+                  Trust this user? Upvote them to see their posts!
+                </div>
+              </div>
 
               <div ng-show="authentication.user" class="panel panel-default panel-success">
                 <div class="panel-body" id="write-feedback">

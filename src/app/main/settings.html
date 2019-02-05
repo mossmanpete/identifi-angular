@@ -1,36 +1,38 @@
 <div class="container">
   <div class="col-md-8">
     <h3>Settings</h3>
-    <p><b>For normal people</b></p>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        Log out
+    <div ng-if="authentication.user">
+      <p><b>For normal people</b></p>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          Log out
+        </div>
+        <div class="panel-body">
+          <p>
+            You cannot log in back to this account unless you have saved a backup of your private key.
+          </p>
+          <p>
+            <button class="btn btn-danger" ng-click="openLogoutModal()">
+              Log out
+            </button>
+          </p>
+        </div>
       </div>
-      <div class="panel-body">
-        <p>
-          You cannot log in back to this account unless you have saved a backup of your private key.
-        </p>
-        <p>
-          <button class="btn btn-danger" ng-click="openLogoutModal()">
-            Log out
-          </button>
-        </p>
-      </div>
-    </div>
-    <div class="panel panel-danger">
-      <div class="panel-heading">
-        Private key
-      </div>
-      <div class="panel-body">
-        <p>Private key is used to log in to your account. Keep your private key safe!</p>
-        <p>
-          <button class="btn btn-danger" ng-click="copyToClipboard(privateKey|json)">
-            Copy to clipboard
-          </button>
-          <button class="btn btn-danger" ng-click="downloadText(privateKey|json)">
-            Download
-          </button>
-        </p>
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          Private key
+        </div>
+        <div class="panel-body">
+          <p>Private key is used to log in to your account. Keep your private key safe!</p>
+          <p>
+            <button class="btn btn-danger" ng-click="copyToClipboard(privateKey|json)">
+              Copy to clipboard
+            </button>
+            <button class="btn btn-danger" ng-click="downloadText(privateKey|json)">
+              Download
+            </button>
+          </p>
+        </div>
       </div>
     </div>
     <p><b>Geeky stuff</b></p>

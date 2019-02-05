@@ -18,24 +18,7 @@
         <div class="hidden-xs hidden-sm" ng-include="'app/messages/filters.partial.html'"></div>
       </div>
       <div class="col-md-8">
-        <div class="panel panel-default" ng-if="!authentication.user">
-          <div class="panel-body">
-            <form class="form-inline" ng-submit="createUser(newUserName)">
-              <div class="form-group">
-                <label for="newUserName" class="mar-right5">Get started</label>
-                <input autofocus focus-on="newUser" style="min-width:200px" type="text" id="newUserName" class="form-control" ng-model="newUserName" placeholder="Your name is all we ask">
-              </div>
-              <i class="hidden-xs mar-right5"></i>
-              <button type="submit" class="btn btn-primary" ng-disabled="!newUserName">Create user</button>
-              <i class="mar-left15 hidden-xs"></i>
-              <i class="mar-top5 visible-xs"></i>
-              <div class="form-group">
-                or <a ng-click="openLoginModal()" href="">Log in</a>
-              </div>
-            </form>
-          </div>
-        </div>
-
+        <div ng-include="'app/main/createuser.partial.html'"></div>
         <div ng-include="'app/main/getstarted.partial.html'"></div>
 
         <div ng-include="'app/messages/create.partial.html'"></div>
