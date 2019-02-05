@@ -17,7 +17,13 @@
       <form>
         <textarea rows="6" class="form-control" placeholder="Paste private key or drop file" ng-model="privateKeySerialized"></textarea><br>
         <button class="btn btn-primary" ng-disabled="!privateKeySerialized" ng-click="loginWithKey(privateKeySerialized, publicKeyPEM)">Log in</button>
+        <a class="pull-right" href="" ng-click="lostKey = !lostKey">Lost your key?</a>
       </form>
+      <div ng-if="lostKey" class="mar-top30 panel panel-info">
+        <div class="panel-heading">
+          Don't worry: just go with "New user" and ask your web of trust to verify that your new key belongs to the already existing identity.
+        </div>
+      </div>
     </div>
   </div>
 </div>
