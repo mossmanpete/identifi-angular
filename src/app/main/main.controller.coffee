@@ -325,7 +325,7 @@ angular.module('identifiAngular').controller 'MainController', [
           console.log 'msg', msg
           $scope.identifiIndex.addMessage(msg, $scope.ipfs)
       .catch (e) ->
-        console.error('failed to create user:', e);
+        console.error('failed to create user:', e)
         $scope.creatingUser = false
 
     $scope.generateKey = ->

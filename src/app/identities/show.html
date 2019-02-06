@@ -209,6 +209,8 @@
                 <span class="visible-xs">Recv ({{0+identity.data.receivedPositive+identity.data.receivedNeutral+identity.data.receivedNegative}})</span>
               </uib-tab-heading>
 
+              <div ng-if="isCurrentUser" ng-include="'app/main/getstarted.partial.html'"></div>
+
               <div class="panel panel-info" ng-if="!isCurrentUser && authentication.user && authentication.identity.data && !authentication.identity.data.sentPositive">
                 <div class="panel-heading">
                   Trust this user? Upvote them to see their posts!
@@ -262,7 +264,6 @@
                 <message ipfs="ipfs" msg-data="msg" page-info="identity" ng-repeat="msg in received | filter:msgFilter | orderBy:'data.timestamp' : true as receivedFiltered" ng-click="openMessage($event, msg, 'lg')"></message>
               </div>
               <div ng-if="!isCurrentUser && receivedFiltered.length == 0" class="alert alert-info text-center">No messages yet</div>
-              <div ng-if="isCurrentUser" ng-include="'app/main/getstarted.partial.html'"></div>
             </uib-tab>
             <uib-tab index="2" ng-if="isUniqueType">
               <uib-tab-heading>Sent ({{0+identity.data.sentPositive+identity.data.sentNeutral+identity.data.sentNegative}})</uib-tab-heading>
