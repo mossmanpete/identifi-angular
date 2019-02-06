@@ -307,6 +307,7 @@ angular.module('identifiAngular').controller 'MainController', [
         fileReader.readAsArrayBuffer(blob)
 
     $scope.createUser = (name) ->
+      $scope.creatingUser = true
       $window.identifiLib.Key.generate()
       .then (key) ->
         $scope.privateKey = key
@@ -319,9 +320,13 @@ angular.module('identifiAngular').controller 'MainController', [
         added = false
         $scope.$watch 'identifiIndex', () ->
           return if added
+          $scope.creatingUser = false
           added = true
           console.log 'msg', msg
           $scope.identifiIndex.addMessage(msg, $scope.ipfs)
+      .catch (e) ->
+        console.error('failed to create user:', e);
+        $scope.creatingUser = false
 
     $scope.generateKey = ->
       $window.identifiLib.Key.generate().then (key) ->
