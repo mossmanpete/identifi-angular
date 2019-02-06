@@ -29,16 +29,6 @@
         <p>It's important to remember that as for now, <b>everything you post on Identifi is public</b>.</p>
         <p>Private chat between users will probably be implemented at some point, and other user permissions and groups maybe later.</p>
 
-        <h4>Technology</h4>
-        <p>
-          Identifi uses <a href="https://gun.eco">GUN</a> for indexing and <a href="https://ipfs.io">IPFS</a> for messages, images and other static data.
-        </p>
-        <p>Identifi is free and open source software. The project is in alpha development stage. <b>Contributions welcome!</b></p>
-        <ul>
-          <li><a href="https://github.com/identifi/identifi">Source code</a></li>
-          <li><a href="https://cdn.rawgit.com/identifi/identifi-lib/b979abf6/example/browser.html">Technical description of Identifi with live code</a></li>
-        </ul>
-
         <h4>Available at</h4>
         <ul>
           <li><a href="https://identi.fi">https://identi.fi</a></li>
@@ -48,6 +38,30 @@
           <!-- TODO: add dynamically updated /ipfs url -->
           <li>Upcoming: Electrum desktop app with bluetooth and LAN peerfinding!</li>
         </ul>
+
+        <h4>Technology</h4>
+        <p>
+          Identifi uses <a href="https://gun.eco">GUN</a> for indexing and <a href="https://ipfs.io">IPFS</a> for messages, images and other static data.
+        </p>
+
+        <p>Identifi is free and open source software. The project is in alpha development stage. <b>Contributions welcome!</b></p>
+        <ul>
+          <li><a href="https://github.com/identifi/identifi">Source code</a></li>
+          <li><a href="https://cdn.rawgit.com/identifi/identifi-lib/b979abf6/example/browser.html">Technical description of Identifi with live code</a></li>
+        </ul>
+
+        <h5>Future tech</h5>
+        <p>
+          Currently the weak point of Identifi's decentralization is the list of initial peers, which could easily be blocked by governments or ISPs. By default, the application connects to IPFS default peers and a couple GUN peers. You can always add peers manually on the <a ui-sref="settings">settings page</a>, but that is cumbersome for the average user.
+        </p>
+
+        <p>
+          We already have a multicast module prototype for GUN which can find peers on the same local area network. Bluetooth modules are not yet implemented, but will enable a network of peers that need to meet each other only occasionally.
+        </p>
+
+        <p>
+          On the wide area network level, Identifi trusted contacts could exchange network addresses privately to avoid having them blocked or tracked. <a href="https://en.wikipedia.org/wiki/Hole_punching_(networking)">Hole punching</a> techniques can be used for direct connections between peers that are behind NAT / firewall.
+        </p>
       </div>
     </div>
   </div>
