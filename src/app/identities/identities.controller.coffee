@@ -332,7 +332,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       a = data.split('/')
       if data.indexOf 'https://identi.fi' == 0 and a.length > 4
         type = a[a.length - 2]
-        value = a[a.length - 1]
+        value = a[a.length - 1].split('?')[0]
         $state.go 'identities.show', {type, value}
       else
         console.log 'Unrecognized identity url', data

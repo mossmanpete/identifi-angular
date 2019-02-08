@@ -1,6 +1,6 @@
 {
   "name": "identifi-angular",
-  "version": "1.22.26",
+  "version": "1.22.27",
   "dependencies": {
     "jquery": "~3.3.1",
     "angular": "^1.7.6",
@@ -22,7 +22,7 @@
     "angular-local-storage": "^0.7.1",
     "angularjs-slider": "^6.6.0",
     "gun": "0.9.9999991",
-    "identifi-lib": "0.0.78",
+    "identifi-lib": "0.0.79",
     "angular-clipboard": "^1.6.2",
     "angular-qrcode": "^7.2.0",
     "ng-file-upload": "^12.2.13",

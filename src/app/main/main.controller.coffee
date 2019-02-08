@@ -20,11 +20,10 @@ angular.module('identifiAngular').controller 'MainController', [
   ($scope, $rootScope, $location, $http, $state, config,
   localStorageService, clipboard, $uibModal, $window, $stateParams, $q, focus) -> # Authentication, Menus, Persona
     hosts = ['https://identifi.herokuapp.com/gun', 'https://identifi2.herokuapp.com/gun']
-    if $window.location.protocol == "https:"
-      $scope.gun = new Gun(hosts)
-    else
+    if $window.location.protocol != "https:"
       hosts.push('http://localhost:8765/gun')
-      $scope.gun = new Gun(hosts)
+
+    $scope.gun = new Gun(hosts)
 
     # TODO: move everything to main controller?
     # set authentication
