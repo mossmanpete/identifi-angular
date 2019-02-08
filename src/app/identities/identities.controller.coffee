@@ -330,9 +330,11 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.qrScanSuccess = (data) ->
       a = data.split('/')
-      if data.indexOf 'https://identi.fi' == 0 and a.length > 4
-        type = a[a.length - 2]
-        value = a[a.length - 1].split('?')[0]
+      if a.length > 4
+        type = decodeURIComponent(a[a.length - 2])
+        value = decodeURIComponent(a[a.length - 1].split('?')[0])
+        console.log 'value', value
+        console.log 'data', data
         $state.go 'identities.show', {type, value}
       else
         console.log 'Unrecognized identity url', data
