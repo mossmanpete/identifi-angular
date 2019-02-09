@@ -39,7 +39,7 @@ angular.module('identifiAngular').controller 'MainController', [
       if Array.isArray(id)
         return encodeURIComponent(id[0]) + ':' + encodeURIComponent(id[1])
       else
-        return encodeURIComponent(id.name) + ':' + encodeURIComponent(id.val)
+        return encodeURIComponent(id.type) + ':' + encodeURIComponent(id.value)
 
     $scope.defaultIndexKeyID = '_D8nRhjFgAGo8frfJHMi4H7M7fTMB2LJshgeKyLaL1Y.9uNU0eQO-1ThgA9fJXFFN3yYbk9SNewC2Pz4mvQvGUE'
     $scope.query = {}
@@ -103,13 +103,13 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.msgs.list = []
       $scope.identifiIndex = results
       console.log 'Got index', $scope.identifiIndex
-      $scope.viewpoint.identity = $scope.identifiIndex.get($scope.viewpoint.val, $scope.viewpoint.name)
+      $scope.viewpoint.identity = $scope.identifiIndex.get($scope.viewpoint.type, $scope.viewpoint.value)
       $scope.viewpoint.identity.gun.get('attrs').open (attrs) ->
         $scope.viewpoint.attrs = attrs
         $scope.viewpoint.mostVerifiedAttributes = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
 
     $scope.loadDefaultIndex = ->
-      $scope.viewpoint = {name: 'keyID', val: $scope.defaultIndexKeyID}
+      $scope.viewpoint = {type: 'keyID', value: $scope.defaultIndexKeyID}
       setIndex new $window.identifiLib.Index($scope.gun.user($scope.defaultIndexKeyID).get('identifi'))
 
     $scope.loginWithKey = (privateKeySerialized) ->
@@ -121,12 +121,12 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.authentication.user.url = $scope.getIdUrl 'keyID', $scope.authentication.user.idValue
       $scope.loginModal.close() if $scope.loginModal
       keyID = $window.identifiLib.Key.getId($scope.privateKey)
-      $scope.viewpoint = {name: 'keyID', val: keyID}
+      $scope.viewpoint = {type: 'keyID', value: keyID}
       $scope.ids.list = []
       $scope.msgs.list = []
       $window.identifiLib.Index.create($scope.gun, $scope.privateKey).then (i) ->
         setIndex(i)
-        $scope.authentication.identity = $scope.identifiIndex.get(keyID, 'keyID')
+        $scope.authentication.identity = $scope.identifiIndex.get('keyID', keyID)
         $scope.authentication.identity.gun.get('attrs').open (val, key, msg, eve) ->
           mva = $window.identifiLib.Identity.getMostVerifiedAttributes(val)
           $scope.authentication.identity.mva = mva
@@ -169,13 +169,13 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.uploadProfilePhoto = (blob, identity) ->
       $scope.uploadFile(blob).then (files) ->
         console.log files, $scope.identity
+        recipient =
+          profilePhoto: '/ipfs/' + files[0].path
         if $state.is 'identities.show'
-          attr = [$stateParams.type, $stateParams.value]
+          recipient[$stateParams.type] = $stateParams.value
         else
-          id = $scope.authentication.user
-          attr = [id.idType, id.idValue]
+          recipient.keyID = $scope.authentication.user.idValue
           $scope.closeProfileUploadNotification()
-        recipient = [attr, ['profilePhoto', '/ipfs/' + files[0].path]]
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
           $scope.hideProfilePhoto = true # There's a weird bug where the profile identicon doesn't update
           $scope.identifiIndex.addMessage(m, $scope.ipfs).then ->
@@ -313,7 +313,9 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.privateKeySerialized = $window.identifiLib.Key.toJwk($scope.privateKey)
         $scope.loginWithKey($scope.privateKeySerialized)
       .then ->
-        recipient = [['keyID', $window.identifiLib.Key.getId($scope.privateKey)], ['name', name]]
+        recipient =
+          keyID: $window.identifiLib.Key.getId($scope.privateKey),
+          name: name
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
       .then (msg) ->
         added = false
@@ -414,12 +416,12 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.message.recipient.gun.get('attrs').open (d) ->
         mva = $window.identifiLib.Identity.getMostVerifiedAttributes(d)
         if mva.name
-          $scope.$apply -> $scope.message.recipient_name = mva.name.attribute.val
+          $scope.$apply -> $scope.message.recipient_name = mva.name.attribute.value
         else if mva.nickname
-          $scope.$apply -> $scope.message.recipient_name = mva.nickname.attribute.val
+          $scope.$apply -> $scope.message.recipient_name = mva.nickname.attribute.value
       $scope.message.signerKeyID = $scope.message.getSignerKeyID()
-      $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
-      $scope.message.verifiedByAttr = new $window.identifiLib.Attribute(['keyID', $scope.message.signerKeyID])
+      $scope.message.verifiedBy = $scope.identifiIndex.get('keyID', $scope.message.signerKeyID)
+      $scope.message.verifiedByAttr = new $window.identifiLib.Attribute('keyID', $scope.message.signerKeyID)
       $scope.messageModal = $uibModal.open(
         animation: $scope.animationsEnabled
         templateUrl: 'app/messages/show.modal.html'
@@ -447,43 +449,44 @@ angular.module('identifiAngular').controller 'MainController', [
         msg.author.gun.get('attrs').open (d) ->
           mva = $window.identifiLib.Identity.getMostVerifiedAttributes(d)
           if mva.name
-            $scope.$apply -> msg.author_name = mva.name.attribute.val
+            $scope.$apply -> msg.author_name = mva.name.attribute.value
           else if mva.nickname
-            $scope.$apply -> msg.author_name = mva.nickname.attribute.val
+            $scope.$apply -> msg.author_name = mva.nickname.attribute.value
         msg.recipient = msg.getRecipient($scope.identifiIndex)
         msg.recipient.gun.get('attrs').open (d) ->
           mva = $window.identifiLib.Identity.getMostVerifiedAttributes(d)
           if mva.name
-            $scope.$apply -> msg.recipient_name = mva.name.attribute.val
+            $scope.$apply -> msg.recipient_name = mva.name.attribute.value
           else if mva.nickname
-            $scope.$apply -> msg.recipient_name = mva.nickname.attribute.val
+            $scope.$apply -> msg.recipient_name = mva.nickname.attribute.value
         $scope.$apply ->
           # TODO: make sure message signature is checked
-
           msg.linkToAuthor = msg.data.author[0]
           i = undefined
           i = 0
           smallestIndex = 1000
-          while i < msg.data.author.length
-            index = Object.keys($window.identifiLib.Attribute.getUniqueIdValidators()).indexOf(msg.data.author[i][0])
+          it = msg.getAuthorIterable()
+          while a = it.next()
+            index = Object.keys($window.identifiLib.Attribute.getUniqueIdValidators()).indexOf(a.type)
             if index > -1 and index < smallestIndex
               smallestIndex = index
-              msg.linkToAuthor = msg.data.author[i]
-            else if !msg.author_name and msg.data.author[i][0] in ['name', 'nickname']
-              msg.author_name = msg.data.author[i][1]
+              msg.linkToAuthor = a
+            else if !msg.author_name and a.type in ['name', 'nickname']
+              msg.author_name = a.value
             i++
-          msg.linkToRecipient = msg.data.recipient[0]
+          # msg.linkToRecipient = msg.data.recipient[0]
           i = 0
           smallestIndex = 1000
-          while i < msg.data.recipient.length
-            index = Object.keys($window.identifiLib.Attribute.getUniqueIdValidators()).indexOf(msg.data.recipient[i][0])
+          it = msg.getAuthorIterable()
+          while a = it.next()
+            index = Object.keys($window.identifiLib.Attribute.getUniqueIdValidators()).indexOf(a.type)
             if index > -1 and index < smallestIndex
               smallestIndex = index
-              msg.linkToRecipient = msg.data.recipient[i]
-            else if !msg.recipient_name and msg.data.recipient[i][0] in ['name', 'nickname']
-              msg.recipient_name = msg.data.recipient[i][1]
+              msg.linkToRecipient = a
+            else if !msg.recipient_name and a.type in ['name', 'nickname']
+              msg.recipient_name = a.value
             i++
-          if msg.linkToAuthor[0] == msg.linkToRecipient[0] and msg.linkToAuthor[1] == msg.linkToRecipient[1]
+          if msg.linkToAuthor.equals(msg.linkToRecipient)
             msg.sameAuthorAndRecipient = true
           signedData = msg.data
           alpha = undefined
@@ -548,17 +551,17 @@ angular.module('identifiAngular').controller 'MainController', [
         $scope.$apply ->
           mva = $window.identifiLib.Identity.getMostVerifiedAttributes(attrs)
           if mva.name
-            i.primaryName = mva.name.attribute.val
+            i.primaryName = mva.name.attribute.value
             i.hasProperName = true
             i.verified = true if mva.name.verified
           else if mva.nickname
-            i.primaryName = mva.nickname.attribute.val
+            i.primaryName = mva.nickname.attribute.value
             i.hasProperName = true
           else
-            i.primaryName = Object.values(attrs)[0].val
+            i.primaryName = Object.values(attrs)[0].value
           if i.primaryName
-            if mva.nickname and mva.nickname.attribute.val != i.primaryName
-              i.nickname = mva.nickname.attribute.val
+            if mva.nickname and mva.nickname.attribute.value != i.primaryName
+              i.nickname = mva.nickname.attribute.value
               i.nickname = i.nickname.replace('<', '&lt;') if htmlSafe
             i.primaryName = i.primaryName.replace('<', '&lt;') if htmlSafe
           $scope.setPageTitle i.primaryName if setTitle
@@ -588,7 +591,7 @@ angular.module('identifiAngular').controller 'MainController', [
             $state.go 'identities.create'
           else
             id = $scope.ids.list[$scope.ids.activeKey]
-            $state.go 'identities.show', { type: id.linkTo.name, value: id.linkTo.val }
+            $state.go 'identities.show', { type: id.linkTo.type, value: id.linkTo.value }
         when -1
           clearTimeout $scope.timer
           $scope.query.term = ''
@@ -606,7 +609,7 @@ angular.module('identifiAngular').controller 'MainController', [
           break
 
     $scope.dropdownSearchSelect = (item) ->
-      $state.go('identities.show', { type: item.linkTo.name, value: item.linkTo.val })
+      $state.go('identities.show', { type: item.linkTo.type, value: item.linkTo.val })
       $scope.query.term = ''
 
     $scope.addGunPeer = (url) ->

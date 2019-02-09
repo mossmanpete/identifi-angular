@@ -49,9 +49,9 @@ angular.module('identifiAngular').controller 'MessagesController', [
           $scope.setPageTitle 'Message ' + hash
           $scope.setMsgRawData($scope.message)
           $scope.message.signerKeyID = $scope.message.getSignerKeyID()
-          $scope.message.verifiedBy = $scope.identifiIndex.get($scope.message.signerKeyID, 'keyID')
+          $scope.message.verifiedBy = $scope.identifiIndex.get('keyID', $scope.message.signerKeyID)
           $scope.setIdentityNames($scope.message.verifiedBy, true)
-          $scope.message.verifiedByAttr = new $window.identifiLib.Attribute(['keyID', $scope.message.signerKeyID])
+          $scope.message.verifiedByAttr = new $window.identifiLib.Attribute('keyID', $scope.message.signerKeyID)
         if hash.match /^Qm[1-9A-Za-z]{40,50}$/ # looks like an ipfs address
           $scope.ipfsGet(hash).then (res) ->
             s = JSON.parse(res.toString())

@@ -105,8 +105,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           (b.conf - 2 * b.ref) - (a.conf - 2 * a.ref)
         for conn in $scope.connections
           return unless conn.name and conn.val
-          conn.attr = new $window.identifiLib.Attribute([conn.name, conn.val])
-          conn.isCurrent = conn.name == $scope.idType and conn.val == $scope.idValue
+          conn.attr = new $window.identifiLib.Attribute(conn.type, conn.value)
+          conn.isCurrent = new $window.identifiLib.Attribute($scope.idType, $scope.idValue).equals(conn.attr)
           switch conn.name
             when 'email'
               conn.iconStyle = 'glyphicon glyphicon-envelope'
@@ -297,7 +297,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       return unless $scope.identifiIndex
       $scope.idType = $stateParams.type
       $scope.idValue = $stateParams.value
-      $scope.idAttr = new $window.identifiLib.Attribute([$scope.idType, $scope.idValue])
+      $scope.idAttr = new $window.identifiLib.Attribute($scope.idType, $scope.idValue)
       $scope.idUrl = $scope.getIdUrl($scope.idType, $scope.idValue)
       $scope.isCurrentUser = $scope.authentication and
         $scope.authentication.user and
@@ -308,7 +308,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $state.go 'identities.list', { search: $scope.idValue }
         $scope.tabs[2].active = true if $scope.tabs
       $scope.setPageTitle $scope.idValue
-      $scope.identity = $scope.identifiIndex.get($scope.idValue, $scope.idType)
+      $scope.identity = $scope.identifiIndex.get($scope.idType, $scope.idValue)
       $scope.setIdentityNames($scope.identity, false, true)
       $scope.identity.gun.on (data) ->
         $scope.identity.data = data
