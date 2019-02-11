@@ -38,7 +38,7 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.getIdKey = (id) ->
       return encodeURIComponent(id.type) + ':' + encodeURIComponent(id.value)
 
-    $scope.defaultIndexKeyID = '_D8nRhjFgAGo8frfJHMi4H7M7fTMB2LJshgeKyLaL1Y.9uNU0eQO-1ThgA9fJXFFN3yYbk9SNewC2Pz4mvQvGUE'
+    $scope.defaultIndexKeyID = 'b8ByaYNBDCMLNdZqMdas5oUFLCxBf2VH3-NjUulDaTo.DVzINErRVs6m5tyjAux6fcNfndadcgZVN5hLSwYTCLc'
     $scope.query = {}
     $scope.query.term = ''
     $scope.previousSearchKey = ''
