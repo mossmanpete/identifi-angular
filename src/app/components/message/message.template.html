@@ -1,34 +1,34 @@
-<div class="panel msg" ng-class="{'panel-info':$ctrl.msgData.isVerification, 'panel-default':$ctrl.msgData.isPost}" style="{{$ctrl.msgData.bgColor}}" ng-if="$ctrl.msgData.data">
+<div class="panel msg" ng-class="{'panel-info':$ctrl.msgData.isVerification, 'panel-default':$ctrl.msgData.isPost}" style="{{$ctrl.msgData.bgColor}}" ng-if="$ctrl.msgData.signedData">
   <div class="message-panel" ng-class="{ 'panel-body': !$ctrl.msgData.isVerification, 'panel-heading': $ctrl.msgData.isVerification || $ctrl.msgData.isUnverification }">
     <p class="">
       <span class="mar-left5 pull-right" ng-class="$ctrl.msgData.iconStyle" ng-repeat="n in $ctrl.msgData.iconCount track by $index"></span>
       <span class="mar-left5 pull-right fa fa-refresh" uib-tooltip="Pending" ng-if="$ctrl.msgData.local"></span>
       <strong>
-        <a ui-sref="identities.show({ type: $ctrl.msgData.linkToAuthor[0], value: $ctrl.msgData.linkToAuthor[1] })" class="id-link">
-          <identicon ipfs="$ctrl.ipfs" identity="($ctrl.msgData.authorIsSelf && $ctrl.pageInfo) || $ctrl.msgData.author" class="mar-right5" border="3" width="35"></identicon>
-          <span ng-bind="($ctrl.msgData.authorIsSelf && $ctrl.pageInfo.primaryName)||$ctrl.msgData.author_name||$ctrl.msgData.linkToAuthor[1]"></span>
+        <a ui-sref="identities.show({ type: $ctrl.msgData.linkToAuthor.type, value: $ctrl.msgData.linkToAuthor.value })" class="id-link">
+          <identicon ipfs="$ctrl.ipfs" identity="$ctrl.msgData.author" class="mar-right5" border="3" width="35"></identicon>
+          <span ng-bind="$ctrl.msgData.author_name||$ctrl.msgData.linkToAuthor.value"></span>
         </a>
       </strong>
       <span ng-show="!$ctrl.msgData.sameAuthorAndRecipient">
         <small><i class="glyphicon glyphicon-play"></i></small>
-        <a ui-sref="identities.show({ type: $ctrl.msgData.linkToRecipient[0], value: $ctrl.msgData.linkToRecipient[1] })" class="id-link">
+        <a ui-sref="identities.show({ type: $ctrl.msgData.linkToRecipient.type, value: $ctrl.msgData.linkToRecipient.value })" class="id-link">
           <identicon ng-if="$ctrl.showRecipient" ipfs="$ctrl.ipfs" identity="$ctrl.msgData.recipient" class="mar-right5" border="3" width="35"></identicon>
-          <span ng-bind="($ctrl.msgData.recipientIsSelf && $ctrl.pageInfo.primaryName)||$ctrl.msgData.recipient_name||$ctrl.msgData.linkToRecipient[1]"></span>
+          <span ng-bind="($ctrl.msgData.recipientIsSelf && $ctrl.pageInfo.primaryName)||$ctrl.msgData.recipient_name||$ctrl.msgData.linkToRecipient.value"></span>
         </a>
       </span>
-       - <a ui-sref="messages.show({ id: ($ctrl.msgData.ipfsUri || $ctrl.msgData.hash) })" ng-bind="$ctrl.msgData.data.timestamp|date:'medium'" class="text-muted small" style="display:inline-block;"></a>
+       - <a ui-sref="messages.show({ id: ($ctrl.msgData.ipfsUri || $ctrl.msgData.hash) })" ng-bind="$ctrl.msgData.signedData.timestamp|date:'medium'" class="text-muted small" style="display:inline-block;"></a>
     </p>
 
     <p ng-if="$ctrl.msgData.isVerification || $ctrl.msgData.isUnverification">
-      <small ng-repeat="recipient in $ctrl.msgData.data.recipient">
-        {{recipient[0]}}:
-        <span ng-if="recipient[0] == 'email' || recipient[0] == 'url'" ng-bind-html="recipient[1] | linky"></span>
-        <span ng-if="!(recipient[0] == 'email' || recipient[0] == 'url')" ng-bind="recipient[1]"></span>
+      <small ng-repeat="a in $ctrl.msgData.recipientArray">
+        {{a.type}}:
+        <span ng-if="a.type == 'email' || a.type == 'url'" ng-bind-html="a.value | linky"></span>
+        <span ng-if="!(a.type == 'email' || a.type == 'url')" ng-bind="a.value"></span>
         <i class="fa fa-link" ng-if="!$last && $ctrl.msgData.isVerification"></i>
         <i class="fa fa-chain-broken" ng-if="!$last && $ctrl.msgData.isUnverification"></i>
       </small>
     </p>
 
-    <p ng-bind-html="$ctrl.msgData.data.comment|linky"></p>
+    <p ng-bind-html="$ctrl.msgData.signedData.comment|linky"></p>
   </div>
 </div>

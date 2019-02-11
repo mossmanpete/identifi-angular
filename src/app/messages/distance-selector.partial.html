@@ -2,8 +2,8 @@
   Viewing as:
   <br class="hidden-sm">
   <span ng-if="viewpoint">
-    <a ui-sref="identities.show({ type: viewpoint.name, value: viewpoint.val })" class="id-link">
-      <span class="distance-container mar-right5 mar-left5"><identicon ipfs="ipfs" identity="viewpoint.identity" class="" border="3" width="35"></identicon></span><strong ng-bind="viewpoint.mostVerifiedAttributes.name.attribute.val"></strong>
+    <a ui-sref="identities.show({ type: viewpoint.type, value: viewpoint.value })" class="id-link">
+      <span class="distance-container mar-right5 mar-left5"><identicon ipfs="ipfs" identity="viewpoint.identity" class="" border="3" width="35"></identicon></span><strong ng-bind="viewpoint.mostVerifiedAttributes.name.attribute.value"></strong>
     </a>
   </span>
   <br class="hidden-sm">

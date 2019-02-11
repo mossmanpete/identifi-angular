@@ -1,6 +1,6 @@
 <div class="panel panel-default panel-default">
   <div class="panel-body">
-    <form ng-submit="createMessage($event, { type: 'post', comment: newMessage.comment, recipient: [['keyID', authentication.user.idValue]] })">
+    <form ng-submit="createMessage($event, { type: 'post', comment: newMessage.comment })">
       <div class="form-group">
         <textarea style="resize: vertical" ng-disabled="!authentication.user" name="comment" class="form-control" id="comment" ng-model="newMessage.comment" placeholder="What's on your mind?"></textarea>
       </div>

@@ -22,7 +22,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
     $scope.activateTab = (tabId) -> $scope.activeTab = tabId
     $scope.sent = []
     $scope.received = []
-    $scope.connections = {}
+    $scope.attributes = {}
     thumbsUpObj = {}
     thumbsDownObj = {}
     $scope.thumbsUp = []
@@ -101,9 +101,9 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           mostConfirmations = c.conf
         else
           mostConfirmations = 1
-        $scope.connections = Object.values(connections).sort (a, b) ->
+        $scope.attributes = Object.values(connections).sort (a, b) ->
           (b.conf - 2 * b.ref) - (a.conf - 2 * a.ref)
-        for conn in $scope.connections
+        for conn in $scope.attributes
           return unless conn.name and conn.val
           conn.attr = new $window.identifiLib.Attribute(conn.type, conn.value)
           conn.isCurrent = new $window.identifiLib.Attribute($scope.idType, $scope.idValue).equals(conn.attr)
@@ -191,7 +191,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
             else
               conn.rowClass = 'danger'
           $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
-        $scope.connectionsLength = Object.keys($scope.connections).length
+        $scope.attributesLength = Object.keys($scope.attributes).length
 
 
     $scope.getConnectingMsgs = (id1, id2) ->
@@ -214,7 +214,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.verifications.forEach (msg) ->
           hasId1 = hasId2 = false
           for id in msg.signedData.recipient
-            return msgs.push msg if id[0] == id2.name and id[1] == id2.val
+            return msgs.push msg if id.type == id2.type and id.value == id2.value
         return msgs
 
     $scope.connectionClicked = (event, id) ->

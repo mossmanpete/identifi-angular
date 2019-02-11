@@ -36,10 +36,7 @@ angular.module('identifiAngular').controller 'MainController', [
         return 'https://identi.fi/' + $state.href('identities.show', {type, value}) + '?share'
 
     $scope.getIdKey = (id) ->
-      if Array.isArray(id)
-        return encodeURIComponent(id[0]) + ':' + encodeURIComponent(id[1])
-      else
-        return encodeURIComponent(id.type) + ':' + encodeURIComponent(id.value)
+      return encodeURIComponent(id.type) + ':' + encodeURIComponent(id.value)
 
     $scope.defaultIndexKeyID = '_D8nRhjFgAGo8frfJHMi4H7M7fTMB2LJshgeKyLaL1Y.9uNU0eQO-1ThgA9fJXFFN3yYbk9SNewC2Pz4mvQvGUE'
     $scope.query = {}
@@ -112,7 +109,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.viewpoint = {type: 'keyID', value: $scope.defaultIndexKeyID}
       setIndex new $window.identifiLib.Index($scope.gun.user($scope.defaultIndexKeyID).get('identifi'))
 
-    $scope.loginWithKey = (privateKeySerialized) ->
+    $scope.loginWithKey = (privateKeySerialized, self) ->
       $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
       localStorageService.set('identifiKey', privateKeySerialized)
       $scope.authentication.user =
@@ -124,7 +121,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.viewpoint = {type: 'keyID', value: keyID}
       $scope.ids.list = []
       $scope.msgs.list = []
-      $window.identifiLib.Index.create($scope.gun, $scope.privateKey).then (i) ->
+      $window.identifiLib.Index.create($scope.gun, $scope.privateKey, {self}).then (i) ->
         setIndex(i)
         $scope.authentication.identity = $scope.identifiIndex.get('keyID', keyID)
         $scope.authentication.identity.gun.get('attrs').open (val, key, msg, eve) ->
@@ -307,24 +304,15 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.createUser = (name) ->
       $scope.creatingUser = true
+      self = {name}
       $window.identifiLib.Key.generate()
       .then (key) ->
         $scope.privateKey = key
         $scope.privateKeySerialized = $window.identifiLib.Key.toJwk($scope.privateKey)
-        $scope.loginWithKey($scope.privateKeySerialized)
-      .then ->
-        recipient =
-          keyID: $window.identifiLib.Key.getId($scope.privateKey),
-          name: name
-        $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey)
+        self.keyID = $window.identifiLib.Key.getId($scope.privateKey)
+        $scope.loginWithKey($scope.privateKeySerialized, self)
       .then (msg) ->
-        added = false
-        $scope.$watch 'identifiIndex', () ->
-          return if added
-          $scope.creatingUser = false
-          added = true
-          console.log 'msg', msg
-          $scope.identifiIndex.addMessage(msg, $scope.ipfs)
+        $scope.creatingUser = false
       .catch (e) ->
         console.error('failed to create user:', e)
         $scope.creatingUser = false
@@ -401,7 +389,7 @@ angular.module('identifiAngular').controller 'MainController', [
     $scope.setMsgRawData = (msg) ->
       showRawData =
         hash: msg.hash
-        data: msg.data
+        data: msg.signedData
         priority: msg.priority
         jws: msg.jws
       msg.strData = JSON.stringify(showRawData, undefined, 2)
@@ -443,7 +431,6 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.processMessages = (messages, msgOptions) ->
       processMessage = (msg) ->
-        msg.data = msg.signedData
         msg.author = msg.getAuthor($scope.identifiIndex)
         msg.author.gun.get('trustDistance').on (d) -> msg.authorTrustDistance = d
         msg.author.gun.get('attrs').open (d) ->
@@ -461,12 +448,12 @@ angular.module('identifiAngular').controller 'MainController', [
             $scope.$apply -> msg.recipient_name = mva.nickname.attribute.value
         $scope.$apply ->
           # TODO: make sure message signature is checked
-          msg.linkToAuthor = msg.data.author[0]
           i = undefined
           i = 0
           smallestIndex = 1000
-          it = msg.getAuthorIterable()
-          while a = it.next()
+          msg.authorArray = msg.getAuthorArray()
+          for a in msg.authorArray
+            msg.linkToAuthor = a unless msg.linkToAuthor
             index = Object.keys($window.identifiLib.Attribute.getUniqueIdValidators()).indexOf(a.type)
             if index > -1 and index < smallestIndex
               smallestIndex = index
@@ -474,11 +461,11 @@ angular.module('identifiAngular').controller 'MainController', [
             else if !msg.author_name and a.type in ['name', 'nickname']
               msg.author_name = a.value
             i++
-          # msg.linkToRecipient = msg.data.recipient[0]
           i = 0
           smallestIndex = 1000
-          it = msg.getAuthorIterable()
-          while a = it.next()
+          msg.recipientArray = msg.getRecipientArray()
+          for a in msg.getRecipientArray
+            msg.linkToRecipient = a unless msg.linkToAuthor
             index = Object.keys($window.identifiLib.Attribute.getUniqueIdValidators()).indexOf(a.type)
             if index > -1 and index < smallestIndex
               smallestIndex = index
@@ -488,12 +475,11 @@ angular.module('identifiAngular').controller 'MainController', [
             i++
           if msg.linkToAuthor.equals(msg.linkToRecipient)
             msg.sameAuthorAndRecipient = true
-          signedData = msg.data
           alpha = undefined
           msg.iconStyle = ''
           msg.bgColor = ''
           msg.iconCount = new Array(1)
-          switch signedData.type
+          switch msg.signedData.type
             when 'verify_identity', 'verification'
               msg.iconStyle = 'glyphicon glyphicon-ok-sign'
               msg.isVerification = true

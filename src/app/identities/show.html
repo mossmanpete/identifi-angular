@@ -159,7 +159,7 @@
                 </div>
                 <div ng-if="isUniqueType" class="mar-top10 quick-contact">
                   <ul class="list-unstyled">
-                    <li ng-repeat="id in connections" ng-if="id.quickContact"><a ng-href="{{id.link}}"><span ng-class="id.iconStyle"></span><span ng-bind="id.linkName || id.val"></span></a></li>
+                    <li ng-repeat="a in attributes" ng-if="a.quickContact"><a ng-href="{{a.link}}"><span ng-class="a.iconStyle"></span><span ng-bind="a.linkName || a.value"></span></a></li>
                     <li ng-if="stats.first_seen">
                       <span class="fa fa-calendar"></span>First seen:
                        <span ng-if="stats.first_seen" ng-bind="stats.first_seen|date:'mediumDate'"></span>
@@ -174,9 +174,9 @@
                   <a ng-repeat="msg in thumbsUp | orderBy:'authorTrustDistance'"
                     ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 4 }"
                     class="mar-right5 mar-bot5"
-                    ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
+                    ui-sref="identities.show({ type: msg.linkToAuthor.type, value: msg.linkToAuthor.value })"
                     title=""
-                    uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}"><identicon ipfs="ipfs" identity="msg.author" class="no-glow" border="3" width="60"></identicon></a>
+                    uib-tooltip="{{ msg.author_name || msg.linkToAuthor.value }}"><identicon ipfs="ipfs" identity="msg.author" class="no-glow" border="3" width="60"></identicon></a>
                 </div>
 
                 <div ng-if="isUniqueType && hasThumbsDown" class="stats-box mar-bot10">
@@ -184,9 +184,9 @@
                   <a ng-repeat="msg in thumbsDown | orderBy:'authorTrustDistance'"
                   ng-class="{ 'hidden-xs': $index > 3, 'hidden-sm': $index > 4 }"
                   class="mar-right5 mar-bot5"
-                  ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })"
+                  ui-sref="identities.show({ type: msg.linkToAuthor.type, value: msg.linkToAuthor.value })"
                   title=""
-                  uib-tooltip="{{ msg.author_name || msg.linkToAuthor[1] }}"><identicon ipfs="ipfs" identity="msg.author" class="no-glow" border="3" width="60"></identicon></a>
+                  uib-tooltip="{{ msg.author_name || msg.linkToAuthor.value }}"><identicon ipfs="ipfs" identity="msg.author" class="no-glow" border="3" width="60"></identicon></a>
                 </div>
               </div>
             </div>
@@ -219,7 +219,7 @@
 
               <div ng-show="authentication.user && !isCurrentUser" class="panel panel-default panel-success">
                 <div class="panel-body" id="write-feedback">
-                  <form ng-controller="MessagesController" ng-submit="createMessage($event, { type: 'rating', rating: newMessage.rating, comment: newMessage.comment, recipient: [[idType, idValue]] })">
+                  <form ng-controller="MessagesController" ng-submit="createMessage($event, { type: 'rating', rating: newMessage.rating, comment: newMessage.comment })">
                     <div class="form-group">
                       <textarea name="comment" class="form-control" id="comment" ng-model="newMessage.comment" placeholder="Write feedback"></textarea>
                     </div>
@@ -297,44 +297,44 @@
                   <!-- <input id="authenticity_token" name="authenticity_token" type="hidden" value="z1JM7ffnFK7gOv6S3yzG9UFyakukYHikAU94/3TcT2o="> -->
                   <table class="table truncated-table table-hover">
                     <tbody>
-                      <tr ng-repeat-start="id in connections" style="{{id.rowStyle}}" ng-class="id.rowClass" ng-click="!id.isCurrent && connectionClicked($event, id)" class="id-row">
+                      <tr ng-repeat-start="a in attributes" style="{{a.rowStyle}}" ng-class="a.rowClass" ng-click="!a.isCurrent && connectionClicked($event, id)" class="id-row">
                         <td>
                           <div class="visible-xs mar-bot5">
-                            <a ui-sref="identities.show({ type: id.name, value: id.val })" ng-bind="id.linkName || id.val" class="id-link"></a>
+                            <a ui-sref="identities.show({ type: a.type, value: a.value })" ng-bind="a.linkName || a.value" class="id-link"></a>
                             <br>
-                            <small ng-bind="id.name"></small>
+                            <small ng-bind="a.type"></small>
                           </div>
                           <div>
-                            <a ng-hide="id.name === 'keyID' || id.name === 'uuid'" style="min-width:45px" class="pull-left btn btn-lg btn-social-icon mar-right15" ng-class="id.btnStyle" ng-href="{{id.link}}">
-                              <span ng-class="id.iconStyle"></span>
-                              <span ng-if="id.iconStyle&&!id.link" class="pull-left btn btn-lg btn-social-icon" ng-class="id.btnStyle" ng-href="{{id.link}}">
-                              <span ng-class="id.iconStyle"></span>
+                            <a ng-hide="a.type === 'keyID' || a.type === 'uuid'" style="min-width:45px" class="pull-left btn btn-lg btn-social-icon mar-right15" ng-class="a.btnStyle" ng-href="{{a.link}}">
+                              <span ng-class="a.iconStyle"></span>
+                              <span ng-if="a.iconStyle&&!a.link" class="pull-left btn btn-lg btn-social-icon" ng-class="a.btnStyle" ng-href="{{a.link}}">
+                              <span ng-class="a.iconStyle"></span>
                             </a>
-                            <identicon identity="id.attr" ng-show="id.attr && (id.name === 'keyID' || id.name === 'uuid')" width="45"></identicon>
+                            <identicon identity="a.attr" ng-show="a.attr && (a.type === 'keyID' || a.type === 'uuid')" width="45"></identicon>
                             <div class="hidden-xs pull-left">
-                              <a ui-sref="identities.show({ type: id.name, value: id.val })" ng-bind="id.linkName || id.val" class="id-link"></a>
+                              <a ui-sref="identities.show({ type: a.type, value: a.value })" ng-bind="a.linkName || a.value" class="id-link"></a>
                               <br>
-                              <small ng-bind="id.name"></small>
+                              <small ng-bind="a.type"></small>
                             </div>
                             <!--
                               <input class="form-control linkedComment" type="text" placeholder="comment" disabled>
                             -->
-                            <div class="pull-right" ng-if="!id.isCurrent">
-                              <button autocomplete="off" name="confirm" class="btn btn-default btn-confirm" ng-click="createMessage($event, { type: 'verify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out">
-                                <span class="positive glyphicon glyphicon-ok"></span> {{id.conf}}
+                            <div class="pull-right" ng-if="!a.isCurrent">
+                              <button autocomplete="off" name="confirm" class="btn btn-default btn-confirm" ng-click="createMessage($event, { type: 'verification' }, id)" ng-disabled="!authentication.user" uib-tooltip="Verify" data-style="zoom-out">
+                                <span class="positive glyphicon glyphicon-ok"></span> {{a.conf}}
                               </button>
-                              <button autocomplete="off" name="unverify" class="btn btn-default btn-unverify" ng-click="createMessage($event, { type: 'unverify_identity', recipient: [[idType, idValue], [id.name, id.val]] }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out">
-                                <span class="negative glyphicon glyphicon-remove"></span> {{id.ref}}
+                              <button autocomplete="off" name="unverify" class="btn btn-default btn-unverify" ng-click="createMessage($event, { type: 'unverification' }, id)" ng-disabled="!authentication.user" uib-tooltip="Unverify" data-style="zoom-out">
+                                <span class="negative glyphicon glyphicon-remove"></span> {{a.ref}}
                               </button>
                             </div>
                             <div class="clear"></div>
                           </div>
                         </td>
                       </tr>
-                      <tr ng-repeat-end ng-if="!id.isCurrent" class="active connectingmsgs">
+                      <tr ng-repeat-end ng-if="!a.isCurrent" class="active connectingmsgs">
                         <td class="connectingmsgs" data-style="zoom-in" data-spinner-color="#000">
-                          <div uib-collapse="!id.collapse">
-                            <div ng-repeat="msg in id.connecting_msgs" ng-click="openMessage($event, msg, 'lg')" class="confirmation-panel">
+                          <div uib-collapse="!a.collapse">
+                            <div ng-repeat="msg in a.connecting_msgs" ng-click="openMessage($event, msg, 'lg')" class="confirmation-panel">
                                 <span ng-if="msg.data.type === 'verify_identity'">
                                   <span class="positive glyphicon glyphicon-ok hidden-xs mar-left5 pull-right"></span>
                                   <span class="positive glyphicon glyphicon-ok visible-xs-inline-block mar-right10"></span>
@@ -344,9 +344,9 @@
                                   <span class="negative glyphicon glyphicon-remove visible-xs-inline-block mar-right10"></span>
                                 </span>
                                 <strong>
-                                  <a ui-sref="identities.show({ type: msg.linkToAuthor[0], value: msg.linkToAuthor[1] })" class="id-link">
+                                  <a ui-sref="identities.show({ type: msg.linkToAuthor.type, value: msg.linkToAuthor.value })" class="id-link">
                                     <identicon ipfs="ipfs" identity="msg" class="mar-right5" border="3" width="30" positive-score="msg.author_pos" negative-score="msg.author_neg"></identicon>
-                                    <span ng-bind="msg.author_name||msg.data.author[0][1]"></span>
+                                    <span ng-bind="msg.author_name||msg.data.author.type.value"></span>
                                   </a>
                                 </strong>
                                  - <span ng-bind="msg.data.timestamp|date:'mediumDate'" class="text-muted small" style="display:inline-block;"></span>
@@ -359,7 +359,7 @@
                           <input id="addValue" ng-change="guessAttributeType()" ng-model="newVerification.value" class="form-control" name="linkedValue" type="text" placeholder="value (e.g. alice@example.com)" ng-disabled="!authentication.user">
                           <input id="addType" ng-model="newVerification.type" class="form-control" name="linkedType" type="text" placeholder="type (e.g. email)" ng-disabled="!authentication.user">
                         <!--<td><input id="addComment" class="form-control" name="linkedComment" type="text" placeholder="comment" disabled></td> -->
-                          <button autocomplete="off" id="addButton" ng-click="createMessage($event, { type: 'verify_identity', recipient: [[idType, idValue], [newVerification.type, newVerification.value]] }, { conf: 0, ref: 0, name: newVerification.type, val: newVerification.value })" class="btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user || !(newVerification.type && newVerification.value)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                          <button autocomplete="off" id="addButton" ng-click="createMessage($event, { type: 'verification', recipient: newVerification }, { conf: 0, ref: 0, name: newVerification.type, val: newVerification.value })" class="btn btn-default" data-style="zoom-out" ng-disabled="!authentication.user || !(newVerification.type && newVerification.value)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                         </td>
                       </tr>
                   </tbody>
