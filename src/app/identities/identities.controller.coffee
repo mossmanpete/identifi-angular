@@ -48,26 +48,16 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $state.reload()
 
     $scope.addEntry = (event, entry) ->
-      recipient = []
-      linkTo = null
-      if entry.name
-        recipient.push ['name', entry.name]
       if entry.email
-        recipient.push ['email', entry.email]
-        linkTo = { type: 'email', value: entry.email }
-      if entry.url
-        recipient.push ['url', entry.url]
-        linkTo = { type: 'url', value: entry.url } unless linkTo
-      if entry.phone
-        recipient.push ['phone', entry.phone]
-        linkTo = { type: 'phone', value: entry.phone } unless linkTo
-      unless entry.email or entry.url or entry.phone
-        uuid = $window.identifiLib.Attribute.getUuid()
-        recipient.push ['uuid', uuid.val]
-        linkTo = { type: 'uuid', value: uuid.val }
+        linkTo = {type:'email', value: entry.email}
+      else if entry.url
+        linkTo = {type:'url', value: entry.url}
+      else
+        linkTo = $window.identifiLib.Attribute.getUuid()
+        entry.uuid = linkTo.value
       params =
         type: 'verification'
-        recipient: recipient
+        recipient: entry
       $scope.createMessage(event, params).then (response) ->
         $state.go 'identities.show', linkTo
       , (error) ->
@@ -84,7 +74,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.addName = (name) ->
       if name
-        recipient = [[$scope.idType, $scope.idValue], ['name', name]]
+        recipient = {name}
+        recipient[$scope.idType] = $scope.idValue
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
           $scope.identifiIndex.addMessage(m, $scope.ipfs)
         $scope.nameAdded = true
@@ -92,7 +83,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         $scope.addingName = true
         focus('addNameFocus')
 
-    $scope.getConnections = ->
+    $scope.getAttributes = ->
       $scope.identity.gun.get('attrs').open (attrs) ->
         console.log attrs
         connections = attrs or []
@@ -103,94 +94,94 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
           mostConfirmations = 1
         $scope.attributes = Object.values(connections).sort (a, b) ->
           (b.conf - 2 * b.ref) - (a.conf - 2 * a.ref)
-        for conn in $scope.attributes
-          return unless conn.name and conn.val
-          conn.attr = new $window.identifiLib.Attribute(conn.type, conn.value)
-          conn.isCurrent = new $window.identifiLib.Attribute($scope.idType, $scope.idValue).equals(conn.attr)
-          switch conn.name
+        for a in $scope.attributes
+          return unless a.type and a.value
+          a.attr = new $window.identifiLib.Attribute(a.type, a.value)
+          a.isCurrent = new $window.identifiLib.Attribute($scope.idType, $scope.idValue).equals(a.attr)
+          switch a.type
             when 'email'
-              conn.iconStyle = 'glyphicon glyphicon-envelope'
-              conn.btnStyle = 'btn-success'
-              conn.link = 'mailto:' + conn.val
-              conn.quickContact = true
+              a.iconStyle = 'glyphicon glyphicon-envelope'
+              a.btnStyle = 'btn-success'
+              a.link = 'mailto:' + a.value
+              a.quickContact = true
             when 'bitcoin_address', 'bitcoin'
-              conn.iconStyle = 'fa fa-bitcoin'
-              conn.btnStyle = 'btn-primary'
-              conn.link = 'https://blockchain.info/address/' + conn.val
-              conn.quickContact = true
+              a.iconStyle = 'fa fa-bitcoin'
+              a.btnStyle = 'btn-primary'
+              a.link = 'https://blockchain.info/address/' + a.value
+              a.quickContact = true
             when 'gpg_fingerprint', 'gpg_keyid'
-              conn.iconStyle = 'fa fa-key'
-              conn.btnStyle = 'btn-default'
-              conn.link = 'https://pgp.mit.edu/pks/lookup?op=get&search=0x' + conn.val
+              a.iconStyle = 'fa fa-key'
+              a.btnStyle = 'btn-default'
+              a.link = 'https://pgp.mit.edu/pks/lookup?op=get&search=0x' + a.value
             when 'account'
-              conn.iconStyle = 'fa fa-at'
+              a.iconStyle = 'fa fa-at'
             when 'nickname'
               $scope.identity.hasProperName = true
-              conn.iconStyle = 'glyphicon glyphicon-font'
+              a.iconStyle = 'glyphicon glyphicon-font'
             when 'name'
               $scope.identity.hasProperName = true
-              conn.iconStyle = 'glyphicon glyphicon-font'
+              a.iconStyle = 'glyphicon glyphicon-font'
             when 'tel', 'phone'
-              conn.iconStyle = 'glyphicon glyphicon-earphone'
-              conn.btnStyle = 'btn-success'
-              conn.link = 'tel:' + conn.val
-              conn.quickContact = true
+              a.iconStyle = 'glyphicon glyphicon-earphone'
+              a.btnStyle = 'btn-success'
+              a.link = 'tel:' + a.value
+              a.quickContact = true
             when 'keyID'
-              conn.iconStyle = 'fa fa-key'
+              a.iconStyle = 'fa fa-key'
             when 'coverPhoto'
-              if conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-                $scope.ipfsGet(conn.val).then (coverPhoto) ->
+              if a.value.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+                $scope.ipfsGet(a.value).then (coverPhoto) ->
                   $scope.coverPhoto = $scope.coverPhoto or { 'background-image': 'url(data:image;base64,' + coverPhoto.toString('base64') + ')' }
             when 'url'
-              conn.link = conn.val
-              if conn.val.indexOf('facebook.com/') > -1
-                conn.iconStyle = 'fa fa-facebook'
-                conn.btnStyle = 'btn-facebook'
-                conn.link = conn.val
-                conn.linkName = conn.val.split('facebook.com/')[1]
-                conn.quickContact = true
-              else if conn.val.indexOf('twitter.com/') > -1
-                conn.iconStyle = 'fa fa-twitter'
-                conn.btnStyle = 'btn-twitter'
-                conn.link = conn.val
-                conn.linkName = conn.val.split('twitter.com/')[1]
-                conn.quickContact = true
-              else if conn.val.indexOf('plus.google.com/') > -1
-                conn.iconStyle = 'fa fa-google-plus'
-                conn.btnStyle = 'btn-google-plus'
-                conn.link = conn.val
-                conn.linkName = conn.val.split('plus.google.com/')[1]
-                conn.quickContact = true
-              else if conn.val.indexOf('linkedin.com/') > -1
-                conn.iconStyle = 'fa fa-linkedin'
-                conn.btnStyle = 'btn-linkedin'
-                conn.link = conn.val
-                conn.linkName = conn.val.split('linkedin.com/')[1]
-                conn.quickContact = true
-              else if conn.val.indexOf('github.com/') > -1
-                conn.iconStyle = 'fa fa-github'
-                conn.btnStyle = 'btn-github'
-                conn.link = conn.val
-                conn.linkName = conn.val.split('github.com/')[1]
-                conn.quickContact = true
+              a.link = a.value
+              if a.value.indexOf('facebook.com/') > -1
+                a.iconStyle = 'fa fa-facebook'
+                a.btnStyle = 'btn-facebook'
+                a.link = a.value
+                a.linkName = a.value.split('facebook.com/')[1]
+                a.quickContact = true
+              else if a.value.indexOf('twitter.com/') > -1
+                a.iconStyle = 'fa fa-twitter'
+                a.btnStyle = 'btn-twitter'
+                a.link = a.value
+                a.linkName = a.value.split('twitter.com/')[1]
+                a.quickContact = true
+              else if a.value.indexOf('plus.google.com/') > -1
+                a.iconStyle = 'fa fa-google-plus'
+                a.btnStyle = 'btn-google-plus'
+                a.link = a.value
+                a.linkName = a.value.split('plus.google.com/')[1]
+                a.quickContact = true
+              else if a.value.indexOf('linkedin.com/') > -1
+                a.iconStyle = 'fa fa-linkedin'
+                a.btnStyle = 'btn-linkedin'
+                a.link = a.value
+                a.linkName = a.value.split('linkedin.com/')[1]
+                a.quickContact = true
+              else if a.value.indexOf('github.com/') > -1
+                a.iconStyle = 'fa fa-github'
+                a.btnStyle = 'btn-github'
+                a.link = a.value
+                a.linkName = a.value.split('github.com/')[1]
+                a.quickContact = true
               else
-                conn.iconStyle = 'glyphicon glyphicon-link'
-                conn.btnStyle = 'btn-default'
-          if conn.val and conn.val.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
-            conn.link = 'https://ipfs.io' + conn.val
-            conn.linkName = conn.val
-            conn.iconStyle = 'glyphicon glyphicon-link'
-            conn.btnStyle = 'btn-default'
-          if conn.conf + conn.ref > 0
-            percentage = conn.conf * 100 / (conn.conf + conn.ref)
+                a.iconStyle = 'glyphicon glyphicon-link'
+                a.btnStyle = 'btn-default'
+          if a.value and a.value.match /^\/ipfs\/[1-9A-Za-z]{40,60}$/
+            a.link = 'https://ipfs.io' + a.value
+            a.linkName = a.value
+            a.iconStyle = 'glyphicon glyphicon-link'
+            a.btnStyle = 'btn-default'
+          if a.conf + a.ref > 0
+            percentage = a.conf * 100 / (a.conf + a.ref)
             if percentage >= 80
-              alpha = conn.conf / mostConfirmations * 0.7 + 0.3
-              # conn.rowStyle = 'background-color: rgba(223,240,216,' + alpha + ')'
+              alpha = a.conf / mostConfirmations * 0.7 + 0.3
+              # a.rowStyle = 'background-color: rgba(223,240,216,' + alpha + ')'
             else if percentage >= 60
-              conn.rowClass = 'warning'
+              a.rowClass = 'warning'
             else
-              conn.rowClass = 'danger'
-          $scope.hasQuickContacts = $scope.hasQuickContacts or conn.quickContact
+              a.rowClass = 'danger'
+          $scope.hasQuickContacts = $scope.hasQuickContacts or a.quickContact
         $scope.attributesLength = Object.keys($scope.attributes).length
 
 
@@ -259,8 +250,8 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
 
     $scope.uploadCoverPhoto = (blob, identity) ->
       $scope.uploadFile(blob).then (files) ->
-        console.log files, $scope.identity
-        recipient = [[$scope.idType, $scope.idValue], ['coverPhoto', '/ipfs/' + files[0].path]]
+        recipient = {coverPhoto: '/ipfs/' + files[0].path}
+        recipient[$scope.idType] = $scope.idValue
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
           $scope.identifiIndex.addMessage(m, $scope.ipfs)
           $scope.uploadModal.close()
@@ -312,7 +303,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
       $scope.setIdentityNames($scope.identity, false, true)
       $scope.identity.gun.on (data) ->
         $scope.identity.data = data
-      $scope.getConnections()
+      $scope.getAttributes()
       $scope.getSentMsgs()
       $scope.getReceivedMsgs()
       $scope.identity.gun.get('scores').open (scores) ->

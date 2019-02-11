@@ -163,9 +163,8 @@ angular.module('identifiAngular').controller 'MainController', [
       return unless $scope.authentication.identity
       $scope.openUploadModal($scope.uploadProfilePhoto, 'Upload profile photo', true)
 
-    $scope.uploadProfilePhoto = (blob, identity) ->
+    $scope.uploadProfilePhoto = (blob) ->
       $scope.uploadFile(blob).then (files) ->
-        console.log files, $scope.identity
         recipient =
           profilePhoto: '/ipfs/' + files[0].path
         if $state.is 'identities.show'
@@ -178,7 +177,7 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.identifiIndex.addMessage(m, $scope.ipfs).then ->
             $scope.hideProfilePhoto = false
             if !$state.is 'identities.show'
-              $state.go 'identities.show', { type: id.idType, value: id.idValue }
+              $state.go 'identities.show', { type: $scope.authentication.user.idType, value: $scope.authentication.user.idValue }
           $scope.uploadModal.close()
 
     $scope.setPageTitle = (title) ->
@@ -210,10 +209,16 @@ angular.module('identifiAngular').controller 'MainController', [
         value: ''
     $scope.resetMsg()
     # Create new Message
-    $scope.createMessage = (event, params, id) ->
+    $scope.createMessage = (event, params, verifiedAttr) ->
       event.stopPropagation() if event
       # Create new Message object
       message = null
+      params.recipient = params.recipient || {}
+      if $state.is 'identities.show'
+        params.recipient[$stateParams.type] = $stateParams.value
+        params.recipient[verifiedAttr.type] = verifiedAttr.value if verifiedAttr
+      else unless $state.is 'identities.create'
+        params.recipient.keyID = $scope.authentication.user.idValue
       if params.type == 'rating'
         params.maxRating |= 3
         params.minRating |= -3
@@ -358,8 +363,8 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.loadDefaultIndex()
       $scope.localSettings = {}
 
-    $scope.msgFilter = (value, index, array) ->
-      data = value.data or value.signedData
+    $scope.msgFilter = (msg, index, array) ->
+      data = msg.signedData
       if $scope.filters.type
         if $scope.filters.type.match /^rating/
           if data.type != 'rating'
@@ -464,7 +469,7 @@ angular.module('identifiAngular').controller 'MainController', [
           i = 0
           smallestIndex = 1000
           msg.recipientArray = msg.getRecipientArray()
-          for a in msg.getRecipientArray
+          for a in msg.recipientArray
             msg.linkToRecipient = a unless msg.linkToAuthor
             index = Object.keys($window.identifiLib.Attribute.getUniqueIdValidators()).indexOf(a.type)
             if index > -1 and index < smallestIndex
@@ -491,12 +496,12 @@ angular.module('identifiAngular').controller 'MainController', [
               msg.iconStyle = 'fa fa-pencil'
               msg.isPost = true
             when 'rating'
-              rating = signedData.rating
-              neutralRating = (signedData.minRating + signedData.maxRating) / 2
-              maxRatingDiff = signedData.maxRating - neutralRating
-              minRatingDiff = signedData.minRating - neutralRating
+              rating = msg.signedData.rating
+              neutralRating = (msg.signedData.minRating + msg.signedData.maxRating) / 2
+              maxRatingDiff = msg.signedData.maxRating - neutralRating
+              minRatingDiff = msg.signedData.minRating - neutralRating
               if rating > neutralRating
-                if signedData.context == 'verifier'
+                if msg.signedData.context == 'verifier'
                   msg.iconStyle = 'fa fa-shield positive'
                 else
                   msg.iconStyle = 'glyphicon glyphicon-thumbs-up positive'
