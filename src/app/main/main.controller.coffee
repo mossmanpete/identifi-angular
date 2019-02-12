@@ -75,6 +75,7 @@ angular.module('identifiAngular').controller 'MainController', [
       cursor = false
       if $scope.ids.list.length
         cursor = $scope.ids.list[$scope.ids.list.length - 1].cursor
+      seen = {}
 
       resultFound = (i) ->
         return if searchKey != $scope.searchKey
@@ -83,10 +84,13 @@ angular.module('identifiAngular').controller 'MainController', [
           i.data = data
           i.gun.get('linkTo').on (linkTo) ->
             return if i.linkTo or !linkTo
+            s = linkTo.type + linkTo.value
+            return if seen[s]
+            seen[s] = true
+            $scope.ids.list.push i
             $scope.$apply ->
               i.linkTo = linkTo
         $scope.setIdentityNames(i, true)
-        $scope.ids.list.push i
 
       $scope.identifiIndex.search(searchKey, undefined, resultFound, limit, cursor)
       return new Promise (resolve) -> # TODO: uib-typeahead is limited, but something better pls
