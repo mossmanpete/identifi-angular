@@ -6,14 +6,25 @@
   "files": "dist",
   "scripts": {
     "test": "gulp test",
-    "electron": "DEV=true electron ."
+    "electron": "DEV=true electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "fi.identi",
+    "mac": {
+      "category": "public.app-category.social-networking"
+    },
+    "directories": {
+      "output": "electron"
+    }
   },
   "devDependencies": {
     "browser-sync": "~2.24.4",
     "browser-sync-spa": "~1.0.3",
     "chalk": "~2.4.1",
     "del": "~3.0.0",
-    "electron": "^4.0.4",
     "eslint-plugin-angular": "~3.3.0",
     "estraverse": "~4.2.0",
     "gulp": "~3.9.0",
@@ -42,7 +53,6 @@
     "gulp-uglify": "~3.0.0",
     "gulp-useref": "~3.1.2",
     "gulp-util": "~3.0.6",
-    "gun": "mmalmi/gun#feature-multicast",
     "handlebars": "~4.0.3",
     "http-proxy-middleware": "~0.18.0",
     "karma": "~2.0.2",
@@ -55,6 +65,11 @@
     "uglify-save-license": "~0.4.1",
     "wiredep": "~4.0.0",
     "wrench": "~1.5.8"
+  },
+  "optionalDependencies": {
+    "gun": "mmalmi/gun#feature-multicast",
+    "electron": "^4.0.4",
+    "electron-builder": "^20.38.5"
   },
   "engines": {
     "node": ">=0.10.0"

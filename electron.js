@@ -14,7 +14,8 @@ function createWindow() {
   win = new BrowserWindow({
     width: 800,
     height: 600,
-    webPreferences: {nodeIntegration: true}
+    webPreferences: {nodeIntegration: true},
+    icon: path.join(__dirname, 'dist/assets/images/icon128.png')
   });
 
   // load the dist folder from Angular

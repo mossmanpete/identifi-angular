@@ -13,8 +13,8 @@ Available at:
 ```
 git clone https://github.com/identifi/identifi-angular.git
 cd identifi-angular
-npm install --global gulp-cli bower
-npm install
+yarn global add gulp-cli bower
+yarn install
 bower install
 gulp serve
 ```
