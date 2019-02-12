@@ -6,7 +6,7 @@
   "files": "dist",
   "scripts": {
     "test": "gulp test",
-    "electron": "electron ."
+    "electron": "DEV=true electron ."
   },
   "devDependencies": {
     "browser-sync": "~2.24.4",
