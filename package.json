@@ -1,6 +1,8 @@
 {
   "name": "identifi-angular",
   "version": "1.22.31",
+  "description": "Social networking freedom",
+  "author": "Martti Malmi",
   "main": "electron.js",
   "dependencies": {},
   "files": "dist",
