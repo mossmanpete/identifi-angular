@@ -107,7 +107,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
     $scope.loadDefaultIndex = ->
       $scope.viewpoint = {type: 'keyID', value: $scope.defaultIndexKeyID}
-      setIndex new $window.identifiLib.Index($scope.gun.user($scope.defaultIndexKeyID).get('identifi'))
+      setIndex new $window.identifiLib.Index($scope.gun.user($scope.defaultIndexKeyID).get('identifi'), {ipfs: $scope.ipfs})
 
     $scope.loginWithKey = (privateKeySerialized, self) ->
       $scope.privateKey = $window.identifiLib.Key.fromJwk(privateKeySerialized)
@@ -121,7 +121,7 @@ angular.module('identifiAngular').controller 'MainController', [
       $scope.viewpoint = {type: 'keyID', value: keyID}
       $scope.ids.list = []
       $scope.msgs.list = []
-      $window.identifiLib.Index.create($scope.gun, $scope.privateKey, {self}).then (i) ->
+      $window.identifiLib.Index.create($scope.gun, $scope.privateKey, {self, ipfs: $scope.ipfs}).then (i) ->
         setIndex(i)
         $scope.authentication.identity = $scope.identifiIndex.get('keyID', keyID)
         $scope.authentication.identity.gun.get('attrs').open (val, key, msg, eve) ->
@@ -174,7 +174,7 @@ angular.module('identifiAngular').controller 'MainController', [
           $scope.closeProfileUploadNotification()
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
           $scope.hideProfilePhoto = true # There's a weird bug where the profile identicon doesn't update
-          $scope.identifiIndex.addMessage(m, $scope.ipfs).then ->
+          $scope.identifiIndex.addMessage(m).then ->
             $scope.hideProfilePhoto = false
             if !$state.is 'identities.show'
               $state.go 'identities.show', { type: $scope.authentication.user.idType, value: $scope.authentication.user.idValue }
@@ -231,7 +231,7 @@ angular.module('identifiAngular').controller 'MainController', [
 
       message.then (m) ->
         console.log m
-        $scope.identifiIndex.addMessage(m, $scope.ipfs)
+        $scope.identifiIndex.addMessage(m)
         if $scope.filters.type not in [params.type, null]
           $scope.filters.type = params.type
         $scope.resetMsg()
@@ -308,6 +308,8 @@ angular.module('identifiAngular').controller 'MainController', [
         fileReader.readAsArrayBuffer(blob)
 
     $scope.createUser = (name) ->
+      return if name.indexOf('{') != -1 or name.indexOf('}') != -1 # prevent accidental private key paste
+      name = name.trim()
       $scope.creatingUser = true
       self = {name}
       $window.identifiLib.Key.generate()

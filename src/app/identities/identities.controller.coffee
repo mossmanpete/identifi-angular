@@ -77,7 +77,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         recipient = {name}
         recipient[$scope.idType] = $scope.idValue
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
-          $scope.identifiIndex.addMessage(m, $scope.ipfs)
+          $scope.identifiIndex.addMessage(m)
         $scope.nameAdded = true
       else
         $scope.addingName = true
@@ -253,7 +253,7 @@ angular.module('identifiAngular').controller 'IdentitiesController', [
         recipient = {coverPhoto: '/ipfs/' + files[0].path}
         recipient[$scope.idType] = $scope.idValue
         $window.identifiLib.Message.createVerification({recipient}, $scope.privateKey).then (m) ->
-          $scope.identifiIndex.addMessage(m, $scope.ipfs)
+          $scope.identifiIndex.addMessage(m)
           $scope.uploadModal.close()
 
     $scope.openShareModal = () ->
