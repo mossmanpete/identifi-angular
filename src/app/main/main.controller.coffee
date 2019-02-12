@@ -219,8 +219,11 @@ angular.module('identifiAngular').controller 'MainController', [
       message = null
       params.recipient = params.recipient || {}
       if $state.is 'identities.show'
-        params.recipient[$stateParams.type] = $stateParams.value
-        params.recipient[verifiedAttr.type] = verifiedAttr.value if verifiedAttr
+        if $stateParams.type == verifiedAttr.type
+          params.recipient[$stateParams.type] = [$stateParams.value, verifiedAttr.value]
+        else
+          params.recipient[$stateParams.type] = $stateParams.value
+          params.recipient[verifiedAttr.type] = verifiedAttr.value if verifiedAttr
       else unless $state.is 'identities.create'
         params.recipient.keyID = $scope.authentication.user.idValue
       if params.type == 'rating'
