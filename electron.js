@@ -2,13 +2,19 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const url = require("url");
 
+const Gun = require("gun");
+require("gun/lib/multicast");
+const server = require('http').createServer(Gun.serve(__dirname + "/dist"));
+const gun = Gun({web: server.listen(8765), multicast: { port: 8765 } });
+console.log('Relay peer started on port ' + 8765 + ' with /gun');
+
 let win;
 
 function createWindow() {
   win = new BrowserWindow({
     width: 800,
     height: 600,
-    webPreferences: {nodeIntegration: false}
+    webPreferences: {nodeIntegration: true}
   });
 
   // load the dist folder from Angular
