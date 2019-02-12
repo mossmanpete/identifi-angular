@@ -219,7 +219,7 @@ angular.module('identifiAngular').controller 'MainController', [
       message = null
       params.recipient = params.recipient || {}
       if $state.is 'identities.show'
-        if $stateParams.type == verifiedAttr.type
+        if verifiedAttr and $stateParams.type == verifiedAttr.type
           params.recipient[$stateParams.type] = [$stateParams.value, verifiedAttr.value]
         else
           params.recipient[$stateParams.type] = $stateParams.value
